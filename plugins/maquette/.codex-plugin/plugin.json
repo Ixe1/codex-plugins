@@ -1,7 +1,7 @@
 {
   "name": "maquette",
   "version": "0.3.2",
-  "description": "Image-guided web design systems for Codex",
+  "description": "Image-guided brand kits, component libraries, and implemented website pages",
   "author": {
     "name": "Ixel",
     "url": "https://github.com/Ixe1"
@@ -19,7 +19,7 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Maquette",
-    "shortDescription": "Image-guided web design systems for Codex",
+    "shortDescription": "Generate brand kits, components, and pages with image-first QA",
     "longDescription": "Create website brand kits, reusable component libraries, and implemented pages through an image_gen-first contract-driven workflow.",
     "developerName": "Ixel",
     "category": "Design",
@@ -29,7 +29,11 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $maquette to run Maquette's staged image-guided website workflow. For broad site or page requests, create any missing focused brand kit first, then any missing component library or focused component/composite coverage, including responsive navigation for pages with primary nav, then the requested page. Do not skip directly to page concepts when brand or component artifacts are absent."
+      "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Run the full workflow: brand kit, component library, then homepage. Include product cards, marketing sections, newsletter signup, footer social links, and original generated image assets where useful.",
+      "Use $maquette-brand-kit to create a focused foundational website brand kit for a boutique snack brand. Generate and inspect a brand board first, then produce design-system JSON, CSS tokens, and approval notes.",
+      "Use $maquette-components to build a reusable component library from the existing approved brand kit. Include buttons, forms, cards, product cards, newsletter modules, footer/social modules, responsive navigation, and gallery QA.",
+      "Use $maquette-pages to create a pricing page from the existing approved brand kit and component library. Reuse existing components first, request focused missing component coverage only if needed, then implement and QA the page.",
+      "Use $maquette-pages to create a product listing page from the existing Maquette artifacts. Check product-card coverage, align repeated card actions, use recognizable footer social icons, and record responsive QA."
     ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.png",
