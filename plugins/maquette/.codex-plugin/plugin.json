@@ -30,6 +30,8 @@
       "Use Maquette to create an image-guided website design system."
     ],
     "brandColor": "#2563EB",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png",
     "screenshots": [
       "./assets/example-board.png",
       "./assets/example-page.png"
