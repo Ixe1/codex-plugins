@@ -36,6 +36,8 @@ The coded gallery/page screenshots are the verification artifacts.
 
 ## Example output
 
+![Example Maquette snack cakes page output](./assets/example-board.png)
+
 ![Example Maquette page output](./assets/example-page.png)
 
 ## How to use

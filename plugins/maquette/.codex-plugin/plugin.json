@@ -31,6 +31,7 @@
     ],
     "brandColor": "#2563EB",
     "screenshots": [
+      "./assets/example-board.png",
       "./assets/example-page.png"
     ]
   }
