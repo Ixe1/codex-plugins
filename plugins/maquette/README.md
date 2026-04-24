@@ -34,6 +34,68 @@ The visual artifact is the creative source and approval artifact.
 The structured JSON/CSS files are the machine-readable source of truth.
 The coded gallery/page screenshots are the verification artifacts.
 
+## How to use
+
+Maquette is usually used in three passes.
+
+### 1. Create a brand kit
+
+Start with `$maquette-brand-kit` and describe the company, product, audience, or aesthetic direction:
+
+```text
+$maquette-brand-kit Make a branding kit for a boutique accounting firm for creative studios.
+```
+
+This pass creates a brand board first, then turns it into design-system files such as:
+
+```text
+ui/brand/brief.md
+ui/brand/design-system.json
+ui/brand/tokens.css
+ui/brand/approved.md
+```
+
+Review the generated brand direction and ask for revisions until it is approved.
+
+### 2. Build the component library
+
+After the brand kit is approved, use `$maquette-components`:
+
+```text
+$maquette-components Make a component library.
+```
+
+This pass creates a component sheet and implements reusable components, states, and a gallery from the approved brand system.
+
+### 3. Create pages
+
+After the component library exists, use `$maquette-pages` for each page or screen:
+
+```text
+$maquette-pages Make a homepage for the accounting firm.
+```
+
+You can also give a more detailed page brief:
+
+```text
+$maquette-pages Make a homepage with a proof-led hero, services section, client logos, founder note, pricing preview, and consultation CTA.
+```
+
+This pass creates a page concept image, implements the page with the approved brand and component references, captures screenshots when possible, and records review notes.
+
+## Invocation
+
+You can invoke Maquette explicitly by naming the plugin or one of its bundled skills:
+
+```text
+@Maquette create a landing page concept for a new SaaS product.
+$maquette-brand-kit create a brand kit for an AI note-taking app.
+$maquette-components build the component library from the approved brand kit.
+$maquette-pages make a pricing page.
+```
+
+Codex may also choose an installed Maquette skill automatically for website UI work when the task clearly matches the plugin. Explicit invocation is still recommended when you want the staged Maquette workflow and image-first behavior.
+
 ## Installation
 
 ### Add the marketplace
