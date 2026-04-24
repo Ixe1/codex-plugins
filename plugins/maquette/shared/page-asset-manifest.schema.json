@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/Ixe1/maquette/master/plugins/maquette/shared/page-asset-manifest.schema.json",
+  "$id": "https://raw.githubusercontent.com/Ixe1/codex-plugins/master/plugins/maquette/shared/page-asset-manifest.schema.json",
   "title": "Maquette Page Asset Manifest",
   "type": "object",
   "additionalProperties": false,
