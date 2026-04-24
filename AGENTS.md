@@ -2,7 +2,9 @@
 
 ## Project Scope
 
-This repository contains the Maquette Codex plugin and its marketplace metadata.
+This repository contains the Ixel Codex plugin marketplace and the plugins published through it.
+
+The marketplace currently includes the Maquette Codex plugin.
 
 Plugin runtime behavior must live in plugin files, not only in repository instructions:
 
@@ -22,7 +24,11 @@ Only touch an installed cache path when the user explicitly asks to patch the lo
 
 ## Documentation
 
-Keep the root `README.md` and `plugins/maquette/README.md` aligned when changing user-facing plugin behavior, invocation examples, installation notes, or release guidance.
+Keep the root `README.md` focused on marketplace-level installation, layout, plugin listings, and release guidance.
+
+Keep `plugins/maquette/README.md` focused on Maquette-specific behavior, invocation examples, workflow details, and plugin-local installation notes.
+
+When changing user-facing Maquette behavior, update `plugins/maquette/README.md` first. Then update the root `README.md` only if the marketplace listing, install guidance, release guidance, or high-level Maquette summary should change.
 
 When changing skill behavior, update the relevant `SKILL.md` first. Then update shared docs or README files only if the behavior should be visible to users.
 
@@ -34,18 +40,20 @@ The plugin version is defined in:
 
 For a stable release:
 
-1. Create or switch to the release branch, for example `release/v0.3.0`.
+1. Create or switch to the release branch, for example `release/maquette/v0.4.0`.
 2. Update the plugin version in `plugin.json`.
 3. Commit the release changes.
-4. Create an annotated tag with the same version, for example `v0.3.0`.
+4. Create an annotated tag for the released plugin version.
 
-Prefer release branch names such as `release/v0.3.0` so they do not collide with version tags such as `v0.3.0`.
+Prefer plugin-scoped release branch names such as `release/maquette/v0.4.0` once the marketplace contains multiple independently versioned plugins.
+
+The existing Maquette `v0.3.3` tag is a legacy single-plugin tag. For future releases, prefer plugin-scoped tag names such as `maquette/v0.4.0` so tags do not collide between plugins.
 
 Use explicit refs when pushing release branches and tags:
 
 ```sh
-git push origin refs/heads/release/v0.3.0
-git push origin refs/tags/v0.3.0
+git push origin refs/heads/release/maquette/v0.4.0
+git push origin refs/tags/maquette/v0.4.0
 ```
 
 For prereleases, use SemVer prerelease versions in `plugin.json` and matching annotated tags:
@@ -59,12 +67,12 @@ For prereleases, use SemVer prerelease versions in `plugin.json` and matching an
 Example prerelease tag:
 
 ```sh
-git tag -a v0.4.0-alpha.1 -m "Maquette v0.4.0-alpha.1"
+git tag -a maquette/v0.4.0-alpha.1 -m "Maquette v0.4.0-alpha.1"
 ```
 
-For development builds, publish or install from a branch ref such as `dev`, `next`, or `release/v0.4.0`. Do not use a stable version tag for moving development work.
+For development builds, publish or install from a branch ref such as `dev`, `next`, or `release/maquette/v0.4.0`. Do not use a stable version tag for moving development work.
 
-## Skill Changes
+## Maquette Skill Changes
 
 When adding a new skill:
 
@@ -74,3 +82,14 @@ When adding a new skill:
 - update README examples if the new skill changes the recommended user workflow
 
 Do not rely on `AGENTS.md` to define behavior that installed-plugin users must receive.
+
+## Plugin Additions
+
+When adding a new plugin to the marketplace:
+
+- create it under `plugins/<plugin-name>/`
+- add its `.codex-plugin/plugin.json`
+- add a plugin-specific `README.md`
+- add or update its entry in `.agents/plugins/marketplace.json`
+- keep the root `marketplace.json` mirror aligned while it remains in the repository
+- update the root `README.md` available plugin list
