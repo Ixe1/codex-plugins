@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/ui-web-page-blueprint.schema.json",
-  "title": "UI Web Page Blueprint",
+  "$id": "https://raw.githubusercontent.com/Ixe1/maquette/master/plugins/maquette/shared/page-blueprint.schema.json",
+  "title": "Maquette Page Blueprint",
   "type": "object",
   "additionalProperties": false,
   "required": [

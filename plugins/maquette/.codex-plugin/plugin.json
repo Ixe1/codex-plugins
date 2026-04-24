@@ -1,0 +1,34 @@
+{
+  "name": "maquette",
+  "version": "0.2.0",
+  "description": "Image-guided web design systems for Codex",
+  "author": {
+    "name": "Ixel",
+    "url": "https://github.com/Ixe1"
+  },
+  "homepage": "https://github.com/Ixe1/maquette",
+  "repository": "https://github.com/Ixe1/maquette",
+  "keywords": [
+    "design",
+    "web",
+    "ui",
+    "design-system",
+    "image-generation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Maquette",
+    "shortDescription": "Image-guided web design systems for Codex",
+    "longDescription": "Create website brand kits, reusable component libraries, and implemented pages through an image_gen-first contract-driven workflow.",
+    "developerName": "Ixel",
+    "category": "Design",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use Maquette to create an image-guided website design system."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

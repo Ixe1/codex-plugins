@@ -1,11 +1,14 @@
 {
-  "name": "local-repo",
+  "name": "ixel",
+  "interface": {
+    "displayName": "Ixel"
+  },
   "plugins": [
     {
-      "name": "ui-web-system",
+      "name": "maquette",
       "source": {
         "source": "local",
-        "path": "./plugins/ui-web-system-plugin"
+        "path": "./plugins/maquette"
       },
       "policy": {
         "installation": "AVAILABLE",

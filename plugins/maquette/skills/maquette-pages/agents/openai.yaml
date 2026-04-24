@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maquette Pages"
+  short_description: "Create website page concepts with image_gen, then implement them with approved brand and component references."
+  default_prompt: "Use $maquette-pages to create or revise a page concept image with image_gen first, then implement the website page using approved brand and component references."

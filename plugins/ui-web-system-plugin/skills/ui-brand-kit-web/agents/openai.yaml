@@ -1,4 +1,0 @@
-interface:
-  display_name: "UI Brand Kit (Web)"
-  short_description: "Create or revise a website brand board and CSS token set using image_gen first."
-  default_prompt: "Use $ui-brand-kit-web to create or revise a website brand board with image_gen first, then produce design-system JSON, CSS tokens, and an approval checklist."

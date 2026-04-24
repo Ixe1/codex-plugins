@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.com/schemas/ui-web-component-catalog.schema.json",
-  "title": "UI Web Component Catalog",
+  "$id": "https://raw.githubusercontent.com/Ixe1/maquette/master/plugins/maquette/shared/component-catalog.schema.json",
+  "title": "Maquette Component Catalog",
   "type": "object",
   "additionalProperties": false,
   "required": [

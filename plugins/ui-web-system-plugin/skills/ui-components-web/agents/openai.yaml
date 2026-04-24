@@ -1,4 +1,0 @@
-interface:
-  display_name: "UI Components (Web)"
-  short_description: "Build a reusable website component library from an approved design system, guided by an image-generated component sheet."
-  default_prompt: "Use $ui-components-web to create or revise a component-sheet image with image_gen, then build a reusable website component library and preview gallery from the approved design system."

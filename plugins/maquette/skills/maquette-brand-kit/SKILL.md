@@ -1,5 +1,5 @@
 ---
-name: ui-brand-kit-web
+name: maquette-brand-kit
 description: "Create or revise a website brand kit from a brief, screenshots, or an existing site. This skill is image_gen-first: always create or revise a structured board image before finalizing the design-system contract, unless the user explicitly tells you not to use image generation or the tool is unavailable."
 ---
 

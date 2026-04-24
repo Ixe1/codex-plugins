@@ -1,5 +1,5 @@
 ---
-name: ui-pages-web
+name: maquette-pages
 description: Create website page concepts from approved brand and component references using image_gen first, then implement them with existing reusable components before adding any new composites.
 ---
 

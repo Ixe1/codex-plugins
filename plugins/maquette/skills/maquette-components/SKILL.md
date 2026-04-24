@@ -1,5 +1,5 @@
 ---
-name: ui-components-web
+name: maquette-components
 description: "Build a reusable website component library and preview gallery from an approved brand token set. This skill is image_gen-guided: create or revise a component-sheet image first, then implement the coded library to match it."
 ---
 

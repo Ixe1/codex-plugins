@@ -1,9 +1,20 @@
 {
+  "name": "ixel",
+  "interface": {
+    "displayName": "Ixel"
+  },
   "plugins": [
     {
-      "name": "ui-web-system",
-      "path": "./plugins/ui-web-system-plugin",
-      "description": "Image-guided brand kit, component library, and page-build workflows for websites"
+      "name": "maquette",
+      "source": {
+        "source": "local",
+        "path": "./plugins/maquette"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Design"
     }
   ]
 }
