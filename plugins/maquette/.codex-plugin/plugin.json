@@ -29,6 +29,9 @@
     "defaultPrompt": [
       "Use Maquette to create an image-guided website design system."
     ],
-    "brandColor": "#2563EB"
+    "brandColor": "#2563EB",
+    "screenshots": [
+      "./assets/example-page.png"
+    ]
   }
 }

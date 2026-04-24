@@ -34,6 +34,10 @@ The visual artifact is the creative source and approval artifact.
 The structured JSON/CSS files are the machine-readable source of truth.
 The coded gallery/page screenshots are the verification artifacts.
 
+## Example output
+
+![Example Maquette page output](./assets/example-page.png)
+
 ## How to use
 
 Maquette is usually used in three passes.
