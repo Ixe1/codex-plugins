@@ -1,3 +1,5 @@
+![Maquette](./assets/logo.png)
+
 # Maquette
 
 Maquette is a Codex plugin by **Ixel** for image-guided website design-system workflows.
