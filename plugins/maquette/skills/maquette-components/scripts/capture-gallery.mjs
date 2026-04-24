@@ -17,11 +17,17 @@ const targetUrl = /^https?:\/\//.test(targetArg)
   ? targetArg
   : `file://${path.resolve(targetArg)}`;
 
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 2200 } });
-await page.goto(targetUrl);
-fs.mkdirSync(path.dirname(outputArg), { recursive: true });
-await page.screenshot({ path: outputArg, fullPage: true });
-await browser.close();
+let browser;
+try {
+  browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 2200 } });
+  await page.goto(targetUrl);
+  fs.mkdirSync(path.dirname(outputArg), { recursive: true });
+  await page.screenshot({ path: outputArg, fullPage: true });
+} finally {
+  if (browser) {
+    await browser.close();
+  }
+}
 
 console.log(`Captured ${outputArg}`);

@@ -13,6 +13,7 @@ Do not design or modify a logo.
 ## Non-negotiable image_gen policy
 
 If the `image_gen` tool is available, you **must use it** for the core design pass.
+Follow `shared/image-gen-workflow.md` for required visual inspection, same-turn continuation, and conditional transparent PNG verification.
 Do not skip straight to HTML/CSS/JS-only output.
 Do not treat image generation as optional inspiration.
 For this skill, the image is the primary creative artifact.
@@ -22,6 +23,8 @@ Use image generation in one of these modes:
 - **Edit** an existing or previously approved brand board to evolve the direction
 
 If you need to edit a local image file, ensure it is first made visible in the conversation with `view_image`, then instruct `image_gen` to edit the visible image.
+
+After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
 Only skip image generation if:
 - the user explicitly says not to use it, or
@@ -62,6 +65,7 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - accessibility requirements
 3. If `image_gen` is available, create or edit a **structured brand board** using `assets/brand-board-prompt.md`.
    - Use the board as the creative exploration and approval artifact.
+   - Inspect the generated board with `view_image` before writing the design-system JSON or CSS tokens.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo, wordmark, monogram, mascot mark, app icon, seal, badge, or trademark-like brand mark, reject that image for brand-kit approval and regenerate or edit it out before continuing.
 4. Create or update `ui/brand/design-system.json` so it matches the approved or proposed board.

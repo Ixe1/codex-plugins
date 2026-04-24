@@ -18,6 +18,7 @@ Preferred inputs:
 ## Non-negotiable image_gen policy
 
 If the `image_gen` tool is available, you **must use it** before implementation.
+Follow `shared/image-gen-workflow.md` for required visual inspection, same-turn continuation, and conditional transparent PNG verification.
 Do not skip directly to code-only page design unless the user explicitly asks you to.
 The page concept image is the creative design artifact for the page and should guide layout, hierarchy, density, and style.
 
@@ -26,6 +27,8 @@ Use image generation to:
 - edit an existing concept image to refine the page while preserving the approved visual language
 
 If editing a local reference image, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
+
+After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
 Only skip image generation if:
 - the user explicitly tells you not to use it, or
@@ -52,11 +55,15 @@ The blueprint JSON must validate against `shared/page-blueprint.schema.json`.
 
 1. Read the approved design system and component catalog.
 2. If `image_gen` is available, create or edit a page concept using the approved references and `assets/page-concept-prompt.md`.
+   - Inspect the generated page concept with `view_image` before writing the page blueprint or implementation.
 3. Reuse existing components first.
 4. Translate the page concept into code using the component library before adding any new composite patterns.
 5. Only create a new composite when the page clearly needs a pattern that the library does not already cover.
 6. Update the page blueprint to document composition and any new composites.
 7. Capture screenshots when possible and compare them to the concept and approved references.
+   - Keep Playwright/Chromium screenshot capture headless.
+   - Ensure every browser/session opened for screenshot capture is closed before finishing.
+   - If cleanup fails, record the failed cleanup command or operation in the final response.
 8. Run the required page QA pass:
    - Compare the top and bottom of the coded page against the concept, especially headers, navigation, newsletter bands, footers, bottom ribbons, and final calls to action.
    - Check that repeated/global regions preserve the concept's structure, not just its colors: logo placement, link-column count, secondary marks/seals, social links, legal links, and bottom strips should be implemented when shown in the concept.

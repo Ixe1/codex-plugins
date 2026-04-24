@@ -11,10 +11,11 @@ It is intentionally **image-guided**:
 
 The workflow is therefore:
 1. **Generate or edit a visual artifact first** with `image_gen`
-2. **Convert that artifact into machine-readable design contracts** such as JSON and CSS tokens
-3. **Implement reusable HTML/CSS/JS**
-4. **Render and screenshot the implementation**
-5. **Compare implementation against the approved visual artifact** and iterate
+2. **Inspect the generated artifact** with `view_image`
+3. **Convert that artifact into machine-readable design contracts** such as JSON and CSS tokens
+4. **Implement reusable HTML/CSS/JS**
+5. **Render and screenshot the implementation**
+6. **Compare implementation against the approved visual artifact** and iterate
 
 This plugin is split into three focused skills:
 - `maquette-brand-kit`
@@ -29,6 +30,8 @@ Each phase must use it as follows unless the user explicitly asks to skip image 
 - brand-kit phase -> create or edit a **brand board image**
 - components phase -> create or edit a **component sheet image** before or alongside implementation
 - pages phase -> create or edit a **page concept image** before implementation
+
+After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
 
 ## Output philosophy
 
@@ -121,6 +124,8 @@ The bundled capture scripts import the `playwright` package directly and launch 
 node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs ui/components/gallery.html ui/components/gallery.png
 node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs ui/pages/homepage/page.html ui/pages/homepage/page.png
 ```
+
+Screenshot capture should stay headless, and every browser instance opened for capture must be closed before the workflow finishes. The bundled scripts close Chromium in a `finally` block.
 
 If Playwright is not available, Maquette can still create the design contracts and code, but screenshot-based visual comparison becomes a manual review step.
 

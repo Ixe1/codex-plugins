@@ -17,6 +17,7 @@ Prefer to wait for user approval of the brand kit before expanding the library.
 ## Non-negotiable image_gen policy
 
 If the `image_gen` tool is available, you **must use it** in this phase.
+Follow `shared/image-gen-workflow.md` for required visual inspection, same-turn continuation, and conditional transparent PNG verification.
 Do not go straight from tokens to coded components with no image pass.
 The component sheet is the creative design artifact that helps the coding model implement a richer and more polished result.
 
@@ -25,6 +26,8 @@ Use image generation to:
 - edit an existing approved component sheet to add or revise components while preserving the design language
 
 If a local board or sheet image must be edited, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
+
+After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive component specifications or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
 Only skip image generation if:
 - the user explicitly tells you not to use it, or
@@ -51,6 +54,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 
 1. Read `ui/brand/design-system.json` and `ui/brand/tokens.css`.
 2. If `image_gen` is available, create or edit a component-sheet image using the approved brand board and `assets/component-sheet-prompt.md`.
+   - Inspect the generated component sheet with `view_image` before implementing components, gallery code, or catalog details.
 3. Build reusable website primitives first:
    - buttons
    - text inputs
@@ -70,6 +74,9 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 5. Keep JS minimal and only add it where interactivity requires it.
 6. Build a gallery page that renders every component, variant, size, and major state.
 7. If screenshot tooling is available, capture the gallery. Use `scripts/capture-gallery.mjs` if present.
+   - Keep Playwright/Chromium screenshot capture headless.
+   - Ensure every browser/session opened for screenshot capture is closed before finishing.
+   - If cleanup fails, record the failed cleanup command or operation in the final response.
 8. Compare the coded gallery against the approved design references and make focused corrections.
 9. Run the required component QA pass:
    - Check icon and icon-button contrast in every visible state, especially active, selected, disabled, inverse, and dark-background states.
