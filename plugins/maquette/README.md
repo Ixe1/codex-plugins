@@ -104,6 +104,26 @@ $maquette-pages make a pricing page.
 
 Codex may also choose an installed Maquette skill automatically for website UI work when the task clearly matches the plugin. Explicit invocation is still recommended when you want the staged Maquette workflow and image-first behavior.
 
+## Optional screenshot tooling
+
+Maquette can use Playwright to capture coded component and page screenshots for visual review.
+
+If your project does not already have Playwright installed, add it in the project where Maquette is generating UI files:
+
+```sh
+npm i -D playwright
+npx playwright install chromium
+```
+
+The bundled capture scripts import the `playwright` package directly and launch Chromium in headless mode:
+
+```sh
+node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs ui/components/gallery.html ui/components/gallery.png
+node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs ui/pages/homepage/page.html ui/pages/homepage/page.png
+```
+
+If Playwright is not available, Maquette can still create the design contracts and code, but screenshot-based visual comparison becomes a manual review step.
+
 ## Installation
 
 ### Add the marketplace
