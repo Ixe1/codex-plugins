@@ -153,9 +153,21 @@ If Playwright is not available, Maquette can still create the design contracts a
 
 ## Installation
 
-### Add the marketplace
+### Add the Ixel marketplace
 
-Once this repository is published, add its marketplace to Codex:
+For active development, add the Ixel marketplace from the `dev` branch:
+
+```sh
+codex plugin marketplace add Ixe1/maquette --ref dev
+```
+
+If the Ixel marketplace is already configured, refresh it instead:
+
+```sh
+codex plugin marketplace upgrade ixel
+```
+
+For released versions, use the default branch:
 
 ```sh
 codex plugin marketplace add Ixe1/maquette --ref master
@@ -172,7 +184,7 @@ In Codex CLI, open the plugin directory with:
 If you want a sparse checkout for the marketplace source, include both the marketplace metadata and plugin folder:
 
 ```sh
-codex plugin marketplace add Ixe1/maquette --ref master --sparse .agents/plugins --sparse plugins/maquette
+codex plugin marketplace add Ixe1/maquette --ref dev --sparse .agents/plugins --sparse plugins/maquette
 ```
 
 ### Manual local install
