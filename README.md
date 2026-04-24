@@ -23,6 +23,25 @@ This plugin includes a root workflow skill plus three focused phase skills:
 - `maquette-components`
 - `maquette-pages`
 
+## Quick start
+
+Maquette helps Codex turn an approved visual direction into reusable website artifacts:
+- brand kits with design-system JSON and CSS tokens
+- component libraries with reusable HTML/CSS/JS and gallery QA
+- implemented pages with screenshot and responsive review notes
+
+Install the marketplace, restart Codex, then invoke the full workflow with `@Maquette` or `$maquette`:
+
+```sh
+codex plugin marketplace add Ixe1/maquette --ref master
+```
+
+```text
+@Maquette Make a homepage for "Northstar Metrics", a lightweight analytics product. Include a metrics overview, recent activity, and a clear signup path.
+```
+
+Use `$maquette-brand-kit`, `$maquette-components`, or `$maquette-pages` when you want to run one phase at a time.
+
 ## Core rule
 
 If the `image_gen` tool is available in the environment, it is **not optional** for the normal happy-path workflow.
@@ -155,7 +174,7 @@ If Playwright is not available, Maquette can still create the design contracts a
 
 ### Add the marketplace
 
-Once this repository is published, add its marketplace to Codex:
+Add the Ixel marketplace to Codex:
 
 ```sh
 codex plugin marketplace add Ixe1/maquette --ref master
