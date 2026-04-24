@@ -1,4 +1,4 @@
 interface:
   display_name: "Maquette Components"
-  short_description: "Build a reusable website component library from an approved design system, guided by an image-generated component sheet."
-  default_prompt: "Use $maquette-components to create or revise a component-sheet image with image_gen, then build a reusable website component library and preview gallery from the approved design system."
+  short_description: "Build a reusable website component library from an approved design system, guided by focused image-generated component sheets."
+  default_prompt: "Use $maquette-components to create or revise focused component-sheet images with image_gen, add data/composite/navigation/product-card/footer-social sheets when needed, then build a reusable website component library and preview gallery from the approved design system. Treat component sheets as the source of truth, match gallery fidelity to the sheet, and QA repeated-card anatomy and action alignment."

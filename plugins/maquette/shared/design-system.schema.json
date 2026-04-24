@@ -439,6 +439,41 @@
                   "type": "string"
                 }
               }
+            },
+            "font_strategy": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading_personality",
+                "body_personality",
+                "preferred_heading_fonts",
+                "preferred_body_fonts",
+                "css_fallback_stacks",
+                "fallback_rationale"
+              ],
+              "properties": {
+                "heading_personality": {
+                  "type": "string"
+                },
+                "body_personality": {
+                  "type": "string"
+                },
+                "preferred_heading_fonts": {
+                  "type": "string"
+                },
+                "preferred_body_fonts": {
+                  "type": "string"
+                },
+                "css_fallback_stacks": {
+                  "type": "string"
+                },
+                "fallback_rationale": {
+                  "type": "string"
+                },
+                "avoid_fonts": {
+                  "type": "string"
+                }
+              }
             }
           }
         },

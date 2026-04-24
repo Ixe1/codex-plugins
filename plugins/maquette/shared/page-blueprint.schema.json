@@ -211,12 +211,47 @@
         "type": "string"
       }
     },
+    "quality_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "font_rationale": {
+          "type": "string"
+        },
+        "concept_region_inventory": {
+          "type": "string"
+        },
+        "asset_manifest": {
+          "type": "string"
+        },
+        "component_sheet_gallery_fidelity": {
+          "type": "string"
+        },
+        "repeated_card_alignment": {
+          "type": "string"
+        },
+        "footer_fidelity": {
+          "type": "string"
+        },
+        "mobile_drawer_scrollability": {
+          "type": "string"
+        },
+        "social_icon_strategy": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
     "assets": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "concept_path",
         "html_path",
+        "concept_region_inventory_path",
+        "asset_manifest_path",
         "screenshot_paths"
       ],
       "properties": {
@@ -238,6 +273,18 @@
             "type": "string"
           },
           "minItems": 1
+        },
+        "nav_open_screenshot_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "concept_region_inventory_path": {
+          "type": "string"
+        },
+        "asset_manifest_path": {
+          "type": "string"
         },
         "review_notes_path": {
           "type": "string"

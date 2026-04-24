@@ -1,0 +1,46 @@
+{
+  "page": "homepage",
+  "status": "draft",
+  "assets": [
+    {
+      "id": "concept",
+      "kind": "concept-screenshot",
+      "status": "generated",
+      "required_by": "page concept review",
+      "path": "pages/homepage/concept.png",
+      "source": "image_gen",
+      "notes": "Inspected before implementation."
+    },
+    {
+      "id": "hero-product",
+      "kind": "hero-image",
+      "status": "generated",
+      "required_by": "hero",
+      "path": "pages/homepage/assets/hero-product.png",
+      "source": "image_gen",
+      "alt_text": "Product arranged in the approved hero composition."
+    },
+    {
+      "id": "product-card-01",
+      "kind": "product-card-image",
+      "status": "generated",
+      "required_by": "product-grid",
+      "path": "pages/homepage/assets/product-card-01.png",
+      "source": "image_gen",
+      "alt_text": "Primary product package."
+    },
+    {
+      "id": "footer-device",
+      "kind": "app-device-image",
+      "status": "not-generated-with-reason",
+      "required_by": "footer app/download module",
+      "source": "not-applicable",
+      "notes": "Concept showed no app/download module; no footer device image required."
+    }
+  ],
+  "review": {
+    "all_referenced_assets_exist": true,
+    "missing_assets": [],
+    "notes": "Every asset referenced by page HTML/CSS/review exists locally."
+  }
+}

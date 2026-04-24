@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Ixe1/maquette/master/plugins/maquette/shared/page-asset-manifest.schema.json",
+  "title": "Maquette Page Asset Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "page",
+    "status",
+    "assets",
+    "review"
+  ],
+  "properties": {
+    "page": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "reviewed",
+        "approved"
+      ]
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "required_by"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "logo",
+              "hero-image",
+              "product-card-image",
+              "promo-image",
+              "lifestyle-story-image",
+              "footer-image",
+              "app-device-image",
+              "background-texture",
+              "decorative-raster",
+              "concept-screenshot",
+              "page-screenshot",
+              "other"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "generated",
+              "provided",
+              "reused-existing",
+              "not-generated-with-reason",
+              "missing"
+            ]
+          },
+          "required_by": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "image_gen",
+              "user-provided",
+              "existing-project",
+              "code-generated",
+              "not-applicable"
+            ]
+          },
+          "alt_text": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "all_referenced_assets_exist",
+        "missing_assets"
+      ],
+      "properties": {
+        "all_referenced_assets_exist": {
+          "type": "boolean"
+        },
+        "missing_assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

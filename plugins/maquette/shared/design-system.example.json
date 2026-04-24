@@ -201,6 +201,15 @@
         "h4": "xl",
         "h5": "lg",
         "h6": "md"
+      },
+      "font_strategy": {
+        "heading_personality": "Geometric, modern, moderately compact, and polished rather than heavy display poster type.",
+        "body_personality": "Neutral, highly legible UI sans for dense operational content.",
+        "preferred_heading_fonts": "Sora, Space Grotesk, or Manrope",
+        "preferred_body_fonts": "Inter, Source Sans 3, or system-ui",
+        "css_fallback_stacks": "heading = \"Sora\", \"Space Grotesk\", \"Inter\", system-ui, sans-serif | body = \"Inter\", \"Source Sans 3\", system-ui, sans-serif | mono = \"JetBrains Mono\", ui-monospace, monospace",
+        "fallback_rationale": "Use open-source geometric sans options for headings and neutral UI sans options for body text when licensed brand fonts are not available.",
+        "avoid_fonts": "Do not use Impact or other crude poster fonts unless explicitly approved by the board."
       }
     },
     "space": {
@@ -469,25 +478,23 @@
   "board": {
     "must_show": [
       "Palette swatches",
-      "Type scale",
-      "Spacing scale",
-      "Buttons",
-      "Inputs",
-      "Checkbox and radio",
-      "Switch",
-      "Slider",
-      "Tabs",
-      "Table row and header",
-      "Cards",
-      "Alerts"
+      "Semantic color roles",
+      "Type scale with recommended font families and fallback stacks",
+      "Spacing rhythm",
+      "Radius scale",
+      "Border and elevation language",
+      "Surface treatments",
+      "Focus and motion principles",
+      "Tiny abstract UI fragments only when needed to show state or surface principles"
     ],
     "spec_panel_sections": [
       "Core CSS variables",
-      "Font families",
-      "Control heights",
+      "Font families and fallback rationale",
+      "Type weights, sizes, and line-height",
+      "Spacing and radius tokens",
       "Radius and shadow notes",
       "State notes"
     ],
-    "notes": "Keep the board readable at a reduced image size and avoid tiny code blocks."
+    "notes": "Keep the board readable at a reduced image size. Do not use the brand board for component inventories or detailed button, input, card, product-card, navigation, or form variants."
   }
 }

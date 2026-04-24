@@ -9,10 +9,12 @@ You are responsible for the **website brand-kit phase**.
 
 Use this skill only for website visual-system work. Do not use it for native desktop UI.
 Do not design or modify a logo.
+Write all Maquette-owned outputs under `.maquette/` in the current project. Do not create or overwrite root-level website files such as `index.html`.
 
 ## Non-negotiable image_gen policy
 
 If the `image_gen` tool is available, you **must use it** for the core design pass.
+Follow `shared/image-gen-workflow.md` for required visual inspection, same-turn continuation, and conditional transparent PNG verification.
 Do not skip straight to HTML/CSS/JS-only output.
 Do not treat image generation as optional inspiration.
 For this skill, the image is the primary creative artifact.
@@ -22,6 +24,8 @@ Use image generation in one of these modes:
 - **Edit** an existing or previously approved brand board to evolve the direction
 
 If you need to edit a local image file, ensure it is first made visible in the conversation with `view_image`, then instruct `image_gen` to edit the visible image.
+
+After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
 Only skip image generation if:
 - the user explicitly says not to use it, or
@@ -36,61 +40,63 @@ You may receive:
 - a previously approved brand board
 - requests to refresh or evolve the current system
 
+Existing websites, screenshots, and code are references for creating the brand board. They are not a substitute for a generated and inspected brand board, design-system JSON, or CSS tokens.
+
 ## Required outputs
 
 Always create or update these files when you finish a pass:
 
-- `ui/brand/brief.md`
-- `ui/brand/design-system.json`
-- `ui/brand/tokens.css`
-- `ui/brand/approved.md`
+- `.maquette/brand/brief.md`
+- `.maquette/brand/design-system.json`
+- `.maquette/brand/tokens.css`
+- `.maquette/brand/approved.md`
 
 When `image_gen` is available, also create or update:
 
-- `ui/brand/brand-board-vN.png`
+- `.maquette/brand/brand-board-vN.png`
 
 The JSON file must validate against `shared/design-system.schema.json`.
 
 ## Workflow
 
 1. Read the request, repo, and visible references.
-2. Write or refresh `ui/brand/brief.md` with:
+2. Write or refresh `.maquette/brand/brief.md` with:
    - product summary
    - audience
    - tone adjectives
    - constraints
    - accessibility requirements
-3. If `image_gen` is available, create or edit a **structured brand board** using `assets/brand-board-prompt.md`.
+3. If `image_gen` is available, create or edit a **focused structured brand board** using `assets/brand-board-prompt.md`.
    - Use the board as the creative exploration and approval artifact.
+   - Inspect the generated board with `view_image` before writing the design-system JSON or CSS tokens.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
-   - Inspect the generated board before using it. If it contains any logo, wordmark, monogram, mascot mark, app icon, seal, badge, or trademark-like brand mark, reject that image for brand-kit approval and regenerate or edit it out before continuing.
-4. Create or update `ui/brand/design-system.json` so it matches the approved or proposed board.
-5. Generate `ui/brand/tokens.css` from the design system JSON. Use `scripts/export-tokens.mjs` if present.
+   - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
+   - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
+4. Create or update `.maquette/brand/design-system.json` so it matches the approved or proposed board.
+5. Generate `.maquette/brand/tokens.css` from the design system JSON. Use `scripts/export-tokens.mjs` if present.
 6. Summarize what changed and ask for approval or revision.
-7. Record the current decision in `ui/brand/approved.md`.
+7. Record the current decision in `.maquette/brand/approved.md`.
 
 ## Board rules
 
-The board should show, at minimum:
-- palette
-- type scale
-- spacing and radius
-- buttons
-- inputs
-- textarea
-- select
-- checkbox
-- radio
-- switch
-- slider
-- tabs
-- cards
-- alerts
-- table styling
-- relevant states
+The board is a foundational visual-system artifact, not a component specification or exhaustive UI inventory. It should focus on:
+- palette and semantic color roles
+- typography direction, recommended font families or categories, fallbacks, weights, sizes, and line-height
+- spacing rhythm
+- radius scale
+- border, elevation, and shadow language
+- surface treatments
+- motion, focus, interaction, disabled, selected, and error principles
 
-The board must not include a logo, wordmark, emblem, mascot, brand seal, app icon, or placeholder mark. Brand kits define visual-system language only; logo creation belongs to a separate logo/asset task.
-It must include a compact text spec panel that mirrors the real token files.
+Do not include full component inventories or detailed button, input, card, product-card, navigation, or form variants on the brand board. Tiny abstract UI fragments are allowed only when they demonstrate color, focus, surface, density, or state principles; label or treat them as visual-system fragments, not component specs.
+
+The board must clearly specify recommended font families or font categories. If exact licensed fonts are unavailable, it must name practical web-safe or open-source substitutes.
+
+Move exhaustive primitive and component coverage to the component-library phase.
+
+The board must not include a logo, wordmark, emblem, mascot, brand seal, app icon, placeholder mark, monogram, badge, or trademark-like element. It also must not show the brand or product name as a masthead, header, large title, display text, logo-like text, app mark, badge, seal, or primary text treatment. Brand kits define visual-system language only; logo creation belongs to a separate logo/asset task.
+If product text is needed on the board, use neutral labels such as "Design System", "Server Discovery UI", "Telemetry Surface", "Operations Dashboard", or similar generic descriptors. The actual brand name may appear only, if at all, as small body-size sample copy and never as the largest, most prominent, or primary text on the image.
+It may include a compact text spec panel that mirrors the real token files, but implementation notes must not dominate the board.
 Keep the board readable even when exported at modest resolution.
 Do not cram dense code into tiny unreadable blocks.
 
@@ -107,3 +113,4 @@ If a board has already been approved:
 - Use semantic tokens rather than hard-coded component colors when possible.
 - Prefer explicit, machine-readable outputs over prose-only descriptions.
 - The image board is the creative artifact; the JSON and CSS files are the machine-readable contract.
+- The design-system JSON must record the intended font personality and acceptable CSS fallback stacks. Do not blindly use crude defaults such as `Impact` only because a board shows condensed or bold headings; use `Impact` only when the board explicitly approves it.

@@ -1,14 +1,25 @@
-Edit the visible approved brand board and component-sheet into a website page concept.
+Edit the visible approved brand board and component-sheet reference or references into a website page concept.
 
 Requirements:
 - use only components and styling consistent with the approved system
 - treat existing components as the first source of truth
-- only introduce a new composite if it is truly necessary for the page goal
+- only introduce a new composite if it is truly necessary for the page goal and a component/composite reference already exists or is created first
+- do not silently invent significant new component language that is absent from the approved or provisional component references
 - prioritize hierarchy, layout, density, and state clarity
-- include enough detail for headers, navigation, newsletter bands, footers, bottom ribbons, social links, legal links, and secondary brand marks/seals when those regions are part of the page
-- render social links and compact action controls as clear icon controls when the concept calls for icons, not visible text abbreviations
+- include enough detail for headers, navigation, newsletter bands, footers, bottom ribbons, social links, legal links, and already-approved secondary brand details when those regions are part of the page
+- make every visible page region identifiable for later implementation inventory: header, nav, hero, sidebars, annotations, product grids, promo cards, newsletter, footer, bottom bars, mobile/tablet callouts, app/device modules, social links, and imagery
+- make required raster image assets identifiable, including logo only if supplied or explicitly requested, hero images, product-card images, promo images, lifestyle/story images, app/device images, footer images, background textures, and decorative rasters
+- use typography consistent with the approved font personality, weight, width, scale, and line-height; if the concept needs condensed editorial headings, make the font direction clear enough for implementation to choose a close CSS stack or open-source substitute
+- if the page has header or primary navigation, define desktop, tablet, and mobile navigation behavior; a desktop-only nav concept is incomplete
+- show or specify desktop inline nav plus tablet/mobile collapsed nav with menu toggle and expanded stacked panel or drawer
+- do not use horizontal-scrolling primary nav as the default tablet/mobile solution
+- render social links and compact action controls as recognizable icon controls when the concept calls for icons, not visible text abbreviations or unrelated generic symbols
+- if the page includes product, pricing, service, offer, or promo card grids, show shared media/header/body/footer/action slots, consistent badge or eyebrow placement, equal-height cards, and bottom-aligned CTA, quantity, price, or action rows across varied copy lengths
+- if the page includes a rich footer, make logo placement, link columns, social icons, app/download module, device/phone imagery, legal links, locale/shipping row, cookie/bottom strip, and brand blurb clear enough to implement
 - make terminal page sections visually specific enough that the coded page cannot reasonably collapse them into generic link lists
-- no logo generation
+- do not invite silent simplification; visible regions and generated asset needs should be clear enough to inventory before coding
+- if the page requires dense data tables, dashboards, server lists, maps, calendars, editors, timelines, filter builders, or other large reusable patterns not present in the component references, pause page invention and request a focused component/composite sheet first
+- no logo generation and no new brand marks, seals, badges, app icons, or emblems
 
 This page concept is the creative design artifact for the page.
 The later coded page should match its overall hierarchy, composition, and styling while reusing approved components first.

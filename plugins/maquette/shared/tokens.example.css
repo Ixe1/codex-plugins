@@ -106,6 +106,13 @@
   --typography-usage-h4: xl;
   --typography-usage-h5: lg;
   --typography-usage-h6: md;
+  --typography-font-strategy-heading-personality: Geometric, modern, moderately compact, and polished rather than heavy display poster type.;
+  --typography-font-strategy-body-personality: Neutral, highly legible UI sans for dense operational content.;
+  --typography-font-strategy-preferred-heading-fonts: Sora, Space Grotesk, or Manrope;
+  --typography-font-strategy-preferred-body-fonts: Inter, Source Sans 3, or system-ui;
+  --typography-font-strategy-css-fallback-stacks: heading = "Sora", "Space Grotesk", "Inter", system-ui, sans-serif | body = "Inter", "Source Sans 3", system-ui, sans-serif | mono = "JetBrains Mono", ui-monospace, monospace;
+  --typography-font-strategy-fallback-rationale: Use open-source geometric sans options for headings and neutral UI sans options for body text when licensed brand fonts are not available.;
+  --typography-font-strategy-avoid-fonts: Do not use Impact or other crude poster fonts unless explicitly approved by the board.;
   --space-base: 4px;
   --space-scale-0: 0px;
   --space-scale-1: 4px;

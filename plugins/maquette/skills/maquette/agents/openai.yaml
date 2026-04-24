@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maquette"
+  short_description: "Run the full staged image-guided website workflow."
+  default_prompt: "Use $maquette to run the full Maquette workflow: create any missing focused foundational brand kit, then any missing component library or focused component/composite coverage including responsive navigation, repeated-card, footer-social, and asset coverage when needed, then the requested page or screen with concept-region inventory and fidelity QA."

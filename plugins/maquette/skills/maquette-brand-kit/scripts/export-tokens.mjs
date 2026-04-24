@@ -2,8 +2,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const inputPath = process.argv[2] ?? "ui/brand/design-system.json";
-const outputPath = process.argv[3] ?? "ui/brand/tokens.css";
+const inputPath = process.argv[2] ?? ".maquette/brand/design-system.json";
+const outputPath = process.argv[3] ?? ".maquette/brand/tokens.css";
 
 function kebabCase(input) {
   return input

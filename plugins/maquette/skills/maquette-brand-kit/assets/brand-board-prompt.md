@@ -3,22 +3,29 @@ Create or edit a website design-system board.
 Goal:
 - Build a structured brand board for a web UI.
 - This board is a creative artifact and approval target for the website visual system.
-- No logo generation, no wordmarks, no monograms, no mascots, no seals, no app icons, and no trademark-like brand marks.
+- No logo generation, no wordmarks, no brand marks, no large brand-name treatment, no monograms, no mascots, no badges, no seals, no app icons, no emblems, and no trademark-like elements.
 
 Show on the board:
-- palette swatches with labels
-- typography scale with clear heading/body distinctions
-- spacing, radius, border, shadow, and motion cues
-- buttons, inputs, textarea, select, checkbox, radio, switch, slider
-- tabs, badges, cards, alerts, and a table header/body example
-- hover, focus-visible, disabled, error, selected, and active states where relevant
-- a compact text spec panel with CSS variable names and implementation notes
+- palette swatches and semantic color roles
+- typography direction with clear heading/body distinctions, recommended font families or categories, fallback stacks, weights, sizes, and line-height
+- spacing rhythm
+- radius scale
+- border, elevation, shadow, surface, and motion cues
+- focus, hover, disabled, error, selected, and active principles
+- only tiny abstract UI fragments if needed to demonstrate color, focus, state, surface, or density principles; these are not component specs
+- a compact token/spec panel if it remains readable
 
 Constraints:
 - the board must be readable even when the image is not full desktop resolution
 - keep spacing rhythm, control language, and typography internally consistent
-- do not invent or display a logo, wordmark, emblem, mascot, seal, app icon, or placeholder brand mark
-- if a brand name is needed, use it only as plain text labels in the type/spec examples, not as a logo treatment
+- do not include a full component inventory or detailed button, input, card, product-card, navigation, or form variants
+- clearly name recommended font families or font categories; if exact licensed fonts are unavailable, name practical web-safe or open-source substitutes
+- if headings imply condensed or editorial bold type, specify the intended font personality and avoid crude default substitutions such as Impact unless explicitly approved
+- do not invent or display a logo, wordmark, emblem, mascot, seal, badge, app icon, placeholder brand mark, monogram, or trademark-like element
+- do not show the brand or product name as a masthead, header, large title, display text, logo-like text, app mark, badge, seal, or primary text treatment
+- if product text is needed, use neutral labels such as "Design System", "Server Discovery UI", "Telemetry Surface", "Operations Dashboard", or similar generic descriptors
+- the actual brand name may appear only, if at all, as small body-size sample copy; it must never be the largest or primary text on the image
+- avoid clutter; if the board cannot be understood at normal preview size, narrow the scope rather than shrinking everything
 - use the provided brief and references, but choose a coherent direction without asking for styling micro-decisions
 - prioritize design clarity, polish, and creativity
 

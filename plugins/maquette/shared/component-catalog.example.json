@@ -12,22 +12,39 @@
     "js_strategy": "vanilla-js for progressive enhancement"
   },
   "assets": {
-    "tokens_css_path": "ui/brand/tokens.css",
-    "gallery_html_path": "ui/components/gallery.html",
+    "tokens_css_path": "brand/tokens.css",
+    "gallery_html_path": "components/gallery.html",
     "gallery_screenshot_paths": [
-      "ui/components/gallery.png"
+      "components/gallery.png"
     ],
-    "component_sheet_path": "ui/components/component-sheet-v1.png",
-    "review_notes_path": "ui/components/approved.md"
+    "component_sheet_path": "components/component-sheet-v1.png",
+    "component_sheet_paths": [
+      "components/component-sheet-v1.png",
+      "components/component-sheet-data-v1.png"
+    ],
+    "nav_open_screenshot_paths": [
+      "components/screenshots/responsive-nav-open-390.png",
+      "components/screenshots/responsive-nav-open-768.png"
+    ],
+    "sheet_fidelity_review": {
+      "reference_sheet_paths": [
+        "components/component-sheet-v1.png",
+        "components/component-sheet-data-v1.png"
+      ],
+      "coverage_summary": "Gallery renders the component families, variants, states, responsive navigation, and repeated-card anatomy shown in the approved sheets.",
+      "simplifications": [],
+      "status": "matches"
+    },
+    "review_notes_path": "components/approved.md"
   },
   "components": [
     {
       "name": "button",
       "source_required_component": "button",
       "files": [
-        "ui/components/components.css",
-        "ui/components/components.js",
-        "ui/components/gallery.html"
+        "components/components.css",
+        "components/components.js",
+        "components/gallery.html"
       ],
       "selectors": [
         ".btn",
@@ -63,10 +80,10 @@
       ],
       "visual_review": {
         "reference_image_paths": [
-          "ui/brand/brand-board-v1.png",
-          "ui/components/component-sheet-v1.png"
+          "brand/brand-board-v1.png",
+          "components/component-sheet-v1.png"
         ],
-        "latest_screenshot_path": "ui/components/gallery.png",
+        "latest_screenshot_path": "components/gallery.png",
         "similarity_notes": "Button density and radius match the approved board. Ghost hover treatment is intentionally subtle."
       },
       "status": "reviewed"
@@ -75,9 +92,9 @@
       "name": "text-input",
       "source_required_component": "text-input",
       "files": [
-        "ui/components/components.css",
-        "ui/components/components.js",
-        "ui/components/gallery.html"
+        "components/components.css",
+        "components/components.js",
+        "components/gallery.html"
       ],
       "selectors": [
         ".field",
@@ -109,10 +126,107 @@
       ],
       "visual_review": {
         "reference_image_paths": [
-          "ui/brand/brand-board-v1.png"
+          "brand/brand-board-v1.png"
         ],
-        "latest_screenshot_path": "ui/components/gallery.png",
+        "latest_screenshot_path": "components/gallery.png",
         "similarity_notes": "Field border and focus ring align with approved design language."
+      },
+      "status": "reviewed"
+    },
+    {
+      "name": "responsive-navigation",
+      "source_required_component": "navigation",
+      "files": [
+        "components/components.css",
+        "components/components.js",
+        "components/gallery.html"
+      ],
+      "selectors": [
+        ".site-nav",
+        ".site-nav__toggle",
+        ".site-nav__panel",
+        ".site-nav__link"
+      ],
+      "implemented_variants": [
+        "desktop-inline",
+        "tablet-collapsed",
+        "mobile-collapsed",
+        "mobile-expanded"
+      ],
+      "implemented_sizes": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "implemented_states": [
+        "default",
+        "active",
+        "focus-visible",
+        "expanded",
+        "collapsed"
+      ],
+      "accessibility_notes": [
+        "Menu toggle uses aria-controls, aria-expanded, and an accessible label",
+        "Expanded menu links are keyboard reachable",
+        "Mobile primary navigation does not require document-level horizontal scrolling"
+      ],
+      "visual_review": {
+        "reference_image_paths": [
+          "components/component-sheet-v1.png"
+        ],
+        "latest_screenshot_path": "components/screenshots/responsive-nav-open-390.png",
+        "similarity_notes": "Responsive navigation keeps desktop inline links and uses a collapsed tablet/mobile panel with visible tap targets."
+      },
+      "status": "reviewed"
+    },
+    {
+      "name": "product-card",
+      "source_required_component": "product-card",
+      "files": [
+        "components/components.css",
+        "components/components.js",
+        "components/gallery.html"
+      ],
+      "selectors": [
+        ".product-card",
+        ".product-card__body",
+        ".product-card__actions",
+        ".quantity-control"
+      ],
+      "implemented_variants": [
+        "default",
+        "featured",
+        "sale"
+      ],
+      "implemented_sizes": [
+        "md"
+      ],
+      "implemented_states": [
+        "default",
+        "hover",
+        "focus-visible",
+        "disabled"
+      ],
+      "accessibility_notes": [
+        "Quantity buttons have accessible labels",
+        "Primary product CTA remains keyboard reachable after variable-length copy"
+      ],
+      "layout_behavior": {
+        "equal_height_grid": "Product cards stretch to the same height within each grid row.",
+        "body_layout": "Card anatomy uses media, header, body, footer, and action slots. Body uses flex column or grid rows so descriptive copy can grow without moving the footer contract.",
+        "action_row_alignment": "Price, quantity selector, and Add to Cart row are pinned to the bottom and align across cards with short, medium, and long copy.",
+        "responsive_notes": "Badges and eyebrows occupy a stable slot. On single-column mobile layouts the action row stays after content; multi-column tablet and desktop layouts preserve equal-height rows."
+      },
+      "visual_review": {
+        "reference_image_paths": [
+          "components/component-sheet-v1.png"
+        ],
+        "latest_screenshot_path": "components/gallery.png",
+        "similarity_notes": "Card surfaces and CTA styling follow the component sheet.",
+        "qa_notes": [
+          "Gallery includes at least three product cards with varied copy length.",
+          "Screenshot review confirms quantity and Add to Cart rows share the same vertical position across the row."
+        ]
       },
       "status": "reviewed"
     }

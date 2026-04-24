@@ -10,15 +10,15 @@
   "references": [
     {
       "kind": "brand-board",
-      "path": "ui/brand/brand-board-v1.png"
+      "path": "brand/brand-board-v1.png"
     },
     {
       "kind": "component-sheet",
-      "path": "ui/components/component-sheet-v1.png"
+      "path": "components/component-sheet-v1.png"
     },
     {
       "kind": "page-concept",
-      "path": "ui/pages/homepage/concept.png"
+      "path": "pages/homepage/concept.png"
     }
   ],
   "viewports": [
@@ -52,7 +52,7 @@
       "uses_components": [
         {
           "name": "navigation-bar",
-          "variant": "default"
+          "variant": "responsive"
         },
         {
           "name": "button",
@@ -64,7 +64,7 @@
         }
       ],
       "introduces_new_composite": false,
-      "notes": "Typography should follow the approved display scale."
+      "notes": "Typography should follow the approved display scale. Navigation uses desktop inline links and tablet/mobile collapsed menu states."
     },
     {
       "id": "metrics-strip",
@@ -101,16 +101,37 @@
     "Uses approved typography and semantic colors.",
     "Reuses existing components before introducing new composites.",
     "Remains readable and coherent across desktop, tablet, and mobile viewports.",
+    "Primary navigation has accessible closed and open tablet/mobile states with no document-level horizontal overflow.",
+    "Repeated product, pricing, service, or offer cards keep CTA and action rows aligned across varied copy lengths.",
+    "Footer social links use recognizable icons with accessible names when the concept shows social icons.",
+    "Typography implementation records chosen font family, fallback stack, and rationale; Impact is not used unless explicitly approved.",
     "Primary CTA remains visually dominant without breaking the calm visual language."
   ],
+  "quality_review": {
+    "font_rationale": "Heading and body stacks follow the design-system font strategy; no crude display defaults are substituted for condensed headings.",
+    "concept_region_inventory": "Every visible concept region is listed in concept-region-inventory.md with implementation status and reasons for any deviation.",
+    "asset_manifest": "Every required raster asset is listed in asset-manifest.json and every referenced local path is verified before final review.",
+    "component_sheet_gallery_fidelity": "Page uses component implementations that were reviewed against the generated component sheet rather than simplified selector demos.",
+    "repeated_card_alignment": "Repeated cards use shared media/header/body/footer/action anatomy, equal-height rows, stable badge placement, and bottom-pinned action regions when they appear in multi-column grids.",
+    "footer_fidelity": "Footer regions are compared against the concept for links, social icons, legal rows, app/device modules, and bottom strips when shown.",
+    "mobile_drawer_scrollability": "Opened mobile and tablet drawers remain scrollable when content exceeds viewport height and controls remain reachable.",
+    "social_icon_strategy": "Social links use recognizable SVG or icon-library glyphs with accessible names instead of text abbreviations unless text badges are part of the concept.",
+    "notes": "Record screenshot evidence and any intentional exceptions in review.md."
+  },
   "assets": {
-    "concept_path": "ui/pages/homepage/concept.png",
-    "html_path": "ui/pages/homepage/page.html",
-    "css_path": "ui/pages/homepage/page.css",
-    "js_path": "ui/pages/homepage/page.js",
+    "concept_path": "pages/homepage/concept.png",
+    "html_path": "pages/homepage/page.html",
+    "css_path": "pages/homepage/page.css",
+    "js_path": "pages/homepage/page.js",
     "screenshot_paths": [
-      "ui/pages/homepage/page.png"
+      "pages/homepage/page.png"
     ],
-    "review_notes_path": "ui/pages/homepage/review.md"
+    "nav_open_screenshot_paths": [
+      "pages/homepage/screenshots/responsive-nav-open-390.png",
+      "pages/homepage/screenshots/responsive-nav-open-768.png"
+    ],
+    "concept_region_inventory_path": "pages/homepage/concept-region-inventory.md",
+    "asset_manifest_path": "pages/homepage/asset-manifest.json",
+    "review_notes_path": "pages/homepage/review.md"
   }
 }

@@ -69,7 +69,8 @@
       "required": [
         "tokens_css_path",
         "gallery_html_path",
-        "gallery_screenshot_paths"
+        "gallery_screenshot_paths",
+        "sheet_fidelity_review"
       ],
       "properties": {
         "tokens_css_path": {
@@ -87,6 +88,49 @@
         },
         "component_sheet_path": {
           "type": "string"
+        },
+        "component_sheet_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "nav_open_screenshot_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sheet_fidelity_review": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reference_sheet_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "coverage_summary": {
+              "type": "string"
+            },
+            "simplifications": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "matches",
+                "deviates",
+                "simplified",
+                "needs-fix"
+              ]
+            }
+          }
         },
         "review_notes_path": {
           "type": "string"
@@ -154,6 +198,24 @@
               "type": "string"
             }
           },
+          "layout_behavior": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "equal_height_grid": {
+                "type": "string"
+              },
+              "body_layout": {
+                "type": "string"
+              },
+              "action_row_alignment": {
+                "type": "string"
+              },
+              "responsive_notes": {
+                "type": "string"
+              }
+            }
+          },
           "visual_review": {
             "type": "object",
             "additionalProperties": false,
@@ -169,6 +231,12 @@
               },
               "similarity_notes": {
                 "type": "string"
+              },
+              "qa_notes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           },
