@@ -9,14 +9,16 @@ It is intentionally **image-guided**:
 - the coding model is the implementation and review engine
 - screenshots of coded output are used for visual comparison and refinement
 
-The workflow is therefore:
+The default workflow is therefore:
 1. **Generate or edit a visual artifact first** with `image_gen`
 2. **Inspect the generated artifact** with `view_image`
 3. **Convert that artifact into machine-readable design contracts** such as JSON and CSS tokens
-4. **Build a componentized visual reference** for each component sheet using reusable HTML/CSS/JS from the start
-5. **Document reusable APIs, slots, states, and usage examples** before moving to the next sheet
+4. **Build a componentized visual reference** for each component artifact using reusable HTML/CSS/JS from the start
+5. **Document reusable APIs, slots, states, and usage examples** before moving to the next artifact
 6. **Render and screenshot the implementation**
 7. **Compare implementation against the approved visual artifact** and iterate
+
+The components phase now defaults to focused direct CSS-contract posters for this experiment. Maquette generates a focused 1:1 black-background CSS-contract poster for one component family, inspects it, tokenizes the recovered rules, implements the reusable component batch, and uses browser screenshots as the visual correction target. Visual component sheets are fallback or explicit-request artifacts.
 
 This plugin includes a root workflow skill plus three focused phase skills:
 - `maquette`
@@ -49,20 +51,21 @@ If the `image_gen` tool is available in the environment, it is **not optional** 
 
 Each phase must use it as follows unless the user explicitly asks to skip image generation or the environment genuinely lacks the tool:
 - brand-kit phase -> create or edit a focused foundational 1:1 **brand board image** with no logo, wordmark, brand mark, large product-name treatment, or detailed component inventory; record explicit typography recommendations and fallback strategy
-- components phase -> create or edit one focused 16:9 **component sheet image** at a time, starting with core primitives, then additional focused 16:9 navigation/layout, data/display, or cards/composites sheets when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them
+- components phase -> create one focused 1:1 text-only **CSS-contract poster** at a time, starting with core primitives, then additional focused 1:1 navigation/layout, data/display, or cards/composites posters when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them. Create visual component sheet images only when explicitly requested or when a CSS-contract poster is too generic to guide implementation.
 - pages phase -> create or edit a **page concept image** before implementation
 
 After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
 Generated boards and sheets should be readable at normal preview size. Maquette should regenerate, edit, or split visual artifacts that are cluttered, logo-like, or not inspectable enough to guide implementation.
 Sites with primary navigation should define responsive navigation before page implementation: desktop inline nav, tablet/mobile menu toggle, expanded panel or drawer, accessible states, and no document-level horizontal scrolling for nav.
 Repeated card grids should define equal-height cards and bottom-pinned action rows before page implementation. Footer social links should use recognizable social icons, and page typography should follow the approved font strategy rather than crude defaults such as `Impact`.
-Component implementation includes hard gates per sheet: first make the optional QA tooling decision, then generate one 16:9 component sheet, render a sheet-specific componentized replica/reference using reusable CSS/JS, write batch artifacts, and only then move to the next sheet.
+Component implementation includes hard gates per artifact: first make the optional QA tooling decision, then generate one 1:1 CSS-contract poster by default, render an artifact-specific componentized replica/reference using reusable CSS/JS, write batch artifacts, and only then move to the next artifact. Every poster must use a strict selector allowlist.
 Page implementation includes a fidelity gate: inventory visible concept regions, create an asset manifest for required raster assets, then document section-by-section screenshot comparison notes before approval.
 
 ## Output philosophy
 
 The brand board is the 1:1 visual-system contract.
-The component sheet is the 16:9 visual target for a coded componentized reference.
+The CSS-contract poster is the default 1:1 text source for selectors, states, slots, and dimensions, not a full visual design target.
+An explicit visual component sheet is the 1:1 visual target for a coded componentized reference when that fallback path is used.
 The reusable component library is the CSS/JS/catalog API proven by that reference and consumed by pages.
 The structured JSON/CSS files are the machine-readable source of truth.
 The coded reference/page screenshots are the verification artifacts.
@@ -116,10 +119,18 @@ After the brand kit is approved, use `$maquette-components`:
 $maquette-components Make a component library.
 ```
 
-This pass creates a focused core component sheet first, builds and reviews a componentized visual reference with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats that loop for focused data/composite/form/navigation/repeated-card/newsletter/footer-social sheets when the product needs them.
+This pass creates a focused core CSS-contract poster first, builds and reviews a componentized visual reference with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats that loop for focused data/composite/form/navigation/repeated-card/newsletter/footer-social artifacts when the product needs them.
 When a site has global navigation, the component pass should include responsive nav variants for desktop, tablet, and mobile.
-Every component sheet is 16:9. Maquette should not generate all component sheets before implementation. Each multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
-Each batch must complete screenshot review or documented manual visual review against its source sheet before Maquette generates the next component sheet.
+Every default CSS-contract poster is 1:1; explicit visual component sheets are also 1:1 when used. Maquette should not generate all component artifacts before implementation. Each multi-poster or multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
+Each batch must complete screenshot review or documented manual visual review against its source sheet or poster before Maquette generates the next component artifact.
+
+Experimental CSS-contract example:
+
+```text
+$maquette-components Use the direct CSS-contract approach for the Forms family first.
+```
+
+For this path, Maquette should generate one focused 1:1 text-only poster with a strict selector allowlist, reject posters with page/reset/gallery CSS, map any raw values back to approved tokens, implement a batch replica, capture screenshots, and record that the artifact was a CSS contract rather than a visual component sheet.
 
 ### 3. Create pages
 
@@ -167,7 +178,7 @@ You can check whether the current project has the optional QA tooling available 
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --json .maquette/qa-tooling.json
 ```
 
-During a Maquette run, Codex should check optional QA tooling before component sheets or component code are generated. If optional QA dependencies are missing and automated QA would materially improve the result, Codex should ask before installing them into the project. If the user agrees, Codex can run the project-local install commands and continue with automated QA. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
+During a Maquette run, Codex should check optional QA tooling before component sheets, CSS-contract posters, or component code are generated. If optional QA dependencies are missing and automated QA would materially improve the result, Codex should ask before installing them into the project. If the user agrees, Codex can run the project-local install commands and continue with automated QA. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
 
 Project-local installs are the recommended path. Global npm installs are not recommended because Node usually will not resolve global packages from plugin scripts unless the user also configures environment-specific module lookup such as `NODE_PATH`.
 
@@ -185,7 +196,7 @@ node plugins/maquette/shared/scripts/page-consumption-smoke.mjs --project . --js
 node plugins/maquette/shared/scripts/validate-artifacts.mjs --project . --json .maquette/components/artifact-validation.json
 ```
 
-Screenshot capture and responsive auditing should stay headless, and every browser instance opened for capture must be closed before the workflow finishes. The bundled scripts close Chromium in a `finally` block. If full-page capture falls back to a clipped full-document screenshot, record the metadata JSON and clipped fallback note in the relevant approval file. Linked asset validation should pass for each batch replica and the final component reference before the next sheet or page phase begins.
+Screenshot capture and responsive auditing should stay headless, and every browser instance opened for capture must be closed before the workflow finishes. The bundled scripts close Chromium in a `finally` block. If full-page capture falls back to a clipped full-document screenshot, record the metadata JSON and clipped fallback note in the relevant approval file. Linked asset validation should pass for each batch replica and the final component reference before the next component artifact or page phase begins.
 
 Responsive review should record measured overflow results at 390, 768, 1024, 1280, and 1440px when browser tooling is available. Page-wide horizontal overflow greater than 1px should be fixed unless an explicit exception is documented. Internal scrolling for genuine wide components should be reported separately from true document overflow.
 For pages with navigation, tablet/mobile review should capture closed and open nav states, verify the menu toggle changes `aria-expanded`, and reject nav that clips, overflows, or requires document-level horizontal scrolling.

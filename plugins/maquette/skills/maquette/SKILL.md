@@ -21,6 +21,8 @@ For broad page or site requests, run the workflow in this order:
 
 Only proceed to a later phase after the required artifacts for earlier phases exist.
 
+The component-library phase uses focused 1:1 CSS-contract posters by default. Preserve explicit user requests for visual component sheets only when the user asks for visual sheets or when the component skill documents that the CSS-contract route was blocked.
+
 ## Phase gates
 
 Before creating a page concept or page implementation, verify that these brand artifacts exist:
@@ -42,11 +44,11 @@ Before creating a page concept or page implementation, verify that these compone
 - `.maquette/components/js/components.js`
 - `.maquette/components/replica-gallery.html`
 - `.maquette/components/approved.md`
-- one or more generated and inspected component sheet images such as `.maquette/components/component-sheet-vN.png`
+- one or more generated and inspected component artifacts, such as `.maquette/components/component-sheet-vN.png` or an experimental `.maquette/components/component-sheet-*-css-contract-vN.png`
 
 If any are missing, run the component-library phase next using `maquette-components`.
 If the component catalog does not mark the reusable component library as ready for pages, run `maquette-components` again before the page phase. The page phase should consume reusable components and cataloged APIs, not copy a componentized reference layout.
-If the requested page needs dense data patterns, dashboards, tables, maps, calendars, editors, timelines, complex workflows, filter builders, or reusable composites that are not covered by the existing component references, run `maquette-components` again to create focused missing coverage before running the page phase. Multi-sheet component work should proceed sequentially: generate one focused 16:9 sheet, build and review its componentized replica/reference, document reusable component APIs, then move to the next sheet.
+If the requested page needs dense data patterns, dashboards, tables, maps, calendars, editors, timelines, complex workflows, filter builders, or reusable composites that are not covered by the existing component references, run `maquette-components` again to create focused missing coverage before running the page phase. Multi-artifact component work should proceed sequentially: generate one focused 1:1 CSS-contract poster by default, or one focused 1:1 visual component sheet only when explicitly requested or documented as needed, build and review its componentized replica/reference, document reusable component APIs, then move to the next artifact.
 If a multi-sheet component catalog records `assets.sheet_implementation_batches`, verify each batch has concrete artifact paths for a batch replica/reference, batch component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review before proceeding to the page phase. Retrospective batch logs without concrete batch artifacts are not enough.
 If the requested page has a header or primary navigation, verify responsive navigation component coverage before running the page phase: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and icon rendering.
 If the requested page has product, pricing, service, offer, or promo card grids, verify repeated-card component coverage before running the page phase: shared media/header/body/footer/action anatomy, stable badge or eyebrow placement, equal-height cards, flex or grid card bodies, and bottom-pinned CTA, quantity, price, or action rows.

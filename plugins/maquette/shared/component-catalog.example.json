@@ -52,7 +52,7 @@
           "implementation_quality": 5
         },
         "corrections_made": [
-          "Adjusted card action rows to align with the 16:9 component sheet."
+          "Adjusted card action rows to align with the 1:1 component sheet."
         ],
         "simplifications": [],
         "deferred_items": [],
@@ -147,7 +147,7 @@
       "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy shown in the approved sheets.",
       "failed_categories": [],
       "corrections_made": [
-        "Adjusted card action rows to align with the 16:9 component sheet.",
+        "Adjusted card action rows to align with the 1:1 component sheet.",
         "Increased icon contrast in active and disabled states after screenshot review."
       ],
       "simplifications": [],

@@ -12,17 +12,18 @@ When `image_gen` is available, each phase must use it:
 1. Brand kit
    - generate or edit a focused 1:1 brand board
 2. Components
-   - generate or edit one focused 16:9 component sheet at a time, starting with core primitives, plus additional focused 16:9 sheets when the product needs them
+   - generate one focused 1:1 text-only CSS-contract poster at a time by default, starting with core primitives, plus additional focused 1:1 posters when the product needs them
+   - generate a focused 1:1 visual component sheet only when the user explicitly asks for visual component sheets or when the component skill documents that the CSS-contract route was blocked
 3. Pages
    - generate or edit a page concept
 
-Only after the visual artifact exists should the workflow proceed to code implementation.
+Only after the visual artifact or CSS-contract poster exists should the workflow proceed to code implementation.
 
 For brand kits, token creation is not script-led extraction. The inspected brand-board image is the visual authority; `design-system.json` and `tokens.css` are machine-readable artifacts derived from that viewed image. Helper scripts may serialize approved JSON into CSS, but they must not infer, normalize, or override palette, typography, spacing, radius, surface, shadow, or state decisions from a predetermined design file unless the user explicitly provides that file as an approved constraint.
 
 ## Project output isolation
 
-Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes brand boards, design-system JSON, CSS tokens, component sheets, sheet inventories, componentized references, component CSS/JS, component catalogs, page concepts, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
+Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes brand boards, design-system JSON, CSS tokens, component sheets, CSS-contract posters, sheet inventories, componentized references, component CSS/JS, component catalogs, page concepts, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
 
 Do not create, overwrite, or rely on `index.html` in the project root for Maquette output. If the user later wants to integrate a Maquette page into the real app or root site entrypoint, treat that as a separate explicit integration task.
 
@@ -38,16 +39,17 @@ After inspection, continue the same turn unless the user explicitly asked for im
 
 ## Inspectability gates
 
-Generated boards and sheets are approval artifacts only when they are readable at normal preview size.
+Generated boards, sheets, and CSS-contract posters are approval artifacts only when they are readable at normal preview size.
 
 - Brand boards are the visual-system contract. They must use a 1:1 square composition by default and focus on visual-system fundamentals, not exhaustive component inventories.
 - Brand boards must specify font direction and fallback strategy, but must not show detailed component inventories or button/input/card variant specs.
 - Brand boards must not contain logo-like marks, brand-name mastheads, large product-name treatments, monograms, seals, badges, app icons, emblems, or trademark-like elements.
-- Component sheets are the componentized reference target. They must use 16:9 landscape composition and be split into focused 16:9 sheets when a single sheet would become cluttered or uninspectable.
+- CSS-contract posters are the default implementation contracts for selectors, states, slots, dimensions, and token intent. They must use 1:1 square composition, black or near-black background, readable white monospace CSS-like text, and a strict selector allowlist. They must not include `body`, `html`, reset, page layout, gallery, panel, note, or documentation CSS.
+- Visual component sheets are optional fallback or explicit-request artifacts. They must use 1:1 square composition and be split into focused 1:1 sheets when a single sheet would become cluttered or uninspectable.
 - Component sheets should be categorized when needed: core primitives, navigation/layout, data/display, and cards/composites. The core primitives sheet comes first; focused follow-up sheets are preferred over crowded mega-sheets.
-- Multi-sheet component work must be sequential: inspect, inventory, build a componentized reference, review, and document reusable component APIs from the current sheet before generating the next sheet. The current sheet must produce concrete category-prefixed batch artifacts under `.maquette/components/` before the next sheet is generated, with CSS under `.maquette/components/css/` and JS under `.maquette/components/js/`; retrospective logs after all sheets are generated are not sufficient.
-- Each component sheet batch must complete screenshot review or documented manual visual review against the generated sheet before the next sheet is generated.
-- Component sheets are the source of truth for component styling. Coded componentized references must match the sheet's component families, variants, states, anatomy, density, spacing, radius, shadows, polish, and composites while using reusable CSS/JS and cataloged APIs from the start.
+- Multi-sheet or multi-poster component work must be sequential: inspect, inventory, build a componentized reference, review, and document reusable component APIs from the current artifact before generating the next artifact. The current artifact must produce concrete category-prefixed batch artifacts under `.maquette/components/` before the next artifact is generated, with CSS under `.maquette/components/css/` and JS under `.maquette/components/js/`; retrospective logs after all artifacts are generated are not sufficient.
+- Each component sheet or CSS-contract poster batch must complete screenshot review or documented manual visual review against the generated artifact before the next artifact is generated.
+- CSS-contract posters are the default source of truth for selectors, states, slots, dimensions, and token intent, and the rendered browser screenshot becomes the primary visual correction target. If a visual component sheet is explicitly used, coded componentized references must match the sheet's component families, variants, states, anatomy, density, spacing, radius, shadows, polish, and composites while using reusable CSS/JS and cataloged APIs from the start.
 - Repeated-card sheets must show shared media/header/body/footer/action anatomy, consistent badge or eyebrow placement, equal-height cards, and bottom-pinned action rows when card grids are relevant.
 - Sites or pages with global navigation need inspectable responsive navigation coverage before implementation: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and visible icons.
 - Page concepts with headers or primary navigation must define desktop, tablet, and mobile behavior. A desktop-only navigation concept is incomplete.
@@ -60,18 +62,18 @@ Generated boards and sheets are approval artifacts only when they are readable a
 
 Before page implementation, create a concept-region inventory and generated asset manifest. Visible concept regions default to implementation, not omission. Any region or asset that is simplified, omitted, implemented differently, blocked on assets, or blocked on component coverage must be documented with a concrete reason before coding proceeds.
 
-Before component coding, write a sheet inventory that lists visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, and the decision to implement, regenerate, or create another focused sheet.
+Before component coding, write a sheet inventory that lists visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, and the decision to implement, regenerate, or create another focused sheet or poster.
 
-Before accepting component implementation, compare the coded componentized reference screenshots against the approved 16:9 component sheets with the component fidelity rubric:
+Before accepting component implementation, compare the coded componentized reference screenshots against the approved 1:1 CSS-contract posters or visual component sheets with the component fidelity rubric:
 - coverage: visible component families, variants, and states are implemented
-- visual match: color, typography, spacing, radius, shadow, density, and polish match the sheet
+- visual match: match the poster contract and approved brand closely enough after screenshot review, or match the visual sheet when one was explicitly used
 - anatomy match: cards, navigation, forms, tables, and composites preserve visible structure
 - responsive match: mobile, tablet, and navigation behavior shown or implied by the sheet is represented
 - implementation quality: semantic HTML, token usage, working icons, readable active/selected/inverse states, no unintended overflow, and no unreadable or overlapping text
 
 After the componentized reference passes review, ensure the component CSS/JS and component catalog expose the reusable APIs, slots, states, JS behavior, and usage examples proven by that reference. Page implementations should consume the reusable catalog, CSS, and JS, not copy the reference page layout.
 
-Use Maquette's bundled scripts for optional QA tooling checks, screenshot capture, linked asset validation, responsive audits, contrast/API checks, JSON validation, and page-consumption smoke checks when available. Optional Node dependencies should be resolved from the current project; do not rely on global npm installs. For component workflows, check optional QA tooling immediately after the brand kit exists and before component sheets or component code are generated. If dependencies are missing and automated QA would materially improve confidence, ask the user through the Codex user-input/question tool before installing project-local dependencies. If the user agrees, install `playwright`, `ajv`, and `ajv-formats` in the current project and continue automated QA; if the user declines, continue with manual review and record the missing tooling. Generated run-local scripts are fallback-only and must be documented in the relevant approval notes with the reason the bundled helper did not cover the scenario.
+Use Maquette's bundled scripts for optional QA tooling checks, screenshot capture, linked asset validation, responsive audits, contrast/API checks, JSON validation, and page-consumption smoke checks when available. Optional Node dependencies should be resolved from the current project; do not rely on global npm installs. For component workflows, check optional QA tooling immediately after the brand kit exists and before component sheets, CSS-contract posters, or component code are generated. If dependencies are missing and automated QA would materially improve confidence, ask the user through the Codex user-input/question tool before installing project-local dependencies. If the user agrees, install `playwright`, `ajv`, and `ajv-formats` in the current project and continue automated QA; if the user declines, continue with manual review and record the missing tooling. Generated run-local scripts are fallback-only and must be documented in the relevant approval notes with the reason the bundled helper did not cover the scenario.
 
 No silent simplification is allowed across brand, component, or page phases. If implementation cannot match a generated artifact, record the deviation, reason, and recommended follow-up in the relevant `approved.md` or `review.md`.
 
@@ -92,7 +94,7 @@ When browser tooling is available, page and component QA must include responsive
 
 ## Final review requirements
 
-Final component and page review files must summarize the generated asset manifest and missing assets, concept-region inventory, component sheet vs replica fidelity, reusable component readiness, card anatomy alignment, footer fidelity, mobile drawer scrollability, responsive overflow measurements, open nav screenshots, visual deviations, and fixes. "Screenshots captured" alone is not a sufficient review.
+Final component and page review files must summarize the generated asset manifest and missing assets, concept-region inventory, component sheet or CSS-contract poster vs replica fidelity, reusable component readiness, card anatomy alignment, footer fidelity, mobile drawer scrollability, responsive overflow measurements, open nav screenshots, visual deviations, and fixes. "Screenshots captured" alone is not a sufficient review.
 
 ## Transparent image requests
 

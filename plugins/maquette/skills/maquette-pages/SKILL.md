@@ -15,14 +15,14 @@ Preferred inputs:
 - `.maquette/brand/design-system.json`
 - `.maquette/components/component-catalog.json`
 - approved brand-board image
-- approved component-sheet image or images
+- approved CSS-contract poster image or images, or approved visual component-sheet images when that fallback path was used
 
 Hard gate:
 - If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
-- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected component sheet image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
+- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected component sheet/CSS-contract poster image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
 - If the component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Run or request `maquette-components` to complete reusable component coverage first.
 - If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
-- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component-sheet references, run or request the component-library phase first to create the missing focused sheet or sheets. Do not silently invent significant new component language inside the page phase.
+- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused sheet or CSS-contract poster. Do not silently invent significant new component language inside the page phase.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
 - In a one-shot `maquette` workflow, earlier phases may be marked provisional, but they still must exist before this phase starts.
 
@@ -34,7 +34,7 @@ Do not skip directly to code-only page design unless the user explicitly asks yo
 The page concept image is the creative design artifact for the page and should guide layout, hierarchy, density, and style.
 
 Use image generation to:
-- create a new page concept from the approved brand board and component sheet or sheets, or
+- create a new page concept from the approved brand board and component sheet, sheets, or CSS-contract-backed component references, or
 - edit an existing concept image to refine the page while preserving the approved visual language
 
 If editing a local reference image, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
@@ -124,7 +124,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If the concept shows social links, use recognizable social icons rather than arbitrary generic icons. Do not substitute unrelated icons such as location, camera, music, or generic circles unless the concept explicitly asks for those symbols.
    - Prefer an existing icon library when available. If no brand-icon library is available, use simple inline SVGs or a locally defined icon set with accessible names.
    - Check that icon-only buttons and compact controls visibly render supported icons and are not blank.
-   - Compare coded typography weight, width, scale, and line-height against the concept, brand board, and component sheet. Avoid `Impact` as the fallback for condensed headings unless the board explicitly approves it.
+   - Compare coded typography weight, width, scale, and line-height against the concept, brand board, and component references. Avoid `Impact` as the fallback for condensed headings unless the board explicitly approves it.
    - Record the chosen font family, fallback stack, and rationale in the design system or `review.md`, especially when importing or substituting an open-source font.
    - Capture and inspect navigation at desktop, tablet, and mobile widths. For tablet and mobile, inspect both closed and open menu states.
    - If browser tooling is available, click the menu toggle and verify `aria-expanded` changes.
@@ -144,7 +144,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Prefer bundled Maquette scripts over generated run-local `.mjs` scripts for capture and responsive auditing. If a fallback script is generated, list it in `review.md` with the reason.
    - For each major section, write concept-to-code comparison notes in `review.md`: `matches`, `deviates`, `missing`, `simplified`, or `fixed`.
    - If a footer, header, terminal section, image asset, or any other visible concept region is simplified from the concept, either fix it or record the intentional reason and recommended follow-up in `review.md`.
-12. Record generated asset manifest status and missing assets, page concept region inventory, component sheet vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
+12. Record generated asset manifest status and missing assets, page concept region inventory, component sheet/CSS-contract poster vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
 
 ## Low-resolution reference rule
 
