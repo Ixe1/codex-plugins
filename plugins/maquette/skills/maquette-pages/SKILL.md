@@ -19,7 +19,9 @@ Preferred inputs:
 
 Hard gate:
 - If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
-- If `.maquette/components/component-catalog.json`, `.maquette/components/components.css`, `.maquette/components/gallery.html`, or a generated and inspected component sheet image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
+- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected component sheet image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
+- If the component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Run or request `maquette-components` to complete reusable component coverage first.
+- If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
 - If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component-sheet references, run or request the component-library phase first to create the missing focused sheet or sheets. Do not silently invent significant new component language inside the page phase.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
 - In a one-shot `maquette` workflow, earlier phases may be marked provisional, but they still must exist before this phase starts.
@@ -68,6 +70,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
 1. Read the approved design system and component catalog.
 2. Check component coverage before page concept work.
    - Reuse existing components first.
+   - Use component catalog APIs, slots, variants, states, and usage examples from the componentized reference. Do not copy the `replica-gallery.html` page layout into the page.
    - Identify any missing primitives, dense data patterns, or larger reusable composites needed by the page.
    - If the page has a header or primary navigation, verify that the component catalog covers responsive navigation variants before concept or implementation work.
    - If missing coverage is significant, run or request `maquette-components` to create the focused component/composite sheet before continuing.
@@ -100,10 +103,14 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Close controls and links must remain reachable in the opened drawer at mobile and tablet heights.
 9. Update the page blueprint to document composition, concept-region inventory path, asset manifest path, and any new composites.
 10. Capture screenshots when possible and compare them to the concept and approved references.
+   - Use Maquette's bundled scripts where possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/capture-browser.mjs`, or `skills/maquette-pages/scripts/capture-page.mjs`.
+   - Check optional project-local QA dependencies before reporting automated screenshot QA as unavailable. Do not assume global npm installs are available.
+   - If optional QA dependencies are missing and automated screenshot or responsive QA would materially improve confidence, ask the user through the Codex user-input/question tool whether to install `playwright`, `ajv`, and `ajv-formats` in the current project. Use explicit yes/no choices. If the user agrees, run `npm i -D playwright ajv ajv-formats` and `npx playwright install chromium`, then continue automated QA. If the user declines, continue with manual review and record the missing tooling.
    - Keep Playwright/Chromium screenshot capture headless.
    - Ensure every browser/session opened for screenshot capture is closed before finishing.
    - If cleanup fails, record the failed cleanup command or operation in the final response.
    - Capture desktop, tablet, and mobile page screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
+   - If screenshot capture falls back to a clipped full-document image, record the capture metadata and clipped fallback status in `review.md`.
 11. Run the required page QA pass:
    - Verify the page concept region inventory against the rendered page. Missing concept regions fail QA unless the inventory records an intentional omission with a concrete reason.
    - Verify the generated asset manifest. Every referenced local raster asset must exist, every generated asset requested by the user must be present or explicitly documented as not generated, and unused generated assets should be noted.
@@ -134,9 +141,10 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Fail and fix the page if document scroll width exceeds viewport width by more than 1px, unless there is an explicit documented exception.
    - Internal horizontal scrolling for wide components is allowed only when intentional and documented. It should generally not appear on normal desktop or tablet layouts unless the component is truly a data grid that requires it.
    - Horizontal scrolling is never an accepted exception for primary navigation.
+   - Prefer bundled Maquette scripts over generated run-local `.mjs` scripts for capture and responsive auditing. If a fallback script is generated, list it in `review.md` with the reason.
    - For each major section, write concept-to-code comparison notes in `review.md`: `matches`, `deviates`, `missing`, `simplified`, or `fixed`.
    - If a footer, header, terminal section, image asset, or any other visible concept region is simplified from the concept, either fix it or record the intentional reason and recommended follow-up in `review.md`.
-12. Record generated asset manifest status and missing assets, page concept region inventory, component sheet vs gallery fidelity notes, card anatomy alignment, footer fidelity, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
+12. Record generated asset manifest status and missing assets, page concept region inventory, component sheet vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
 
 ## Low-resolution reference rule
 

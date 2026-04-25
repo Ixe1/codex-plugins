@@ -73,13 +73,16 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
 4. Create or update `.maquette/brand/design-system.json` so it matches the approved or proposed board.
-5. Generate `.maquette/brand/tokens.css` from the design system JSON. Use `scripts/export-tokens.mjs` if present.
+   - The inspected brand board is the visual source of truth for palette, typography direction, spacing, radius, surfaces, shadows, and state principles.
+   - Do not use a script, existing CSS file, Figma/design export, or predetermined token file to infer or override brand tokens unless the user explicitly provides it as an approved constraint.
+5. Export `.maquette/brand/tokens.css` from the board-derived design system JSON. Use `scripts/export-tokens.mjs` if present.
+   - The export script is only a deterministic JSON-to-CSS serializer. It must not be treated as token extraction, visual analysis, or design decision-making.
 6. Summarize what changed and ask for approval or revision.
 7. Record the current decision in `.maquette/brand/approved.md`.
 
 ## Board rules
 
-The board is a foundational visual-system artifact, not a component specification or exhaustive UI inventory. It should focus on:
+The board is a foundational 1:1 visual-system artifact, not a component specification or exhaustive UI inventory. It should focus on:
 - palette and semantic color roles
 - typography direction, recommended font families or categories, fallbacks, weights, sizes, and line-height
 - spacing rhythm
@@ -112,5 +115,6 @@ If a board has already been approved:
 - Website only: use CSS token naming that can be consumed directly by HTML/CSS/JS.
 - Use semantic tokens rather than hard-coded component colors when possible.
 - Prefer explicit, machine-readable outputs over prose-only descriptions.
-- The image board is the creative artifact; the JSON and CSS files are the machine-readable contract.
+- The image board is the creative artifact and visual authority; the JSON and CSS files are the machine-readable contract derived from that inspected board.
+- Token export scripts may serialize the approved JSON into CSS, but they must not extract, guess, normalize, or replace visual decisions from the board.
 - The design-system JSON must record the intended font personality and acceptable CSS fallback stacks. Do not blindly use crude defaults such as `Impact` only because a board shows condensed or bold headings; use `Impact` only when the board explicitly approves it.

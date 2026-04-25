@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 
 const DEFAULT_WIDTHS = [390, 768, 1024, 1280, 1440];
@@ -65,8 +66,13 @@ let chromium;
 try {
   ({ chromium } = await import("playwright"));
 } catch (error) {
-  console.error("Playwright is not installed. Run `npm i -D playwright` and `npx playwright install chromium`, or run a manual responsive overflow audit.");
-  process.exit(2);
+  try {
+    const requireFromProject = createRequire(path.join(process.cwd(), "package.json"));
+    ({ chromium } = requireFromProject("playwright"));
+  } catch (fallbackError) {
+    console.error("Playwright is not installed. Run `npm i -D playwright` and `npx playwright install chromium`, or run a manual responsive overflow audit.");
+    process.exit(2);
+  }
 }
 
 const targetUrl = /^https?:\/\//.test(targetArg)
@@ -386,12 +392,28 @@ try {
 
       const viewportWidth = window.innerWidth;
       const allElements = Array.from(document.body.querySelectorAll("*"));
+      function hasScrollableWideAncestor(element) {
+        let current = element;
+        while (current && current !== document.body && current !== document.documentElement) {
+          const style = window.getComputedStyle(current);
+          const overflowAllowsScroll = ["auto", "scroll"].includes(style.overflowX)
+            || ["auto", "scroll"].includes(style.overflow);
+          const markedWide = current.matches(wideSelector);
+          if ((overflowAllowsScroll || markedWide) && current.scrollWidth > current.clientWidth + 1) {
+            return true;
+          }
+          current = current.parentElement;
+        }
+        return false;
+      }
+
       const overflowOffenders = allElements
         .map((element) => {
           const rect = element.getBoundingClientRect();
           const rightOverflow = Math.max(0, rect.right - viewportWidth);
           const leftOverflow = Math.max(0, -rect.left);
           const overflow = Math.max(rightOverflow, leftOverflow);
+          const acceptedInternalScroll = hasScrollableWideAncestor(element);
           return {
             selector: cssPath(element),
             tag: element.localName,
@@ -400,6 +422,7 @@ try {
             right: Number(rect.right.toFixed(2)),
             width: Number(rect.width.toFixed(2)),
             overflow: Number(overflow.toFixed(2)),
+            acceptedInternalScroll,
           };
         })
         .filter((item) => item.overflow > 1 && item.width > 0)
@@ -420,6 +443,9 @@ try {
         })
         .filter((item) => item.clientWidth > 0 || item.scrollWidth > 0);
 
+      const trueOverflowOffenders = overflowOffenders.filter((item) => !item.acceptedInternalScroll);
+      const acceptedInternalScrollOffenders = overflowOffenders.filter((item) => item.acceptedInternalScroll);
+
       return {
         windowInnerWidth: viewportWidth,
         documentElementScrollWidth: document.documentElement.scrollWidth,
@@ -431,6 +457,8 @@ try {
         ),
         wideComponents,
         overflowOffenders,
+        trueOverflowOffenders,
+        acceptedInternalScrollOffenders,
       };
     });
 
@@ -477,12 +505,16 @@ if (jsonPath) {
 
 for (const result of results) {
   const wideScrollCount = result.wideComponents.filter((item) => item.hasInternalHorizontalScroll).length;
+  const acceptedInternalScrollCount = result.acceptedInternalScrollOffenders?.length ?? 0;
   const status = result.passDocumentOverflow && result.passResponsiveNavigation ? "PASS" : "FAIL";
   const navStatus = result.passResponsiveNavigation ? "nav=pass" : "nav=fail";
-  console.log(`${status} ${result.windowInnerWidth}px: docEl=${result.documentElementScrollWidth}, body=${result.bodyScrollWidth}, overflow=${result.documentOverflowPx}px, wideScroll=${wideScrollCount}, ${navStatus}`);
-  if (result.overflowOffenders.length > 0) {
-    const top = result.overflowOffenders[0];
+  console.log(`${status} ${result.windowInnerWidth}px: docEl=${result.documentElementScrollWidth}, body=${result.bodyScrollWidth}, overflow=${result.documentOverflowPx}px, wideScroll=${wideScrollCount}, acceptedInternalScroll=${acceptedInternalScrollCount}, ${navStatus}`);
+  if (result.trueOverflowOffenders?.length > 0) {
+    const top = result.trueOverflowOffenders[0];
     console.log(`  top offender: ${top.selector || top.tag} (${top.overflow}px)`);
+  } else if (acceptedInternalScrollCount > 0) {
+    const top = result.acceptedInternalScrollOffenders[0];
+    console.log(`  accepted internal scroll: ${top.selector || top.tag} (${top.overflow}px)`);
   }
   if (result.responsiveNavigation?.toggleCheck) {
     const check = result.responsiveNavigation.toggleCheck;

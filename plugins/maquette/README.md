@@ -13,9 +13,10 @@ The workflow is therefore:
 1. **Generate or edit a visual artifact first** with `image_gen`
 2. **Inspect the generated artifact** with `view_image`
 3. **Convert that artifact into machine-readable design contracts** such as JSON and CSS tokens
-4. **Implement reusable HTML/CSS/JS**
-5. **Render and screenshot the implementation**
-6. **Compare implementation against the approved visual artifact** and iterate
+4. **Build a componentized visual reference** for each component sheet using reusable HTML/CSS/JS from the start
+5. **Document reusable APIs, slots, states, and usage examples** before moving to the next sheet
+6. **Render and screenshot the implementation**
+7. **Compare implementation against the approved visual artifact** and iterate
 
 This plugin includes a root workflow skill plus three focused phase skills:
 - `maquette`
@@ -27,7 +28,7 @@ This plugin includes a root workflow skill plus three focused phase skills:
 
 Maquette helps Codex turn an approved visual direction into reusable website artifacts:
 - brand kits with design-system JSON and CSS tokens
-- component libraries with reusable HTML/CSS/JS and gallery QA
+- component libraries with reusable HTML/CSS/JS and reference QA
 - implemented pages with screenshot and responsive review notes
 
 Install the marketplace, restart Codex, then invoke the full workflow with `@Maquette` or `$maquette`:
@@ -47,21 +48,25 @@ Use `$maquette-brand-kit`, `$maquette-components`, or `$maquette-pages` when you
 If the `image_gen` tool is available in the environment, it is **not optional** for the normal happy-path workflow.
 
 Each phase must use it as follows unless the user explicitly asks to skip image generation or the environment genuinely lacks the tool:
-- brand-kit phase -> create or edit a focused foundational **brand board image** with no logo, wordmark, brand mark, large product-name treatment, or detailed component inventory; record explicit typography recommendations and fallback strategy
-- components phase -> create or edit a focused core **component sheet image** before or alongside implementation, plus additional focused sheets when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them
+- brand-kit phase -> create or edit a focused foundational 1:1 **brand board image** with no logo, wordmark, brand mark, large product-name treatment, or detailed component inventory; record explicit typography recommendations and fallback strategy
+- components phase -> create or edit one focused 16:9 **component sheet image** at a time, starting with core primitives, then additional focused 16:9 navigation/layout, data/display, or cards/composites sheets when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them
 - pages phase -> create or edit a **page concept image** before implementation
 
 After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
 Generated boards and sheets should be readable at normal preview size. Maquette should regenerate, edit, or split visual artifacts that are cluttered, logo-like, or not inspectable enough to guide implementation.
 Sites with primary navigation should define responsive navigation before page implementation: desktop inline nav, tablet/mobile menu toggle, expanded panel or drawer, accessible states, and no document-level horizontal scrolling for nav.
 Repeated card grids should define equal-height cards and bottom-pinned action rows before page implementation. Footer social links should use recognizable social icons, and page typography should follow the approved font strategy rather than crude defaults such as `Impact`.
-Page implementation now includes a fidelity gate: inventory visible concept regions, create an asset manifest for required raster assets, then document section-by-section screenshot comparison notes before approval.
+Component implementation includes hard gates per sheet: first make the optional QA tooling decision, then generate one 16:9 component sheet, render a sheet-specific componentized replica/reference using reusable CSS/JS, write batch artifacts, and only then move to the next sheet.
+Page implementation includes a fidelity gate: inventory visible concept regions, create an asset manifest for required raster assets, then document section-by-section screenshot comparison notes before approval.
 
 ## Output philosophy
 
-The visual artifact is the creative source and approval artifact.
+The brand board is the 1:1 visual-system contract.
+The component sheet is the 16:9 visual target for a coded componentized reference.
+The reusable component library is the CSS/JS/catalog API proven by that reference and consumed by pages.
 The structured JSON/CSS files are the machine-readable source of truth.
-The coded gallery/page screenshots are the verification artifacts.
+The coded reference/page screenshots are the verification artifacts.
+Token scripts are serializers, not design authorities: `tokens.css` should be exported from the inspected-board-derived `design-system.json`, not extracted from or overridden by a predetermined design file unless the user explicitly approves that file as a constraint.
 All Maquette-owned project artifacts are isolated by the workflow under `.maquette/`, including generated images, HTML/CSS/JS, manifests, review notes, Playwright screenshots, and responsive audit output. Maquette should not create a root-level `index.html`; app integration is a separate explicit task.
 
 ## Example output
@@ -111,8 +116,10 @@ After the brand kit is approved, use `$maquette-components`:
 $maquette-components Make a component library.
 ```
 
-This pass creates a focused core component sheet, adds focused data/composite/form/navigation/repeated-card/newsletter/footer-social sheets when the product needs them, and implements reusable components, states, and a gallery from the approved brand system.
+This pass creates a focused core component sheet first, builds and reviews a componentized visual reference with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats that loop for focused data/composite/form/navigation/repeated-card/newsletter/footer-social sheets when the product needs them.
 When a site has global navigation, the component pass should include responsive nav variants for desktop, tablet, and mobile.
+Every component sheet is 16:9. Maquette should not generate all component sheets before implementation. Each multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
+Each batch must complete screenshot review or documented manual visual review against its source sheet before Maquette generates the next component sheet.
 
 ### 3. Create pages
 
@@ -143,32 +150,54 @@ $maquette-pages make a pricing page.
 
 Use `@Maquette` or `$maquette` when you want the full staged workflow. Use the individual phase skills when you intentionally want to work on only one phase.
 
-## Optional screenshot tooling
+## Optional QA tooling
 
-Maquette can use Playwright to capture coded component and page screenshots for visual review and responsive overflow QA.
+Maquette can use project-local Node dependencies for automated screenshot capture, responsive overflow QA, component API smoke checks, page-consumption smoke checks, and JSON schema validation. These dependencies are **not** bundled with the plugin, and installing Maquette does not create `node_modules`.
 
-If your project does not already have Playwright installed, add it in the project where Maquette is generating UI files:
+If your project does not already have the optional QA dependencies installed, add them in the project where Maquette is generating UI files:
 
 ```sh
-npm i -D playwright
+npm i -D playwright ajv ajv-formats
 npx playwright install chromium
 ```
 
-The bundled capture scripts import the `playwright` package directly and launch Chromium in headless mode:
+You can check whether the current project has the optional QA tooling available without installing anything:
 
 ```sh
-node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs components/gallery.html components/gallery.png
-node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs pages/homepage/page.html pages/homepage/page.png
-node plugins/maquette/shared/scripts/audit-responsive-layout.mjs pages/homepage/page.html --json pages/homepage/responsive-audit.json --screenshots-dir pages/homepage/screenshots
+node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --json .maquette/qa-tooling.json
 ```
 
-Screenshot capture and responsive auditing should stay headless, and every browser instance opened for capture must be closed before the workflow finishes. The bundled scripts close Chromium in a `finally` block.
+During a Maquette run, Codex should check optional QA tooling before component sheets or component code are generated. If optional QA dependencies are missing and automated QA would materially improve the result, Codex should ask before installing them into the project. If the user agrees, Codex can run the project-local install commands and continue with automated QA. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
 
-Responsive review should record measured overflow results at 390, 768, 1024, 1280, and 1440px when browser tooling is available. Page-wide horizontal overflow greater than 1px should be fixed unless an explicit exception is documented.
+Project-local installs are the recommended path. Global npm installs are not recommended because Node usually will not resolve global packages from plugin scripts unless the user also configures environment-specific module lookup such as `NODE_PATH`.
+
+The bundled browser scripts load `playwright` from the current project when available and launch Chromium in headless mode. The JSON validation helper loads `ajv` and `ajv-formats` from the current project when available:
+
+```sh
+node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser
+node plugins/maquette/shared/scripts/capture-browser.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png --json .maquette/components/reference-capture.json
+node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png
+node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs .maquette/pages/homepage/page.html .maquette/pages/homepage/page.png
+node plugins/maquette/shared/scripts/validate-linked-assets.mjs .maquette/components/replica-gallery.html --json .maquette/components/linked-assets.json
+node plugins/maquette/shared/scripts/audit-responsive-layout.mjs .maquette/pages/homepage/page.html --json .maquette/pages/homepage/responsive-audit.json --screenshots-dir .maquette/pages/homepage/screenshots
+node plugins/maquette/shared/scripts/check-component-gallery.mjs .maquette/components/replica-gallery.html --json .maquette/components/component-reference-check.json
+node plugins/maquette/shared/scripts/page-consumption-smoke.mjs --project . --json .maquette/components/page-consumption-smoke.json
+node plugins/maquette/shared/scripts/validate-artifacts.mjs --project . --json .maquette/components/artifact-validation.json
+```
+
+Screenshot capture and responsive auditing should stay headless, and every browser instance opened for capture must be closed before the workflow finishes. The bundled scripts close Chromium in a `finally` block. If full-page capture falls back to a clipped full-document screenshot, record the metadata JSON and clipped fallback note in the relevant approval file. Linked asset validation should pass for each batch replica and the final component reference before the next sheet or page phase begins.
+
+Responsive review should record measured overflow results at 390, 768, 1024, 1280, and 1440px when browser tooling is available. Page-wide horizontal overflow greater than 1px should be fixed unless an explicit exception is documented. Internal scrolling for genuine wide components should be reported separately from true document overflow.
 For pages with navigation, tablet/mobile review should capture closed and open nav states, verify the menu toggle changes `aria-expanded`, and reject nav that clips, overflows, or requires document-level horizontal scrolling.
 For pages with repeated cards, review should compare shared anatomy, badge placement, CTA, quantity, price, and action-row alignment across cards with varied copy lengths. For rich footers, review should verify footer structure rather than accepting generic columns. For pages with social links, review should verify recognizable social icons with accessible names. Mobile drawer review should verify opened drawers can scroll independently when needed. Typography review should record the chosen font family, fallback stack, and rationale.
 
-If Playwright is not available, Maquette can still create the design contracts and code, but screenshot-based visual comparison becomes a manual review step.
+If Playwright is not available, Maquette can still create the design contracts and code, but screenshot-based visual comparison becomes a manual review step. In that case the component catalog should use `review_mode: "manual"`, record `blocked_screenshot_reason`, and put HTML or other non-screenshot evidence in `gallery_review_artifact_paths` rather than pretending those files are screenshots.
+
+If `ajv` or `ajv-formats` is not available, Maquette can still continue, but schema validation should be recorded as unavailable or performed manually rather than reported as passed. When available, the bundled artifact validator also checks that component-catalog paths such as approval notes, references, batch reviews, screenshots, and catalog snapshots actually exist.
+
+Generated project-local scripts are fallback-only. Prefer the bundled Maquette helpers for capture, responsive audits, contrast/API smoke checks, JSON validation, and page-consumption smoke checks; if a generated fallback script is necessary, document it in `approved.md` or `review.md` with the reason.
+
+Disposable Maquette smoke runs used while developing this plugin should live under `.maquette-test/`. The repository ignores that directory so generated screenshots, local `node_modules`, and temporary validation artifacts are not committed.
 
 ## Installation
 

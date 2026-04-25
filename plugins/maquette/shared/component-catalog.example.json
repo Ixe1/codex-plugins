@@ -13,9 +13,98 @@
   },
   "assets": {
     "tokens_css_path": "brand/tokens.css",
-    "gallery_html_path": "components/gallery.html",
+    "sheet_inventory_path": "components/sheet-inventory.md",
+    "sheet_implementation_log_path": "components/sheet-implementation-log.md",
+    "sheet_implementation_batches": [
+      {
+        "category": "core-primitives",
+        "sheet_path": "components/component-sheet-v1.png",
+        "replica_artifact_paths": [
+          "components/core-primitives.replica.html"
+        ],
+        "component_artifact_paths": [
+          "components/core-primitives.replica.html",
+          "components/css/core-primitives.components.css",
+          "components/js/core-primitives.components.js"
+        ],
+        "catalog_snapshot_path": "components/core-primitives.component-catalog.json",
+        "review_path": "components/core-primitives.review.md",
+        "review_artifact_paths": [
+          "components/core-primitives.review.md",
+          "components/core-primitives.replica.html",
+          "components/screenshots/core-primitives-1440.png"
+        ],
+        "screenshot_paths": [
+          "components/screenshots/core-primitives-1440.png"
+        ],
+        "review_mode": "screenshot",
+        "reusable_components_added": [
+          "button",
+          "text-input",
+          "responsive-navigation",
+          "product-card"
+        ],
+        "rubric_scores": {
+          "coverage": 5,
+          "visual_match": 4,
+          "anatomy_match": 5,
+          "responsive_match": 5,
+          "implementation_quality": 5
+        },
+        "corrections_made": [
+          "Adjusted card action rows to align with the 16:9 component sheet."
+        ],
+        "simplifications": [],
+        "deferred_items": [],
+        "completed_before_next_sheet": true,
+        "status": "implemented"
+      },
+      {
+        "category": "data-display",
+        "sheet_path": "components/component-sheet-data-v1.png",
+        "replica_artifact_paths": [
+          "components/data-display.replica.html"
+        ],
+        "component_artifact_paths": [
+          "components/data-display.replica.html",
+          "components/css/data-display.components.css",
+          "components/js/data-display.components.js"
+        ],
+        "catalog_snapshot_path": "components/data-display.component-catalog.json",
+        "review_path": "components/data-display.review.md",
+        "review_artifact_paths": [
+          "components/data-display.review.md",
+          "components/data-display.replica.html",
+          "components/screenshots/data-display-1440.png"
+        ],
+        "screenshot_paths": [
+          "components/screenshots/data-display-1440.png"
+        ],
+        "review_mode": "screenshot",
+        "reusable_components_added": [
+          "data-table",
+          "status-badge"
+        ],
+        "rubric_scores": {
+          "coverage": 4,
+          "visual_match": 4,
+          "anatomy_match": 4,
+          "responsive_match": 5,
+          "implementation_quality": 5
+        },
+        "corrections_made": [
+          "Increased icon contrast in active and disabled states after screenshot review."
+        ],
+        "simplifications": [],
+        "deferred_items": [],
+        "completed_before_next_sheet": true,
+        "status": "implemented"
+      }
+    ],
+    "replica_gallery_html_path": "components/replica-gallery.html",
+    "component_reference_html_path": "components/replica-gallery.html",
     "gallery_screenshot_paths": [
-      "components/gallery.png"
+      "components/replica-gallery.png"
     ],
     "component_sheet_path": "components/component-sheet-v1.png",
     "component_sheet_paths": [
@@ -26,14 +115,60 @@
       "components/screenshots/responsive-nav-open-390.png",
       "components/screenshots/responsive-nav-open-768.png"
     ],
+    "gallery_review_artifact_paths": [
+      "components/replica-gallery.html",
+      "components/replica-gallery.png",
+      "components/component-gallery-check.json",
+      "components/page-consumption-smoke.json",
+      "components/artifact-validation.json"
+    ],
+    "replica_fidelity_review": {
+      "reference_sheet_paths": [
+        "components/component-sheet-v1.png",
+        "components/component-sheet-data-v1.png"
+      ],
+      "gallery_screenshot_paths": [
+        "components/replica-gallery.png",
+        "components/screenshots/responsive-390.png",
+        "components/screenshots/responsive-1440.png"
+      ],
+      "gallery_review_artifact_paths": [
+        "components/replica-gallery.html",
+        "components/replica-gallery.png"
+      ],
+      "review_mode": "screenshot",
+      "rubric_scores": {
+        "coverage": 5,
+        "visual_match": 4,
+        "anatomy_match": 5,
+        "responsive_match": 5,
+        "implementation_quality": 5
+      },
+      "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy shown in the approved sheets.",
+      "failed_categories": [],
+      "corrections_made": [
+        "Adjusted card action rows to align with the 16:9 component sheet.",
+        "Increased icon contrast in active and disabled states after screenshot review."
+      ],
+      "simplifications": [],
+      "status": "matches"
+    },
     "sheet_fidelity_review": {
       "reference_sheet_paths": [
         "components/component-sheet-v1.png",
         "components/component-sheet-data-v1.png"
       ],
-      "coverage_summary": "Gallery renders the component families, variants, states, responsive navigation, and repeated-card anatomy shown in the approved sheets.",
+      "review_mode": "screenshot",
+      "coverage_summary": "Compatibility summary for older Maquette consumers; see replica_fidelity_review for the detailed rubric.",
       "simplifications": [],
       "status": "matches"
+    },
+    "reusable_component_review": {
+      "status": "ready",
+      "api_summary": "Reusable classes expose variants, sizes, states, slots, JS behavior, and accessibility hooks for page implementation.",
+      "ready_for_pages": true,
+      "usage_examples_path": "components/replica-gallery.html",
+      "gaps": []
     },
     "review_notes_path": "components/approved.md"
   },
@@ -42,9 +177,9 @@
       "name": "button",
       "source_required_component": "button",
       "files": [
-        "components/components.css",
-        "components/components.js",
-        "components/gallery.html"
+        "components/css/components.css",
+        "components/js/components.js",
+        "components/replica-gallery.html"
       ],
       "selectors": [
         ".btn",
@@ -74,6 +209,22 @@
         "disabled",
         "loading"
       ],
+      "api": {
+        "slots": [
+          "icon-start",
+          "label",
+          "icon-end"
+        ],
+        "required_attributes": [
+          "type for native button usage",
+          "aria-busy when loading"
+        ],
+        "js_behavior": "No JS required except optional loading-state toggles.",
+        "usage_examples": [
+          "<button class=\"btn btn--primary\">Save route</button>",
+          "<button class=\"btn btn--secondary\"><span class=\"icon\"></span>Filter</button>"
+        ]
+      },
       "accessibility_notes": [
         "Visible focus ring",
         "Minimum 40px touch target on md and lg"
@@ -83,7 +234,7 @@
           "brand/brand-board-v1.png",
           "components/component-sheet-v1.png"
         ],
-        "latest_screenshot_path": "components/gallery.png",
+        "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Button density and radius match the approved board. Ghost hover treatment is intentionally subtle."
       },
       "status": "reviewed"
@@ -92,9 +243,9 @@
       "name": "text-input",
       "source_required_component": "text-input",
       "files": [
-        "components/components.css",
-        "components/components.js",
-        "components/gallery.html"
+        "components/css/components.css",
+        "components/js/components.js",
+        "components/replica-gallery.html"
       ],
       "selectors": [
         ".field",
@@ -120,6 +271,22 @@
         "error",
         "readonly"
       ],
+      "api": {
+        "slots": [
+          "label",
+          "control",
+          "help-text",
+          "error-text"
+        ],
+        "required_attributes": [
+          "for/id pairing",
+          "aria-describedby when help or error text exists"
+        ],
+        "js_behavior": "No JS required for static fields.",
+        "usage_examples": [
+          "<label class=\"field\"><span class=\"field__label\">Email</span><input class=\"field__input\" type=\"email\"></label>"
+        ]
+      },
       "accessibility_notes": [
         "Error state retains readable contrast",
         "Placeholder remains visually distinct from actual value text"
@@ -128,7 +295,7 @@
         "reference_image_paths": [
           "brand/brand-board-v1.png"
         ],
-        "latest_screenshot_path": "components/gallery.png",
+        "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Field border and focus ring align with approved design language."
       },
       "status": "reviewed"
@@ -137,9 +304,9 @@
       "name": "responsive-navigation",
       "source_required_component": "navigation",
       "files": [
-        "components/components.css",
-        "components/components.js",
-        "components/gallery.html"
+        "components/css/components.css",
+        "components/js/components.js",
+        "components/replica-gallery.html"
       ],
       "selectors": [
         ".site-nav",
@@ -165,6 +332,22 @@
         "expanded",
         "collapsed"
       ],
+      "api": {
+        "slots": [
+          "brand",
+          "primary-links",
+          "actions",
+          "mobile-panel"
+        ],
+        "required_attributes": [
+          "aria-controls and aria-expanded on menu toggle",
+          "aria-current on current page link"
+        ],
+        "js_behavior": "Toggle aria-expanded and mobile panel visibility; preserve keyboard access.",
+        "usage_examples": [
+          "<nav class=\"site-nav\" aria-label=\"Primary\">...</nav>"
+        ]
+      },
       "accessibility_notes": [
         "Menu toggle uses aria-controls, aria-expanded, and an accessible label",
         "Expanded menu links are keyboard reachable",
@@ -183,9 +366,9 @@
       "name": "product-card",
       "source_required_component": "product-card",
       "files": [
-        "components/components.css",
-        "components/components.js",
-        "components/gallery.html"
+        "components/css/components.css",
+        "components/js/components.js",
+        "components/replica-gallery.html"
       ],
       "selectors": [
         ".product-card",
@@ -207,6 +390,24 @@
         "focus-visible",
         "disabled"
       ],
+      "api": {
+        "slots": [
+          "media",
+          "eyebrow",
+          "title",
+          "body",
+          "metadata",
+          "actions"
+        ],
+        "required_attributes": [
+          "descriptive heading",
+          "accessible names for quantity controls"
+        ],
+        "js_behavior": "Optional quantity increment/decrement behavior.",
+        "usage_examples": [
+          "<article class=\"product-card\"><div class=\"product-card__body\">...</div><div class=\"product-card__actions\">...</div></article>"
+        ]
+      },
       "accessibility_notes": [
         "Quantity buttons have accessible labels",
         "Primary product CTA remains keyboard reachable after variable-length copy"
@@ -221,10 +422,10 @@
         "reference_image_paths": [
           "components/component-sheet-v1.png"
         ],
-        "latest_screenshot_path": "components/gallery.png",
+        "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Card surfaces and CTA styling follow the component sheet.",
         "qa_notes": [
-          "Gallery includes at least three product cards with varied copy length.",
+          "Componentized reference includes at least three product cards with varied copy length.",
           "Screenshot review confirms quantity and Add to Cart rows share the same vertical position across the row."
         ]
       },

@@ -1,0 +1,180 @@
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const args = process.argv.slice(2);
+
+function usage() {
+  console.error([
+    "Usage: node validate-artifacts.mjs [options]",
+    "",
+    "Options:",
+    "  --project <path>       Project root, default current directory",
+    "  --schema-root <path>   Maquette shared schema directory",
+    "  --json <path>          Write JSON validation output",
+  ].join("\n"));
+}
+
+let projectRoot = process.cwd();
+let schemaRoot = path.resolve(currentDir, "..");
+let jsonPath;
+
+for (let index = 0; index < args.length; index += 1) {
+  const arg = args[index];
+  if (arg === "--help" || arg === "-h") {
+    usage();
+    process.exit(0);
+  } else if (arg === "--project") {
+    projectRoot = path.resolve(args[++index]);
+  } else if (arg === "--schema-root") {
+    schemaRoot = path.resolve(args[++index]);
+  } else if (arg === "--json") {
+    jsonPath = args[++index];
+  } else {
+    console.error(`Unknown option: ${arg}`);
+    usage();
+    process.exit(1);
+  }
+}
+
+let Ajv2020;
+let addFormats;
+try {
+  const requireFromProject = createRequire(path.join(projectRoot, "package.json"));
+  const ajvModule = requireFromProject("ajv/dist/2020.js");
+  const formatsModule = requireFromProject("ajv-formats");
+  Ajv2020 = ajvModule.default ?? ajvModule;
+  addFormats = formatsModule.default ?? formatsModule;
+} catch (error) {
+  console.error("ajv and ajv-formats are not available from the target project. Install them or run manual JSON validation.");
+  process.exit(2);
+}
+
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+
+const checks = [
+  {
+    name: "design-system",
+    schemaPath: path.join(schemaRoot, "design-system.schema.json"),
+    dataPath: path.join(projectRoot, ".maquette/brand/design-system.json"),
+  },
+  {
+    name: "component-catalog",
+    schemaPath: path.join(schemaRoot, "component-catalog.schema.json"),
+    dataPath: path.join(projectRoot, ".maquette/components/component-catalog.json"),
+  },
+];
+
+function asArray(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function resolveArtifactPath(projectRootPath, artifactPath) {
+  if (!artifactPath || typeof artifactPath !== "string") return null;
+  if (path.isAbsolute(artifactPath)) return artifactPath;
+  const maquetteRelative = path.join(projectRootPath, ".maquette", artifactPath);
+  if (fs.existsSync(maquetteRelative)) return maquetteRelative;
+  return path.join(projectRootPath, artifactPath);
+}
+
+function collectComponentArtifactPaths(componentCatalog) {
+  const assets = componentCatalog.assets ?? {};
+  const paths = [
+    assets.tokens_css_path,
+    assets.sheet_inventory_path,
+    assets.sheet_implementation_log_path,
+    assets.replica_gallery_html_path,
+    assets.component_reference_html_path,
+    assets.gallery_html_path,
+    assets.component_sheet_path,
+    assets.review_notes_path,
+    ...asArray(assets.component_sheet_paths),
+    ...asArray(assets.gallery_screenshot_paths),
+    ...asArray(assets.nav_open_screenshot_paths),
+    ...asArray(assets.gallery_review_artifact_paths),
+  ];
+
+  for (const batch of asArray(assets.sheet_implementation_batches)) {
+    paths.push(
+      batch.sheet_path,
+      batch.catalog_snapshot_path,
+      batch.review_path,
+      ...asArray(batch.replica_artifact_paths),
+      ...asArray(batch.component_artifact_paths),
+      ...asArray(batch.reusable_artifact_paths),
+      ...asArray(batch.review_artifact_paths),
+      ...asArray(batch.screenshot_paths),
+    );
+  }
+
+  return paths.filter(Boolean);
+}
+
+const results = checks.map((check) => {
+  if (!fs.existsSync(check.dataPath)) {
+    return {
+      name: check.name,
+      schemaPath: check.schemaPath,
+      dataPath: check.dataPath,
+      pass: false,
+      errors: [{ message: "Data file does not exist" }],
+    };
+  }
+
+  const schema = JSON.parse(fs.readFileSync(check.schemaPath, "utf8"));
+  const data = JSON.parse(fs.readFileSync(check.dataPath, "utf8"));
+  const validate = ajv.compile(schema);
+  const schemaPass = validate(data);
+  const artifactErrors = check.name === "component-catalog"
+    ? collectComponentArtifactPaths(data)
+      .map((artifactPath) => ({
+        artifactPath,
+        resolvedPath: resolveArtifactPath(projectRoot, artifactPath),
+      }))
+      .filter((item) => !item.resolvedPath || !fs.existsSync(item.resolvedPath))
+      .map((item) => ({
+        instancePath: "/assets",
+        message: `Referenced artifact does not exist: ${item.artifactPath}`,
+        params: { artifactPath: item.artifactPath },
+      }))
+    : [];
+  const pass = schemaPass && artifactErrors.length === 0;
+  return {
+    name: check.name,
+    schemaPath: check.schemaPath,
+    dataPath: check.dataPath,
+    pass,
+    errors: [
+      ...(validate.errors ?? []),
+      ...artifactErrors,
+    ],
+  };
+});
+
+const output = {
+  projectRoot,
+  schemaRoot,
+  results,
+  pass: results.every((result) => result.pass),
+};
+
+if (jsonPath) {
+  fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+  fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
+}
+
+for (const result of results) {
+  console.log(`${result.pass ? "PASS" : "FAIL"} ${result.name}: ${result.dataPath}`);
+  if (!result.pass) {
+    console.log(JSON.stringify(result.errors, null, 2));
+  }
+}
+
+if (!output.pass) {
+  process.exit(1);
+}

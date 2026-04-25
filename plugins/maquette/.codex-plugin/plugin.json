@@ -31,7 +31,7 @@
     "defaultPrompt": [
       "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Run the full workflow: brand kit, component library, then homepage. Include product cards, marketing sections, newsletter signup, footer social links, and original generated image assets where useful.",
       "Use $maquette-brand-kit to create a focused foundational website brand kit for a boutique snack brand. Generate and inspect a brand board first, then produce design-system JSON, CSS tokens, and approval notes.",
-      "Use $maquette-components to build a reusable component library from the existing approved brand kit. Include buttons, forms, cards, product cards, newsletter modules, footer/social modules, responsive navigation, and gallery QA.",
+      "Use $maquette-components to build a reusable component library from the existing approved brand kit. Process focused 16:9 component sheets sequentially: check optional QA tooling, generate one sheet, write concrete category-prefixed componentized batch replica/reference, CSS/JS, catalog, and screenshot-reviewed artifacts, then move to the next sheet. Include buttons, forms, cards, product cards, newsletter modules, footer/social modules, responsive navigation, and reference QA.",
       "Use $maquette-pages to create a pricing page from the existing approved brand kit and component library. Reuse existing components first, request focused missing component coverage only if needed, then implement and QA the page.",
       "Use $maquette-pages to create a product listing page from the existing Maquette artifacts. Check product-card coverage, align repeated card actions, use recognizable footer social icons, and record responsive QA."
     ],

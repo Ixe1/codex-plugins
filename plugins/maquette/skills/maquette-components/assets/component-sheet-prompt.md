@@ -1,5 +1,9 @@
 Edit the visible approved brand board into a focused website component-sheet image.
 
+Use a 16:9 landscape composition for every component sheet. Exact generated pixel dimensions are not controllable; prioritize a clearly landscape 16:9 board with no cropping, letterboxing, or extra content outside the board.
+
+Generate only the current requested sheet category. Do not include teaser panels for later sheet categories. In multi-sheet workflows, the implementation model will inspect, implement a componentized replica/reference, review, and document reusable components from this sheet before requesting the next focused sheet.
+
 Preserve:
 - approved palette
 - typography personality
@@ -8,18 +12,21 @@ Preserve:
 - interaction style
 
 Show:
-- a focused core-primitives sheet first
-- responsive navigation primitives when the site or page has global navigation
-- component styling for buttons, links, icon buttons, text inputs, selects, checkboxes, switches, tabs, badges, alerts, cards, product cards, newsletter modules, and footer/social modules as needed by the product brief
+- a focused core-primitives sheet first: buttons, icon buttons, links, text inputs, textarea, selects, checkboxes, radios, switches, tabs, badges, and alerts
+- a navigation/layout sheet when needed: desktop nav, tablet/mobile nav, drawers/panels, breadcrumbs, sidebars, page shell, and toolbars
+- a data/display sheet when needed: tables, lists, metrics, feeds, empty/loading/error states, filters, and pagination
+- a cards/composites sheet when needed: product, service, pricing, task, workflow, newsletter, footer, and social modules
 - component anatomy where useful
 - variant examples and size examples where relevant
+- visible states, density, spacing, radius, shadows, and polish that are clear enough to implement in HTML/CSS
 - separate asset requirements when component families need raster assets, such as product-card imagery, promo-card imagery, newsletter illustrations, app/device imagery, footer modules, background textures, or lifestyle/story imagery
 - compact implementation notes only where they help implementation
 - no logo
 
 Adaptive sheet rules:
 - do not create one exhaustive mega-sheet
-- infer whether additional sheets are needed from the product brief and references
+- infer whether additional sheets are needed from the product brief and references, but keep this image focused on the current sheet category
+- every additional focused sheet must also use a 16:9 landscape composition
 - if the product involves dense data, dashboards, server lists, tables, maps, calendars, editors, timelines, complex workflows, filter builders, or large reusable composites, create additional focused sheets for those families instead of crowding the core-primitives sheet
 - if the product has global navigation, include a focused navigation family: desktop inline nav, compact/tablet nav, mobile menu toggle, expanded mobile menu or drawer, active link, focus-visible state, and icon rendering
 - if the product has repeated product, pricing, service, offer, or promo cards, include a focused card family that shows shared media/header/body/footer/action slots, consistent badge or eyebrow placement, equal-height cards, flexible body layout, and bottom-pinned action rows
@@ -30,7 +37,9 @@ Adaptive sheet rules:
 
 Quality requirements:
 - component sheets define component styling; they should not contradict the approved brand board, and any unavoidable contradiction must be noted for `approved.md`
-- the later coded gallery must be able to match this sheet's sophistication; do not show component details, density, states, or composites that are too ambiguous to implement
+- component sheets are componentized reference targets, not mood references; the later coded reference should reproduce the visible component families, anatomy, variants, states, density, spacing, radius, shadows, and polish using reusable CSS/JS from the start
+- foreground/background contrast must remain readable in active, selected, focus, disabled, inverse, and dark navigation states
+- the later coded componentized reference and reusable component API must be able to match this sheet's sophistication; do not show component details, density, states, or composites that are too ambiguous to implement
 - icon-only controls must have readable icon/background contrast in default, hover, active, selected, disabled, and inverse states
 - variants of the same component should keep comparable anatomy and action placement unless an intentional exception is shown
 - repeated card grids must show shared anatomy, aligned card heights, stable badge/eyebrow placement, and aligned action rows; quantity selectors, prices, and primary CTAs should align across cards even when title or description copy lengths vary
@@ -40,5 +49,5 @@ Quality requirements:
 - table cells, badges, labels, icons, and buttons must remain readable without overlap
 - reject the layout direction if labels are too small, unrelated families are crammed into tiny cells, components overlap, full tables or dashboards crowd out primitives, implementation notes dominate, or the image cannot guide implementation without heavy zooming
 
-This component sheet is a creative design artifact that the later coded library should match.
+This component sheet is a creative design artifact that the later coded componentized reference should match while exposing reusable component APIs.
 Do not create a new visual direction.

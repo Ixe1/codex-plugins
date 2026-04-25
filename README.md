@@ -69,7 +69,7 @@ Maquette is a Codex plugin for image-guided website design-system workflows.
 It helps Codex turn an approved visual direction into reusable website artifacts:
 
 - brand kits with design-system JSON and CSS tokens
-- component libraries with reusable HTML/CSS/JS and gallery QA
+- component libraries with reusable HTML/CSS/JS and reference QA
 - implemented pages with screenshot and responsive review notes
 
 Invoke the full staged workflow with `@Maquette` or `$maquette`:
@@ -80,7 +80,7 @@ Invoke the full staged workflow with `@Maquette` or `$maquette`:
 
 Use `$maquette-brand-kit`, `$maquette-components`, or `$maquette-pages` when you want to run one phase at a time.
 
-See the [Maquette README](./plugins/maquette/README.md) for the full workflow, image generation rules, optional Playwright tooling, and manual local install notes.
+See the [Maquette README](./plugins/maquette/README.md) for the full workflow, image generation rules, optional QA tooling, and manual local install notes.
 
 ## Adding Plugins
 
