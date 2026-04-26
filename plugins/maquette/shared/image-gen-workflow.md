@@ -39,13 +39,21 @@ After inspection, continue the same turn unless the user explicitly asked for im
 
 ## Image Generation Delegation
 
-Subagent delegation must follow the current Codex runtime policy. If that policy requires explicit user authorization before spawning subagents, Maquette must not silently skip the image-worker path. Ask once near the start of the run whether to use dedicated image-worker subagents for Maquette image generation and editing.
+Subagent delegation must follow the current Codex runtime policy. If that policy requires explicit user authorization before spawning subagents, Maquette must not silently skip the image-worker path. Absence of prior subagent authorization is a reason to ask the user, not a reason to generate images in the main workflow.
+
+Before the first Maquette `image_gen` create or edit call in a run, resolve the image-worker decision:
+
+- If the user already explicitly asked for subagents or image-worker subagents in the current Maquette request, treat that as authorization for this run and do not ask again.
+- If the user explicitly declined subagents/image workers, explicitly asked to avoid questions, or explicitly requested an unattended/no-pauses/skip-approval run, do not ask the image-worker question; use the main workflow and record the reason.
+- Otherwise, ask once near the start of the run whether to use dedicated image-worker subagents for Maquette image generation and editing.
+
+Workflow violation: do not make or edit any Maquette image in the main workflow merely because subagents were not previously authorized. The decision must be authorized, declined, explicitly bypassed by unattended language, or blocked by unavailable tooling before the first image generation/editing step starts. A request to use `Image Gen` or to generate image assets is not, by itself, image-worker authorization; ask the preflight question unless the request also authorizes subagents.
 
 Use the Codex user-input/question tool when available. Provide choices equivalent to:
 - `Use image workers` as the recommended choice
 - `Use main workflow`
 
-If the user chooses image workers, that is explicit authorization for Maquette image-generation and image-edit subtasks in the current run. If the user chooses the main workflow, or if subagents are unavailable after authorization, generate and edit images in the main workflow and record that image-worker handoff was not used. If the user already explicitly asked for subagents or image-worker subagents in the request, do not ask again.
+If the user chooses image workers, that is explicit authorization for Maquette image-generation and image-edit subtasks in the current run. If the user chooses the main workflow, or if subagents are unavailable after authorization, generate and edit images in the main workflow and record that image-worker handoff was not used.
 
 When authorized and available, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
 
@@ -56,7 +64,7 @@ Use this handoff pattern:
 - after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image`
 - the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
 - if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
-- if subagents are unavailable or not authorized for the run, perform image generation in the main workflow and record that the image-worker path was unavailable or declined
+- if subagents are unavailable after asking, explicitly declined, or explicitly bypassed by unattended/no-question language, perform image generation in the main workflow and record the exact reason the image-worker path was not used
 
 Do not delegate approval decisions to the image worker. The worker creates or edits the visual artifact and reports paths; the main workflow inspects, asks any required approval question, and decides the next phase.
 
