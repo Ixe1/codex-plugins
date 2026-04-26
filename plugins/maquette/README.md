@@ -113,7 +113,7 @@ brand/tokens.css
 brand/approved.md
 ```
 
-Review the generated brand direction and ask for revisions until it is approved.
+Review the generated brand direction, then approve it or ask Maquette to make a new one.
 Maquette should ask for approval immediately after viewing the generated board, before writing design-system JSON or CSS tokens.
 
 ### 2. Build the component library
@@ -128,14 +128,6 @@ This pass creates a focused core CSS-contract poster first, builds and reviews a
 When a site has global navigation, the component pass should include responsive nav variants for desktop, tablet, and mobile.
 Every default CSS-contract poster is 1:1; explicit visual component sheets are also 1:1 when used. Maquette should not generate all component artifacts before implementation. Each multi-poster or multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `contracts/<batch-slug>.contract.css` for CSS-contract batches, `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
 Each batch must complete screenshot review or documented manual visual review against its source sheet or poster before Maquette generates the next component artifact.
-
-Experimental CSS-contract example:
-
-```text
-$maquette-components Use the direct CSS-contract approach for the Forms family first.
-```
-
-For this path, Maquette should generate one focused 1:1 text-only poster with a strict selector allowlist, reject posters with page/reset/gallery CSS, transcribe the inspected poster into a contract CSS file, map any raw values back to approved tokens, implement a batch replica, capture screenshots, and record that the artifact was a CSS contract rather than a visual component sheet.
 
 ### 3. Create pages
 
