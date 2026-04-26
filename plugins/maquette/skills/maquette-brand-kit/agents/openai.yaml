@@ -1,4 +1,4 @@
 interface:
   display_name: "Maquette Brand Kit"
   short_description: "Create or revise a focused website brand board and CSS token set using image_gen first."
-  default_prompt: "Use $maquette-brand-kit to create or revise a focused foundational website brand board with image_gen first. Do not generate logos, wordmarks, brand marks, large product-name treatments, or detailed component inventories. Require explicit typography recommendations, fallback stacks, and font rationale, then produce design-system JSON, CSS tokens, and an approval checklist."
+  default_prompt: "Use $maquette-brand-kit to create or revise a focused foundational website brand board with image_gen first, preferably through the Maquette image-worker subagent handoff when available and allowed. Do not generate logos, wordmarks, brand marks, large product-name treatments, or detailed component inventories. Inspect the generated board, ask the user whether to use it, make a new one, or revise it, then only after approval produce design-system JSON, CSS tokens, font rationale, and approval notes."

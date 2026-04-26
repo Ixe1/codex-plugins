@@ -25,6 +25,10 @@ The component-library phase uses focused 1:1 CSS-contract posters by default. Pr
 
 Before component or page implementation, the optional QA tooling decision must be explicit when any planned automated QA path is blocked. Partial availability is not enough: if Playwright is available but `ajv` or `ajv-formats` is missing, ask for an install decision before replacing schema validation with manual JSON checks, unless the user already declined installation for the current run or installation is impossible.
 
+When subagent tooling is available and allowed, run Maquette image creation and image editing in a dedicated image worker subagent, then have the main workflow inspect the returned project-local image path. This applies to brand boards, CSS-contract posters, visual component sheets, page concepts, and generated page raster assets. If subagents are unavailable or disallowed, continue in the main workflow and record that image-worker handoff was unavailable.
+
+Brand boards and page concepts are user approval gates. After the main workflow inspects the generated image, ask whether to use it, make a new one, or revise it before deriving downstream artifacts. Do not treat one-shot provisional runs as implicit approval unless the user explicitly requested an unattended run.
+
 ## Phase gates
 
 Before creating a page concept or page implementation, verify that these brand artifacts exist:
@@ -76,13 +80,13 @@ Do not treat copied CSS values, notes, or screenshots as the final design system
 
 ## One-shot requests
 
-If the user asks for a page and the project has no Maquette artifacts yet, complete a provisional full pass in sequence:
+If the user asks for a page and the project has no Maquette artifacts yet, complete a full pass in sequence, pausing at required image approval gates unless the user explicitly asked for an unattended run:
 
 1. Create the brand kit.
 2. Create the component library.
 3. Create the requested page.
 
-Mark the outputs as proposed or provisional when the user has not explicitly approved the intermediate phases.
+Mark the outputs as proposed or provisional only for phases that do not require an image approval gate, or when the user explicitly requested an unattended run.
 Infer focused extra component/composite sheets when the page brief needs them; the user should not have to ask for fewer components, split sheets, or wide-data coverage.
 Infer responsive navigation coverage for page/site requests with global navigation; the user should not have to ask for mobile nav or overflow checks.
 Infer repeated-card and footer/social coverage for commerce, product-grid, pricing, service-list, newsletter, app/download, and footer-heavy pages; the user should not have to ask for card anatomy, action alignment, footer fidelity, or recognizable social icons.

@@ -20,6 +20,8 @@ The default workflow is therefore:
 
 The components phase now defaults to focused direct CSS-contract posters for this experiment. Maquette generates a focused 1:1 black-background CSS-contract poster for one component family, inspects it, transcribes the recovered rules into a reviewable `.maquette/components/contracts/<batch>.contract.css` bridge file, implements the reusable component batch, and uses browser screenshots as the visual correction target. Visual component sheets are fallback or explicit-request artifacts.
 
+When subagent tooling is available and allowed, Maquette should run image creation and image editing in a dedicated image worker subagent. The worker generates or edits the image, locates the saved file on disk, copies or preserves it under the expected `.maquette/` path, and returns the exact source and project-local paths. The main workflow then inspects the returned image and continues with approval, contracts, coding, and QA.
+
 This plugin includes a root workflow skill plus three focused phase skills:
 - `maquette`
 - `maquette-brand-kit`
@@ -55,6 +57,7 @@ Each phase must use it as follows unless the user explicitly asks to skip image 
 - pages phase -> create or edit a **page concept image**, then write a page layout contract before implementation
 
 After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
+Brand-board and page-concept images are explicit user approval gates. After Maquette generates and inspects one, it should ask whether to use it, make a new one, or revise the direction before deriving tokens, page blueprints, layout contracts, assets, or code. CSS-contract posters remain internal implementation artifacts unless the user explicitly asks to approve each one.
 Generated boards and sheets should be readable at normal preview size. Maquette should regenerate, edit, or split visual artifacts that are cluttered, logo-like, or not inspectable enough to guide implementation.
 Sites with primary navigation should define responsive navigation before page implementation: desktop inline nav, tablet/mobile menu toggle, expanded panel or drawer, accessible states, and no document-level horizontal scrolling for nav.
 Repeated card grids should define equal-height cards and bottom-pinned action rows before page implementation. Footer social links should use recognizable social icons, and page typography should follow the approved font strategy rather than crude defaults such as `Impact`.
@@ -110,6 +113,7 @@ brand/approved.md
 ```
 
 Review the generated brand direction and ask for revisions until it is approved.
+Maquette should ask for approval immediately after viewing the generated board, before writing design-system JSON or CSS tokens.
 
 ### 2. Build the component library
 
@@ -147,6 +151,7 @@ $maquette-pages Make a homepage with a proof-led hero, services section, client 
 ```
 
 This pass creates a page concept image, writes a page layout contract for section density, media crops, terminal sections, and responsive behavior, implements the page with the approved brand and component references, captures screenshots when possible, and records review notes.
+Maquette should ask for approval immediately after viewing the page concept, before writing the blueprint, inventory, layout contract, asset manifest, or page code.
 
 ## Invocation
 

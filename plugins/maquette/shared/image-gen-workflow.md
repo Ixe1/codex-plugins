@@ -37,6 +37,36 @@ After every `image_gen` create or edit step:
 
 After inspection, continue the same turn unless the user explicitly asked for image-only output. Briefly identify the generated artifact, provide its saved path or asset reference when available, assess whether it matches the request, and continue to the next requested workflow step.
 
+## Image Generation Delegation
+
+When subagent tooling is available and allowed by the current conversation or runtime policy, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
+
+Use this handoff pattern:
+- start a bounded image worker with the specific Maquette artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
+- instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the expected `.maquette/` artifact path, and return the exact source path and project-local path
+- capture the worker start time and worker/subagent id when available; if the worker cannot directly report a saved path, use those details to locate the matching file in the Codex generated-images directory by timestamp and filename metadata
+- after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image`
+- the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
+- if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
+- if subagents are unavailable or disallowed, perform image generation in the main workflow and record that the subagent image path was unavailable
+
+Do not delegate approval decisions to the image worker. The worker creates or edits the visual artifact and reports paths; the main workflow inspects, asks any required approval question, and decides the next phase.
+
+## User Approval Gates
+
+Brand boards and page concepts require explicit user approval after generation and inspection.
+
+After a generated or edited brand-board image passes internal rejection checks and has been inspected with `view_image`, ask the user whether to use it before writing `design-system.json` or `tokens.css`.
+
+After a generated or edited page-concept image passes internal rejection checks and has been inspected with `view_image`, ask the user whether to use it before writing `page-blueprint.json`, `concept-region-inventory.md`, `page-layout-contract.md`, `asset-manifest.json`, or page code.
+
+Use the Codex user-input/question tool when available. Provide choices equivalent to:
+- `Yes, use this` as the recommended choice
+- `No, make a new one`
+- `Revise this direction`
+
+If the user approves, continue the workflow from the inspected image. If the user asks for a new image, regenerate before deriving downstream artifacts. If the user asks to revise, use the user's notes as the edit brief, inspect the revised image, and ask again. In a one-shot Maquette workflow, do not treat brand boards or page concepts as approved merely because the run is provisional; the approval question is still required unless the user explicitly asked for an unattended run.
+
 ## Inspectability gates
 
 Generated boards, sheets, and CSS-contract posters are approval artifacts only when they are readable at normal preview size.

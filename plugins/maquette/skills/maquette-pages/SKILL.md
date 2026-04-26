@@ -24,7 +24,7 @@ Hard gate:
 - If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
 - If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused sheet or CSS-contract poster. Do not silently invent significant new component language inside the page phase.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
-- In a one-shot `maquette` workflow, earlier phases may be marked provisional, but they still must exist before this phase starts.
+- In a one-shot unattended `maquette` workflow where the user explicitly asked not to pause, earlier phases may be marked provisional, but they still must exist before this phase starts. Otherwise, generated brand-board and page-concept approval gates still require explicit user decisions.
 
 ## Non-negotiable image_gen policy
 
@@ -40,6 +40,15 @@ Use image generation to:
 If editing a local reference image, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+
+When subagent tooling is available and allowed, run page-concept image generation or editing in a dedicated image worker subagent. The worker should return the exact saved image path and the project-local `.maquette/pages/<page-name>/concept.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive page artifacts or code.
+
+After inspecting a generated or edited page concept that passes rejection checks, ask the user whether to use it before writing the page blueprint, concept-region inventory, page layout contract, asset manifest, or page code. Use the Codex user-input/question tool when available with choices equivalent to:
+- `Yes, use this` as the recommended choice
+- `No, make a new one`
+- `Revise this direction`
+
+If the user approves, continue. If the user asks for a new one, regenerate before deriving page artifacts. If the user asks to revise, edit the concept using the user's notes, inspect the revision, and ask again. Do not treat a page concept as approved merely because the run is one-shot or provisional unless the user explicitly requested an unattended run.
 
 Only skip image generation if:
 - the user explicitly tells you not to use it, or
@@ -78,32 +87,37 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
 3. If `image_gen` is available, create or edit a page concept using the approved references and `assets/page-concept-prompt.md`.
    - Inspect the generated page concept with `view_image` before writing the page blueprint or implementation.
    - A concept with header or primary navigation is incomplete if it only shows desktop navigation. It must define desktop, tablet, and mobile nav behavior, including the collapsed and expanded tablet/mobile state.
-4. Before coding, create `.maquette/pages/<page-name>/concept-region-inventory.md`.
+4. Ask the user whether to use the inspected page concept.
+   - Use the approval choices from the non-negotiable image policy.
+   - Record the user's decision in `review.md` once the review file exists.
+   - Do not create the page blueprint, concept-region inventory, page layout contract, asset manifest, or page code until the user approves the concept, unless the user explicitly requested an unattended run.
+5. Before coding, create `.maquette/pages/<page-name>/concept-region-inventory.md`.
    - Use `shared/concept-region-inventory.template.md` if present.
    - Inventory every visible concept region, including header, nav, hero, sidebars, annotations, product grids, promo cards, newsletter, footer, bottom bars, mobile/tablet callouts, app/device modules, social links, and imagery.
    - For each visible region, record one status: `implemented`, `implemented differently with reason`, `intentionally omitted with reason`, `requires more assets`, or `requires component expansion`.
    - Visible concept regions default to implementation. Missing, simplified, or merged regions must have a concrete reason before coding proceeds.
    - If any visible region requires component expansion, run or request `maquette-components` before implementing that region.
-5. Before coding, create `.maquette/pages/<page-name>/page-layout-contract.md`.
+6. Before coding, create `.maquette/pages/<page-name>/page-layout-contract.md`.
    - Use `shared/page-layout-contract.template.md` if present.
    - Translate the inspected page concept into implementable layout rules for each major region: section order, relative section heights, section density/compactness, background bands, grid behavior, image container aspect ratios, image crop behavior, footer structure, legal/bottom row structure, and mobile stacking.
    - Record top, middle, and terminal-region expectations. Terminal regions include final CTA/impact strips, newsletter blocks, footers, legal rows, bottom bars, app/download modules, and social areas.
    - For every major raster media region, record whether the image must fill its container, which `object-fit` behavior is expected, and whether blank bands or letterboxing are acceptable. Blank parent backgrounds around fitted media are deviations unless the contract explicitly accepts them.
    - Record which component catalog APIs are expected in each region and where page-specific layout CSS is allowed.
    - Any visible concept region that will be taller, looser, more compact, cropped differently, or structurally simplified must be recorded here before implementation with a concrete reason.
-6. Create `.maquette/pages/<page-name>/asset-manifest.json` before coding.
+7. Create `.maquette/pages/<page-name>/asset-manifest.json` before coding.
    - Use `shared/page-asset-manifest.example.json` and `shared/page-asset-manifest.schema.json` if present.
    - List every required raster image: logo if supplied or explicitly requested, hero images, product-card images, promo images, lifestyle/story images, footer/app/device images, background textures, decorative rasters, and generated concept/page screenshots.
    - If the user asked for generated image assets, generate all required project-local assets or document why each missing asset was not generated.
+   - When subagent tooling is available and allowed, generate or edit required raster assets through the dedicated image worker handoff from `shared/image-gen-workflow.md`, then inspect or verify each returned project-local path before using it in HTML, CSS, JS, or review notes.
    - If Maquette policy forbids an asset, such as generating a new logo during the brand-kit phase, record the reason and use a permissible fallback only when it still matches the concept.
    - Every asset referenced by HTML, CSS, JS, or review notes must exist locally before final review.
-7. Reuse existing components first.
-8. Translate the page concept and page layout contract into code using the component library before adding any new composite patterns.
+8. Reuse existing components first.
+9. Translate the page concept and page layout contract into code using the component library before adding any new composite patterns.
    - Use the font families, weights, widths, sizes, and line-heights recorded in the design system and component catalog. If the concept implies condensed or editorial display type, choose a closer available CSS stack or project-approved open-source import instead of defaulting to crude substitutes such as `Impact`.
    - Do not silently simplify visible concept regions, generated component details, or requested image assets. Any simplification must be documented with a concrete reason and recommended follow-up when appropriate.
    - Preserve section density from the layout contract. Do not let terminal sections such as impact strips, newsletter areas, or footers become materially taller, looser, or more generic than the concept unless the contract records why.
    - Implement major media containers so their images fill or crop according to the layout contract. Fix visible blank bands, unintended letterboxing, or exposed parent backgrounds before accepting screenshots.
-9. Only create a new composite when the page clearly needs a pattern that the library does not already cover and the visual/reference component coverage exists.
+10. Only create a new composite when the page clearly needs a pattern that the library does not already cover and the visual/reference component coverage exists.
    - When a page has primary navigation, implement accessible responsive navigation: desktop inline nav, tablet/mobile menu toggle, stacked panel or drawer, and no document-level horizontal scrolling.
    - The menu toggle must have `aria-controls`, `aria-expanded`, and an accessible label.
    - The collapsed menu must be keyboard reachable when opened, and hidden menu content must not trap or block focus when closed.
@@ -111,8 +125,8 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Primary mobile navigation must not require horizontal page scrolling. Horizontal scrolling may only be accepted for explicit dense data components, not primary nav.
    - Opened mobile/tablet drawers must remain scrollable when content exceeds viewport height; prefer `overflow-y: auto` and `overscroll-behavior: contain` on the drawer or drawer body while any body scroll lock is active.
    - Close controls and links must remain reachable in the opened drawer at mobile and tablet heights.
-10. Update the page blueprint to document composition, concept-region inventory path, page layout contract path, asset manifest path, and any new composites.
-11. Capture screenshots when possible and compare them to the concept and approved references.
+11. Update the page blueprint to document composition, concept-region inventory path, page layout contract path, asset manifest path, and any new composites.
+12. Capture screenshots when possible and compare them to the concept and approved references.
    - Use Maquette's bundled scripts where possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/capture-browser.mjs`, or `skills/maquette-pages/scripts/capture-page.mjs`.
    - Check optional project-local QA dependencies before reporting automated screenshot QA as unavailable. Do not assume global npm installs are available.
    - Treat partial QA availability as missing QA tooling. For example, if browser QA can run but `ajv-formats` is missing, schema validation for page blueprints or asset manifests is still blocked.
@@ -123,7 +137,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If cleanup fails, record the failed cleanup command or operation in the final response.
    - Capture desktop, tablet, and mobile page screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
    - If screenshot capture falls back to a clipped full-document image, record the capture metadata and clipped fallback status in `review.md`.
-12. Run the required page QA pass:
+13. Run the required page QA pass:
    - Verify the page concept region inventory against the rendered page. Missing concept regions fail QA unless the inventory records an intentional omission with a concrete reason.
    - Verify the page layout contract against the rendered page. Fail and fix when the implementation violates recorded section order, section density, image crop behavior, footer structure, or terminal-section compactness without a documented reason.
    - Verify the generated asset manifest. Every referenced local raster asset must exist, every generated asset requested by the user must be present or explicitly documented as not generated, and unused generated assets should be noted.
@@ -160,7 +174,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Prefer bundled Maquette scripts over generated run-local `.mjs` scripts for capture and responsive auditing. If a fallback script is generated, list it in `review.md` with the reason.
    - For each major section, write concept-to-code comparison notes in `review.md`: `matches`, `deviates`, `missing`, `simplified`, or `fixed`.
    - If a footer, header, terminal section, image asset, or any other visible concept region is simplified from the concept, either fix it or record the intentional reason and recommended follow-up in `review.md`.
-13. Record generated asset manifest status and missing assets, page concept region inventory, page layout contract status, component sheet/CSS-contract poster vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
+14. Record generated asset manifest status and missing assets, page concept approval decision, page concept region inventory, page layout contract status, component sheet/CSS-contract poster vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
 
 ## Low-resolution reference rule
 

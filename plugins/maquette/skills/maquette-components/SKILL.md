@@ -18,7 +18,7 @@ Also require a generated and inspected brand board image, such as `.maquette/bra
 
 If these artifacts are missing, do not invent a component library from raw notes, copied CSS, screenshots, or an existing website alone. Run the brand-kit phase first using `maquette-brand-kit`.
 
-Prefer to wait for user approval of the brand kit before expanding the library. In a one-shot `maquette` workflow, proceed with the brand kit as provisional and record that status.
+Require user approval of the generated and inspected brand board before expanding the library. In a one-shot unattended `maquette` workflow where the user explicitly asked not to pause, proceed with the brand kit as provisional and record that status.
 
 ## Non-negotiable image_gen policy
 
@@ -56,6 +56,8 @@ If a local board or sheet image must be edited, first make it visible in the con
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive component specifications or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 Reject, regenerate, or split a sheet before implementation if it is not readable and useful at normal preview size.
+
+When subagent tooling is available and allowed, run component CSS-contract poster generation, visual component-sheet generation, and image editing in a dedicated image worker subagent. The worker should return the exact saved image path and the project-local `.maquette/components/component-sheet-*-vN.png` path. The main workflow must inspect the returned image with `view_image`, inventory it, transcribe CSS-contract posters when applicable, and perform implementation and QA. If subagents are unavailable or disallowed, generate in the main workflow and record that the image-worker path was unavailable.
 
 Only skip image generation if:
 - the user explicitly tells you not to use it, or
