@@ -32,9 +32,8 @@ When image-worker subagents are explicitly authorized for the current run, run b
 After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
 - `No, make a new one`
-- `Revise this direction`
 
-If the user approves, continue. If the user asks for a new one, regenerate before deriving tokens. If the user asks to revise, edit the image using the user's notes, inspect the revision, and ask again. Do not treat a brand board as approved merely because the run is one-shot or provisional unless the user explicitly requested an unattended run. `One pass`, `full workflow`, `final homepage`, `fresh disposable test`, and similar phrasing are not unattended requests by themselves.
+If the user approves, continue. If the user asks for a new one, regenerate before deriving tokens. If the user gives free-form revision notes, edit the image using those notes, inspect the revision, and ask again with the same two approval choices. Do not treat a brand board as approved merely because the run is one-shot or provisional unless the user explicitly requested an unattended run. `One pass`, `full workflow`, `final homepage`, `fresh disposable test`, and similar phrasing are not unattended requests by themselves.
 
 Only skip image generation if:
 - the user explicitly says not to use it, or
