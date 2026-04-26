@@ -29,6 +29,8 @@ When subagent tooling is available, follow `shared/image-gen-workflow.md` to get
 
 Brand boards and page concepts are user approval gates. After the main workflow inspects the generated image, ask whether to use it, make a new one, or revise it before deriving downstream artifacts. Do not treat one-shot provisional runs as implicit approval unless the user explicitly requested an unattended run.
 
+Unattended mode requires explicit user language such as `unattended`, `do not ask questions`, `no pauses`, `skip approval questions`, or `make all decisions yourself`. Do not infer unattended mode from `one pass`, `full workflow`, `final homepage`, `fresh disposable test`, `run a Maquette test`, or similar phrasing.
+
 ## Phase gates
 
 Before creating a page concept or page implementation, verify that these brand artifacts exist:
@@ -80,7 +82,7 @@ Do not treat copied CSS values, notes, or screenshots as the final design system
 
 ## One-shot requests
 
-If the user asks for a page and the project has no Maquette artifacts yet, complete a full pass in sequence, pausing at required image approval gates unless the user explicitly asked for an unattended run:
+If the user asks for a page and the project has no Maquette artifacts yet, complete a full pass in sequence, pausing at the image-worker authorization question and required image approval gates unless the user explicitly asked for an unattended run:
 
 1. Create the brand kit.
 2. Create the component library.
