@@ -21,7 +21,9 @@ For broad page or site requests, run the workflow in this order:
 
 Only proceed to a later phase after the required artifacts for earlier phases exist.
 
-The component-library phase uses focused 1:1 CSS-contract posters by default. Preserve explicit user requests for visual component sheets only when the user asks for visual sheets or when the component skill documents that the CSS-contract route was blocked.
+The component-library phase uses focused 1:1 CSS-contract posters by default. Preserve explicit user requests for visual component sheets only when the user asks for visual sheets or when the component skill documents that the CSS-contract route was blocked. Each accepted CSS-contract poster should be transcribed into a reviewable contract CSS bridge file before implementation CSS is written.
+
+Before component or page implementation, the optional QA tooling decision must be explicit when any planned automated QA path is blocked. Partial availability is not enough: if Playwright is available but `ajv` or `ajv-formats` is missing, ask for an install decision before replacing schema validation with manual JSON checks, unless the user already declined installation for the current run or installation is impossible.
 
 ## Phase gates
 
@@ -45,15 +47,16 @@ Before creating a page concept or page implementation, verify that these compone
 - `.maquette/components/replica-gallery.html`
 - `.maquette/components/approved.md`
 - one or more generated and inspected component artifacts, such as `.maquette/components/component-sheet-vN.png` or an experimental `.maquette/components/component-sheet-*-css-contract-vN.png`
+- `.maquette/components/contracts/<batch-slug>.contract.css` for each CSS-contract poster batch
 
 If any are missing, run the component-library phase next using `maquette-components`.
 If the component catalog does not mark the reusable component library as ready for pages, run `maquette-components` again before the page phase. The page phase should consume reusable components and cataloged APIs, not copy a componentized reference layout.
 If the requested page needs dense data patterns, dashboards, tables, maps, calendars, editors, timelines, complex workflows, filter builders, or reusable composites that are not covered by the existing component references, run `maquette-components` again to create focused missing coverage before running the page phase. Multi-artifact component work should proceed sequentially: generate one focused 1:1 CSS-contract poster by default, or one focused 1:1 visual component sheet only when explicitly requested or documented as needed, build and review its componentized replica/reference, document reusable component APIs, then move to the next artifact.
-If a multi-sheet component catalog records `assets.sheet_implementation_batches`, verify each batch has concrete artifact paths for a batch replica/reference, batch component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review before proceeding to the page phase. Retrospective batch logs without concrete batch artifacts are not enough.
+If a multi-sheet component catalog records `assets.sheet_implementation_batches`, verify each batch has concrete artifact paths for a transcribed contract when the source was a CSS-contract poster, batch replica/reference, batch component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review before proceeding to the page phase. Retrospective batch logs without concrete batch artifacts are not enough.
 If the requested page has a header or primary navigation, verify responsive navigation component coverage before running the page phase: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and icon rendering.
 If the requested page has product, pricing, service, offer, or promo card grids, verify repeated-card component coverage before running the page phase: shared media/header/body/footer/action anatomy, stable badge or eyebrow placement, equal-height cards, flex or grid card bodies, and bottom-pinned CTA, quantity, price, or action rows.
 If the requested page has a rich footer, footer social links, app/download modules, legal/locale rows, or device imagery, verify footer/social module coverage before running the page phase: recognizable social icons, accessible names, link column anatomy, app/device module coverage, bottom strip coverage, and no unrelated generic icon substitutions.
-If the requested page needs generated raster images, verify that the page phase will create a concept-region inventory and asset manifest before coding.
+Verify that the page phase will create a concept-region inventory, page layout contract, and asset manifest before coding. This applies even when the page has few raster assets, because the layout contract is the guardrail for section compactness, terminal-region fidelity, and media fit/crop behavior.
 
 Only after both gates pass should you run the page phase using `maquette-pages`.
 
@@ -84,6 +87,7 @@ Infer focused extra component/composite sheets when the page brief needs them; t
 Infer responsive navigation coverage for page/site requests with global navigation; the user should not have to ask for mobile nav or overflow checks.
 Infer repeated-card and footer/social coverage for commerce, product-grid, pricing, service-list, newsletter, app/download, and footer-heavy pages; the user should not have to ask for card anatomy, action alignment, footer fidelity, or recognizable social icons.
 Infer page asset-manifest needs for pages with logos supplied by the user, hero images, product images, promo imagery, lifestyle/story imagery, footer/app/device images, background textures, or requested imagegen assets.
+Infer page layout-contract needs for section compactness, terminal regions, image fit/crop behavior, footer structure, and responsive stacking; the user should not have to ask for bottom-of-page fidelity checks.
 
 Do not ask the user to manually rerun separate commands unless you are blocked.
 

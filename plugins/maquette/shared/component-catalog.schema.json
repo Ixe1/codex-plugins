@@ -129,6 +129,13 @@
           },
           "minItems": 1
         },
+        "component_contract_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
         "nav_open_screenshot_paths": {
           "type": "array",
           "items": {
@@ -362,6 +369,9 @@
           ]
         },
         "sheet_path": {
+          "type": "string"
+        },
+        "contract_path": {
           "type": "string"
         },
         "replica_artifact_paths": {

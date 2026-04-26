@@ -18,7 +18,8 @@
     "sheet_implementation_batches": [
       {
         "category": "core-primitives",
-        "sheet_path": "components/component-sheet-v1.png",
+        "sheet_path": "components/component-sheet-core-primitives-css-contract-v1.png",
+        "contract_path": "components/contracts/core-primitives.contract.css",
         "replica_artifact_paths": [
           "components/core-primitives.replica.html"
         ],
@@ -52,7 +53,7 @@
           "implementation_quality": 5
         },
         "corrections_made": [
-          "Adjusted card action rows to align with the 1:1 component sheet."
+          "Adjusted card action rows to align with the CSS-contract poster and rendered screenshot."
         ],
         "simplifications": [],
         "deferred_items": [],
@@ -61,7 +62,8 @@
       },
       {
         "category": "data-display",
-        "sheet_path": "components/component-sheet-data-v1.png",
+        "sheet_path": "components/component-sheet-data-display-css-contract-v1.png",
+        "contract_path": "components/contracts/data-display.contract.css",
         "replica_artifact_paths": [
           "components/data-display.replica.html"
         ],
@@ -106,10 +108,14 @@
     "gallery_screenshot_paths": [
       "components/replica-gallery.png"
     ],
-    "component_sheet_path": "components/component-sheet-v1.png",
+    "component_sheet_path": "components/component-sheet-core-primitives-css-contract-v1.png",
     "component_sheet_paths": [
-      "components/component-sheet-v1.png",
-      "components/component-sheet-data-v1.png"
+      "components/component-sheet-core-primitives-css-contract-v1.png",
+      "components/component-sheet-data-display-css-contract-v1.png"
+    ],
+    "component_contract_paths": [
+      "components/contracts/core-primitives.contract.css",
+      "components/contracts/data-display.contract.css"
     ],
     "nav_open_screenshot_paths": [
       "components/screenshots/responsive-nav-open-390.png",
@@ -124,8 +130,8 @@
     ],
     "replica_fidelity_review": {
       "reference_sheet_paths": [
-        "components/component-sheet-v1.png",
-        "components/component-sheet-data-v1.png"
+        "components/component-sheet-core-primitives-css-contract-v1.png",
+        "components/component-sheet-data-display-css-contract-v1.png"
       ],
       "gallery_screenshot_paths": [
         "components/replica-gallery.png",
@@ -144,10 +150,10 @@
         "responsive_match": 5,
         "implementation_quality": 5
       },
-      "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy shown in the approved sheets.",
+      "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy from the approved CSS-contract posters.",
       "failed_categories": [],
       "corrections_made": [
-        "Adjusted card action rows to align with the 1:1 component sheet.",
+        "Adjusted card action rows to align with the CSS-contract poster and rendered screenshot.",
         "Increased icon contrast in active and disabled states after screenshot review."
       ],
       "simplifications": [],
@@ -155,8 +161,8 @@
     },
     "sheet_fidelity_review": {
       "reference_sheet_paths": [
-        "components/component-sheet-v1.png",
-        "components/component-sheet-data-v1.png"
+        "components/component-sheet-core-primitives-css-contract-v1.png",
+        "components/component-sheet-data-display-css-contract-v1.png"
       ],
       "review_mode": "screenshot",
       "coverage_summary": "Compatibility summary for older Maquette consumers; see replica_fidelity_review for the detailed rubric.",
@@ -232,7 +238,7 @@
       "visual_review": {
         "reference_image_paths": [
           "brand/brand-board-v1.png",
-          "components/component-sheet-v1.png"
+          "components/component-sheet-core-primitives-css-contract-v1.png"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Button density and radius match the approved board. Ghost hover treatment is intentionally subtle."
@@ -355,7 +361,7 @@
       ],
       "visual_review": {
         "reference_image_paths": [
-          "components/component-sheet-v1.png"
+          "components/component-sheet-core-primitives-css-contract-v1.png"
         ],
         "latest_screenshot_path": "components/screenshots/responsive-nav-open-390.png",
         "similarity_notes": "Responsive navigation keeps desktop inline links and uses a collapsed tablet/mobile panel with visible tap targets."
@@ -420,10 +426,10 @@
       },
       "visual_review": {
         "reference_image_paths": [
-          "components/component-sheet-v1.png"
+          "components/component-sheet-core-primitives-css-contract-v1.png"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
-        "similarity_notes": "Card surfaces and CTA styling follow the component sheet.",
+        "similarity_notes": "Card surfaces and CTA styling follow the CSS-contract poster and rendered screenshot.",
         "qa_notes": [
           "Componentized reference includes at least three product cards with varied copy length.",
           "Screenshot review confirms quantity and Add to Cart rows share the same vertical position across the row."

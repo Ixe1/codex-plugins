@@ -100,10 +100,22 @@ const missingPackages = packageChecks
   .filter((item) => !item.available)
   .map((item) => item.name);
 
+const missingBrowserQaPackages = missingPackages.filter((name) => name === "playwright");
+const missingSchemaQaPackages = missingPackages.filter((name) => name === "ajv" || name === "ajv-formats");
+const blockedQaCapabilities = [
+  missingBrowserQaPackages.length > 0 || browserCheck.available === false ? "browser-screenshot-and-responsive-qa" : null,
+  missingSchemaQaPackages.length > 0 ? "json-schema-validation" : null,
+].filter(Boolean);
+
 const output = {
   projectRoot,
   packageChecks,
   browserCheck,
+  missingPackages,
+  missingBrowserQaPackages,
+  missingSchemaQaPackages,
+  blockedQaCapabilities,
+  installDecisionRequired: blockedQaCapabilities.length > 0,
   installCommand,
   browserInstallCommand,
   globalInstallRecommended: false,
@@ -126,6 +138,10 @@ if (output.pass) {
   if (missingPackages.length > 0) {
     console.log(`Missing project-local QA packages: ${missingPackages.join(", ")}`);
     console.log(`Install with: ${installCommand}`);
+  }
+  if (blockedQaCapabilities.length > 0) {
+    console.log(`Blocked Maquette QA capabilities: ${blockedQaCapabilities.join(", ")}`);
+    console.log("Ask the user for an install decision before skipping these automated QA checks.");
   }
   if (browserCheck.available === false) {
     console.log("Playwright is installed, but Chromium could not be launched.");

@@ -94,6 +94,7 @@ function collectComponentArtifactPaths(componentCatalog) {
     assets.component_sheet_path,
     assets.review_notes_path,
     ...asArray(assets.component_sheet_paths),
+    ...asArray(assets.component_contract_paths),
     ...asArray(assets.gallery_screenshot_paths),
     ...asArray(assets.nav_open_screenshot_paths),
     ...asArray(assets.gallery_review_artifact_paths),
@@ -102,6 +103,7 @@ function collectComponentArtifactPaths(componentCatalog) {
   for (const batch of asArray(assets.sheet_implementation_batches)) {
     paths.push(
       batch.sheet_path,
+      batch.contract_path,
       batch.catalog_snapshot_path,
       batch.review_path,
       ...asArray(batch.replica_artifact_paths),
