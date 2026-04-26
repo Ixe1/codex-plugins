@@ -27,7 +27,7 @@ If you need to edit a local image file, ensure it is first made visible in the c
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
-When subagent tooling is available and allowed, run brand-board image generation or editing in a dedicated image worker subagent. The worker should return the exact saved image path and the project-local `.maquette/brand/brand-board-vN.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive tokens.
+When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If subagents have not been authorized yet, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/brand/brand-board-vN.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive tokens.
 
 After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice

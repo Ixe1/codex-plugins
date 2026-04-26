@@ -39,7 +39,15 @@ After inspection, continue the same turn unless the user explicitly asked for im
 
 ## Image Generation Delegation
 
-When subagent tooling is available and allowed by the current conversation or runtime policy, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
+Subagent delegation must follow the current Codex runtime policy. If that policy requires explicit user authorization before spawning subagents, Maquette must not silently skip the image-worker path. Ask once near the start of the run whether to use dedicated image-worker subagents for Maquette image generation and editing.
+
+Use the Codex user-input/question tool when available. Provide choices equivalent to:
+- `Use image workers` as the recommended choice
+- `Use main workflow`
+
+If the user chooses image workers, that is explicit authorization for Maquette image-generation and image-edit subtasks in the current run. If the user chooses the main workflow, or if subagents are unavailable after authorization, generate and edit images in the main workflow and record that image-worker handoff was not used. If the user already explicitly asked for subagents or image-worker subagents in the request, do not ask again.
+
+When authorized and available, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
 
 Use this handoff pattern:
 - start a bounded image worker with the specific Maquette artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
@@ -48,7 +56,7 @@ Use this handoff pattern:
 - after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image`
 - the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
 - if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
-- if subagents are unavailable or disallowed, perform image generation in the main workflow and record that the subagent image path was unavailable
+- if subagents are unavailable or not authorized for the run, perform image generation in the main workflow and record that the image-worker path was unavailable or declined
 
 Do not delegate approval decisions to the image worker. The worker creates or edits the visual artifact and reports paths; the main workflow inspects, asks any required approval question, and decides the next phase.
 
