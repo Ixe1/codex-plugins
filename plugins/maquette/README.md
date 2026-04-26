@@ -47,6 +47,8 @@ codex plugin marketplace add Ixe1/maquette --ref master
 
 Use `$maquette-brand-kit`, `$maquette-components`, or `$maquette-pages` when you want to run one phase at a time.
 
+See [`CHANGELOG.md`](./CHANGELOG.md) for notable Maquette workflow, prompt, and release changes.
+
 ## Core rule
 
 If the `image_gen` tool is available in the environment, it is **not optional** for the normal happy-path workflow.

@@ -32,6 +32,8 @@ When changing user-facing Maquette behavior, update `plugins/maquette/README.md`
 
 When changing skill behavior, update the relevant `SKILL.md` first. Then update shared docs or README files only if the behavior should be visible to users.
 
+Update `plugins/maquette/CHANGELOG.md` in the same change whenever Maquette behavior, workflow rules, prompts, skills, schemas, bundled scripts, plugin metadata, or user-facing documentation changes. Most entries should go under `## Unreleased` until a release is cut. Internal-only edits may skip the changelog only when they cannot affect installed-plugin behavior, generated artifacts, QA results, or user-visible documentation.
+
 ## Versioning And Releases
 
 The plugin version is defined in:
@@ -42,8 +44,9 @@ For a stable release:
 
 1. Create or switch to the release branch, for example `release/maquette/v0.4.0`.
 2. Update the plugin version in `plugin.json`.
-3. Commit the release changes.
-4. Create an annotated tag for the released plugin version.
+3. Move relevant `plugins/maquette/CHANGELOG.md` entries from `Unreleased` into a versioned section such as `## 0.4.0 - YYYY-MM-DD`.
+4. Commit the release changes.
+5. Create an annotated tag for the released plugin version.
 
 Prefer plugin-scoped release branch names such as `release/maquette/v0.4.0` once the marketplace contains multiple independently versioned plugins.
 
