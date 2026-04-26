@@ -1,6 +1,6 @@
 {
   "name": "maquette",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "description": "Image-guided brand kits, component libraries, and implemented website pages",
   "author": {
     "name": "Ixel",
@@ -29,11 +29,11 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Run the full workflow: brand kit, component library, then homepage. Include product cards, marketing sections, newsletter signup, footer social links, and original generated image assets where useful.",
-      "Use $maquette-brand-kit to create a focused foundational website brand kit for a boutique snack brand. Generate and inspect a brand board first, then produce design-system JSON, CSS tokens, and approval notes.",
-      "Use $maquette-components to build a reusable component library from the existing approved brand kit. Include buttons, forms, cards, product cards, newsletter modules, footer/social modules, responsive navigation, and gallery QA.",
-      "Use $maquette-pages to create a pricing page from the existing approved brand kit and component library. Reuse existing components first, request focused missing component coverage only if needed, then implement and QA the page.",
-      "Use $maquette-pages to create a product listing page from the existing Maquette artifacts. Check product-card coverage, align repeated card actions, use recognizable footer social icons, and record responsive QA."
+      "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Include product highlights, marketing sections, newsletter signup, footer content, and generated image assets where useful.",
+      "Use $maquette-brand-kit to create a brand kit for a boutique snack brand with a warm premium grocery feel.",
+      "Use $maquette-components to build a reusable component library from the existing approved Maquette brand kit.",
+      "Use $maquette-pages to create a pricing page from the existing approved Maquette brand kit and component library. Include plan cards, feature comparison, FAQs, and a clear upgrade path.",
+      "Use $maquette-pages to create a product listing page from the existing Maquette artifacts. Include filters, product cards, promo content, and a complete footer."
     ],
     "brandColor": "#2563EB",
     "composerIcon": "./assets/icon.png",

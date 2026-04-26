@@ -1,33 +1,16 @@
 #!/usr/bin/env node
 import path from "node:path";
-import fs from "node:fs";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const targetArg = process.argv[2] ?? ".maquette/components/gallery.html";
-const outputArg = process.argv[3] ?? ".maquette/components/gallery.png";
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const sharedScript = path.resolve(currentDir, "../../../shared/scripts/capture-browser.mjs");
+const targetArg = process.argv[2] ?? ".maquette/components/replica-gallery.html";
+const outputArg = process.argv[3] ?? ".maquette/components/replica-gallery.png";
+const extraArgs = process.argv.slice(4);
 
-let chromium;
-try {
-  ({ chromium } = await import("playwright"));
-} catch (error) {
-  console.error("Playwright is not installed. Run `npm i -D playwright` and `npx playwright install chromium`, or run a manual visual review.");
-  process.exit(2);
-}
+const result = spawnSync(process.execPath, [sharedScript, targetArg, outputArg, ...extraArgs], {
+  stdio: "inherit",
+});
 
-const targetUrl = /^https?:\/\//.test(targetArg)
-  ? targetArg
-  : `file://${path.resolve(targetArg)}`;
-
-let browser;
-try {
-  browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 2200 } });
-  await page.goto(targetUrl);
-  fs.mkdirSync(path.dirname(outputArg), { recursive: true });
-  await page.screenshot({ path: outputArg, fullPage: true });
-} finally {
-  if (browser) {
-    await browser.close();
-  }
-}
-
-console.log(`Captured ${outputArg}`);
+process.exit(result.status ?? 1);

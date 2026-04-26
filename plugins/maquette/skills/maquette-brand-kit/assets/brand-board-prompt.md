@@ -3,6 +3,7 @@ Create or edit a website design-system board.
 Goal:
 - Build a structured brand board for a web UI.
 - This board is a creative artifact and approval target for the website visual system.
+- Use a 1:1 square composition by default.
 - No logo generation, no wordmarks, no brand marks, no large brand-name treatment, no monograms, no mascots, no badges, no seals, no app icons, no emblems, and no trademark-like elements.
 
 Show on the board:

@@ -29,7 +29,7 @@ function flatten(obj, prefix = []) {
 const designSystem = JSON.parse(fs.readFileSync(inputPath, "utf8"));
 const tokenEntries = flatten(designSystem.tokens);
 const lines = [
-  "/* Generated from design-system.json. Do not edit by hand unless you know what you are doing. */",
+  "/* Exported from board-derived design-system.json. This script serializes approved tokens; it does not extract or decide them. */",
   ":root {",
   ...tokenEntries.map(([name, value]) => `  --${name}: ${value};`),
   "}"

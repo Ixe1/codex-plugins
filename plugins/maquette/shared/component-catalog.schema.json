@@ -67,13 +67,46 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "tokens_css_path",
-        "gallery_html_path",
-        "gallery_screenshot_paths",
-        "sheet_fidelity_review"
+        "tokens_css_path"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "component_reference_html_path"
+          ]
+        },
+        {
+          "required": [
+            "replica_gallery_html_path"
+          ]
+        },
+        {
+          "required": [
+            "gallery_html_path"
+          ]
+        }
       ],
       "properties": {
         "tokens_css_path": {
+          "type": "string"
+        },
+        "sheet_inventory_path": {
+          "type": "string"
+        },
+        "sheet_implementation_log_path": {
+          "type": "string"
+        },
+        "sheet_implementation_batches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sheetImplementationBatch"
+          },
+          "minItems": 1
+        },
+        "replica_gallery_html_path": {
+          "type": "string"
+        },
+        "component_reference_html_path": {
           "type": "string"
         },
         "gallery_html_path": {
@@ -96,41 +129,59 @@
           },
           "minItems": 1
         },
+        "component_contract_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
         "nav_open_screenshot_paths": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "sheet_fidelity_review": {
+        "gallery_review_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replica_fidelity_review": {
+          "$ref": "#/$defs/fidelityReview"
+        },
+        "reusable_component_review": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "reference_sheet_paths": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "coverage_summary": {
-              "type": "string"
-            },
-            "simplifications": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
             "status": {
               "type": "string",
               "enum": [
-                "matches",
-                "deviates",
-                "simplified",
-                "needs-fix"
+                "ready",
+                "needs-fix",
+                "blocked"
               ]
+            },
+            "api_summary": {
+              "type": "string"
+            },
+            "ready_for_pages": {
+              "type": "boolean"
+            },
+            "usage_examples_path": {
+              "type": "string"
+            },
+            "gaps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
+        },
+        "sheet_fidelity_review": {
+          "$ref": "#/$defs/fidelityReview"
         },
         "review_notes_path": {
           "type": "string"
@@ -192,6 +243,33 @@
               "type": "string"
             }
           },
+          "api": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slots": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "required_attributes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "js_behavior": {
+                "type": "string"
+              },
+              "usage_examples": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "accessibility_notes": {
             "type": "array",
             "items": {
@@ -249,6 +327,244 @@
             ]
           }
         }
+      }
+    }
+  },
+  "$defs": {
+    "sheetImplementationBatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "sheet_path",
+        "replica_artifact_paths",
+        "catalog_snapshot_path",
+        "review_path",
+        "review_artifact_paths",
+        "completed_before_next_sheet",
+        "status"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "component_artifact_paths"
+          ]
+        },
+        {
+          "required": [
+            "reusable_artifact_paths"
+          ]
+        }
+      ],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "core-primitives",
+            "navigation-layout",
+            "data-display",
+            "cards-composites",
+            "focused-follow-up",
+            "other"
+          ]
+        },
+        "sheet_path": {
+          "type": "string"
+        },
+        "contract_path": {
+          "type": "string"
+        },
+        "replica_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reusable_components_added": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reusable_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "component_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "catalog_snapshot_path": {
+          "type": "string"
+        },
+        "review_path": {
+          "type": "string"
+        },
+        "review_artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "screenshot_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review_mode": {
+          "type": "string",
+          "enum": [
+            "screenshot",
+            "manual"
+          ]
+        },
+        "blocked_screenshot_reason": {
+          "type": "string"
+        },
+        "completed_before_next_sheet": {
+          "type": "boolean"
+        },
+        "rubric_scores": {
+          "$ref": "#/$defs/rubricScores"
+        },
+        "corrections_made": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "simplifications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deferred_items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "implemented",
+            "needs-fix",
+            "regenerated",
+            "deferred"
+          ]
+        }
+      }
+    },
+    "rubricScores": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "coverage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "visual_match": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "anatomy_match": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "responsive_match": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "implementation_quality": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "fidelityReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+            "reference_sheet_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "gallery_screenshot_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "gallery_review_artifact_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "review_mode": {
+              "type": "string",
+              "enum": [
+                "screenshot",
+                "manual"
+              ]
+            },
+            "blocked_screenshot_reason": {
+              "type": "string"
+            },
+            "rubric_scores": {
+              "$ref": "#/$defs/rubricScores"
+            },
+            "coverage_summary": {
+              "type": "string"
+            },
+            "failed_categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "coverage",
+                  "visual_match",
+                  "anatomy_match",
+                  "responsive_match",
+                  "implementation_quality"
+                ]
+              }
+            },
+            "corrections_made": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "simplifications": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "matches",
+                "deviates",
+                "simplified",
+                "needs-fix"
+              ]
+            }
       }
     }
   }

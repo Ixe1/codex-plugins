@@ -64,6 +64,7 @@
             "enum": [
               "brand-board",
               "component-sheet",
+              "page-layout-contract",
               "page-concept",
               "other"
             ]
@@ -221,6 +222,9 @@
         "concept_region_inventory": {
           "type": "string"
         },
+        "page_layout_contract": {
+          "type": "string"
+        },
         "asset_manifest": {
           "type": "string"
         },
@@ -251,6 +255,7 @@
         "concept_path",
         "html_path",
         "concept_region_inventory_path",
+        "page_layout_contract_path",
         "asset_manifest_path",
         "screenshot_paths"
       ],
@@ -281,6 +286,9 @@
           }
         },
         "concept_region_inventory_path": {
+          "type": "string"
+        },
+        "page_layout_contract_path": {
           "type": "string"
         },
         "asset_manifest_path": {

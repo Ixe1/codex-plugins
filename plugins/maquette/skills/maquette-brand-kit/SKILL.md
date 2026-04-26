@@ -27,6 +27,14 @@ If you need to edit a local image file, ensure it is first made visible in the c
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
+When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/brand/brand-board-vN.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive tokens.
+
+After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
+- `Yes, use this` as the recommended choice
+- `No, make a new one`
+
+If the user approves, continue. If the user asks for a new one, regenerate before deriving tokens. If the user gives free-form revision notes, edit the image using those notes, inspect the revision, and ask again with the same two approval choices. Do not treat a brand board as approved merely because the run is one-shot or provisional unless the user explicitly requested an unattended run. `One pass`, `full workflow`, `final homepage`, `fresh disposable test`, and similar phrasing are not unattended requests by themselves.
+
 Only skip image generation if:
 - the user explicitly says not to use it, or
 - the environment genuinely does not provide the tool
@@ -72,14 +80,20 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
-4. Create or update `.maquette/brand/design-system.json` so it matches the approved or proposed board.
-5. Generate `.maquette/brand/tokens.css` from the design system JSON. Use `scripts/export-tokens.mjs` if present.
-6. Summarize what changed and ask for approval or revision.
-7. Record the current decision in `.maquette/brand/approved.md`.
+4. Ask the user whether to use the inspected brand board.
+   - Use the approval choices from the non-negotiable image policy.
+   - Record the user's decision in `.maquette/brand/approved.md`.
+   - Do not create the design-system JSON or tokens until the user approves the board, unless the user explicitly requested an unattended run.
+5. Create or update `.maquette/brand/design-system.json` so it matches the approved board.
+   - The inspected brand board is the visual source of truth for palette, typography direction, spacing, radius, surfaces, shadows, and state principles.
+   - Do not use a script, existing CSS file, Figma/design export, or predetermined token file to infer or override brand tokens unless the user explicitly provides it as an approved constraint.
+6. Export `.maquette/brand/tokens.css` from the board-derived design system JSON. Use `scripts/export-tokens.mjs` if present.
+   - The export script is only a deterministic JSON-to-CSS serializer. It must not be treated as token extraction, visual analysis, or design decision-making.
+7. Summarize what changed and record the approved board, token status, and any user revision notes in `.maquette/brand/approved.md`.
 
 ## Board rules
 
-The board is a foundational visual-system artifact, not a component specification or exhaustive UI inventory. It should focus on:
+The board is a foundational 1:1 visual-system artifact, not a component specification or exhaustive UI inventory. It should focus on:
 - palette and semantic color roles
 - typography direction, recommended font families or categories, fallbacks, weights, sizes, and line-height
 - spacing rhythm
@@ -112,5 +126,6 @@ If a board has already been approved:
 - Website only: use CSS token naming that can be consumed directly by HTML/CSS/JS.
 - Use semantic tokens rather than hard-coded component colors when possible.
 - Prefer explicit, machine-readable outputs over prose-only descriptions.
-- The image board is the creative artifact; the JSON and CSS files are the machine-readable contract.
+- The image board is the creative artifact and visual authority; the JSON and CSS files are the machine-readable contract derived from that inspected board.
+- Token export scripts may serialize the approved JSON into CSS, but they must not extract, guess, normalize, or replace visual decisions from the board.
 - The design-system JSON must record the intended font personality and acceptable CSS fallback stacks. Do not blindly use crude defaults such as `Impact` only because a board shows condensed or bold headings; use `Impact` only when the board explicitly approves it.

@@ -17,6 +17,10 @@
       "path": "components/component-sheet-v1.png"
     },
     {
+      "kind": "page-layout-contract",
+      "path": "pages/homepage/page-layout-contract.md"
+    },
+    {
       "kind": "page-concept",
       "path": "pages/homepage/concept.png"
     }
@@ -100,6 +104,7 @@
   "acceptance_criteria": [
     "Uses approved typography and semantic colors.",
     "Reuses existing components before introducing new composites.",
+    "Follows the page layout contract for section compactness, terminal regions, and media fit/crop behavior.",
     "Remains readable and coherent across desktop, tablet, and mobile viewports.",
     "Primary navigation has accessible closed and open tablet/mobile states with no document-level horizontal overflow.",
     "Repeated product, pricing, service, or offer cards keep CTA and action rows aligned across varied copy lengths.",
@@ -110,6 +115,7 @@
   "quality_review": {
     "font_rationale": "Heading and body stacks follow the design-system font strategy; no crude display defaults are substituted for condensed headings.",
     "concept_region_inventory": "Every visible concept region is listed in concept-region-inventory.md with implementation status and reasons for any deviation.",
+    "page_layout_contract": "Section density, terminal regions, and media fit/crop behavior are recorded before coding and checked against screenshots.",
     "asset_manifest": "Every required raster asset is listed in asset-manifest.json and every referenced local path is verified before final review.",
     "component_sheet_gallery_fidelity": "Page uses component implementations that were reviewed against the generated component sheet rather than simplified selector demos.",
     "repeated_card_alignment": "Repeated cards use shared media/header/body/footer/action anatomy, equal-height rows, stable badge placement, and bottom-pinned action regions when they appear in multi-column grids.",
@@ -131,6 +137,7 @@
       "pages/homepage/screenshots/responsive-nav-open-768.png"
     ],
     "concept_region_inventory_path": "pages/homepage/concept-region-inventory.md",
+    "page_layout_contract_path": "pages/homepage/page-layout-contract.md",
     "asset_manifest_path": "pages/homepage/asset-manifest.json",
     "review_notes_path": "pages/homepage/review.md"
   }
