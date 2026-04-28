@@ -37,11 +37,11 @@ Use image generation to:
 - create a new page concept from the approved brand board and component sheet, sheets, or CSS-contract-backed component references, or
 - edit an existing concept image to refine the page while preserving the approved visual language
 
-If editing a local reference image, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
+If editing a local reference image, first make it visible in the conversation with `view_image` using its absolute filesystem path, then ask `image_gen` to edit the visible image.
 
-After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run page-concept image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/pages/<page-name>/concept.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive page artifacts or code.
+When image-worker subagents are explicitly authorized for the current run, run page-concept image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/pages/<page-name>/concept.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, ask the approval question, and only then derive page artifacts or code.
 
 After inspecting a generated or edited page concept that passes rejection checks, ask the user whether to use it before writing the page blueprint, concept-region inventory, page layout contract, asset manifest, or page code. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -84,7 +84,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If the page has a header or primary navigation, verify that the component catalog covers responsive navigation variants before concept or implementation work.
    - If missing coverage is significant, run or request `maquette-components` to create the focused component/composite sheet before continuing.
 3. If `image_gen` is available, create or edit a page concept using the approved references and `assets/page-concept-prompt.md`.
-   - Inspect the generated page concept with `view_image` before writing the page blueprint or implementation.
+   - Inspect the generated page concept with `view_image` using its absolute filesystem path before writing the page blueprint or implementation.
    - A concept with header or primary navigation is incomplete if it only shows desktop navigation. It must define desktop, tablet, and mobile nav behavior, including the collapsed and expanded tablet/mobile state.
 4. Ask the user whether to use the inspected page concept.
    - Use the approval choices from the non-negotiable image policy.
@@ -107,7 +107,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Use `shared/page-asset-manifest.example.json` and `shared/page-asset-manifest.schema.json` if present.
    - List every required raster image: logo if supplied or explicitly requested, hero images, product-card images, promo images, lifestyle/story images, footer/app/device images, background textures, decorative rasters, and generated concept/page screenshots.
    - If the user asked for generated image assets, generate all required project-local assets or document why each missing asset was not generated.
-   - When image-worker subagents are explicitly authorized for the current run, generate or edit required raster assets through the dedicated image worker handoff from `shared/image-gen-workflow.md`, then inspect or verify each returned project-local path before using it in HTML, CSS, JS, or review notes. Generate these assets in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
+   - When image-worker subagents are explicitly authorized for the current run, generate or edit required raster assets through the dedicated image worker handoff from `shared/image-gen-workflow.md`, then inspect or verify each returned project-local artifact by resolving it to an absolute filesystem path before using it in HTML, CSS, JS, or review notes. Generate these assets in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
    - If Maquette policy forbids an asset, such as generating a new logo during the brand-kit phase, record the reason and use a permissible fallback only when it still matches the concept.
    - Every asset referenced by HTML, CSS, JS, or review notes must exist locally before final review.
 8. Reuse existing components first.

@@ -30,12 +30,14 @@ Do not create, overwrite, or rely on `index.html` in the project root for Maquet
 ## Mandatory image inspection
 
 After every `image_gen` create or edit step:
-- inspect the generated image with `view_image` before treating it as the design source
+- inspect the generated image with `view_image` using its full absolute filesystem path before treating it as the design source
 - do not derive tokens, component specifications, page blueprints, or implementation details from the prompt alone
 - if the generated file cannot be inspected, state that limitation and treat the image as unverified
 - when revising a prior artifact, inspect both the prior reference and the new generated result when possible
 
-After inspection, continue the same turn unless the user explicitly asked for image-only output. Briefly identify the generated artifact, provide its saved path or asset reference when available, assess whether it matches the request, and continue to the next requested workflow step.
+When an image is copied into `.maquette/`, resolve the project-local artifact path against the current workspace before passing it to `view_image` or rendering it in chat. Local image Markdown shown to the user must also use an absolute filesystem path, for example `![brand board](/absolute/path/.maquette/brand/brand-board-v1.png)`, never a repo-relative path such as `![brand board](.maquette/brand/brand-board-v1.png)`.
+
+After inspection, continue the same turn unless the user explicitly asked for image-only output. Briefly identify the generated artifact, provide its saved absolute filesystem path or asset reference when available, assess whether it matches the request, and continue to the next requested workflow step.
 
 ## Image Generation Delegation
 
@@ -59,9 +61,9 @@ When authorized and available, Maquette image creation and image editing should 
 
 Use this handoff pattern:
 - start a bounded image worker with the specific Maquette artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
-- instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the expected `.maquette/` artifact path, and return the exact source path and project-local path
+- instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the expected `.maquette/` artifact path, and return the exact source path plus the absolute filesystem path to the project-local artifact
 - capture the worker start time and worker/subagent id when available; if the worker cannot directly report a saved path, use those details to locate the matching file in the Codex generated-images directory by timestamp and filename metadata
-- after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image`
+- after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image` using the returned absolute filesystem path
 - the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
 - if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
 - if subagents are unavailable after asking, explicitly declined, or explicitly bypassed by unattended/no-question language, perform image generation in the main workflow and record the exact reason the image-worker path was not used
@@ -72,9 +74,9 @@ Do not delegate approval decisions to the image worker. The worker creates or ed
 
 Brand boards and page concepts require explicit user approval after generation and inspection.
 
-After a generated or edited brand-board image passes internal rejection checks and has been inspected with `view_image`, ask the user whether to use it before writing `design-system.json` or `tokens.css`.
+After a generated or edited brand-board image passes internal rejection checks and has been inspected with `view_image` using its absolute filesystem path, ask the user whether to use it before writing `design-system.json` or `tokens.css`.
 
-After a generated or edited page-concept image passes internal rejection checks and has been inspected with `view_image`, ask the user whether to use it before writing `page-blueprint.json`, `concept-region-inventory.md`, `page-layout-contract.md`, `asset-manifest.json`, or page code.
+After a generated or edited page-concept image passes internal rejection checks and has been inspected with `view_image` using its absolute filesystem path, ask the user whether to use it before writing `page-blueprint.json`, `concept-region-inventory.md`, `page-layout-contract.md`, `asset-manifest.json`, or page code.
 
 Use the Codex user-input/question tool when available. Provide choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -155,6 +157,6 @@ Most Maquette artifacts are opaque boards, sheets, and page concepts. If a task 
 ## Editing visible images
 
 When revising a previously generated or local image:
-- make the image visible in the conversation first, typically via `view_image`
+- make the image visible in the conversation first, typically via `view_image` with its absolute filesystem path
 - ask `image_gen` to edit the visible image
 - preserve approved style unless the user requested change

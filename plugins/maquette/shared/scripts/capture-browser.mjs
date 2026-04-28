@@ -58,6 +58,9 @@ if (!targetArg || !outputArg || !Number.isFinite(width) || !Number.isFinite(heig
   process.exit(1);
 }
 
+const outputPath = path.resolve(outputArg);
+const metadataJsonPath = jsonPath ? path.resolve(jsonPath) : null;
+
 let chromium;
 try {
   ({ chromium } = await import("playwright"));
@@ -79,7 +82,7 @@ let browser;
 const metadata = {
   target: targetArg,
   targetUrl,
-  outputPath: outputArg,
+  outputPath,
   viewport: { width, height },
   requestedMode: mode,
   captureMode: null,
@@ -94,14 +97,14 @@ try {
   const page = await browser.newPage({ viewport: { width, height } });
   await page.goto(targetUrl, { waitUntil: "load", timeout: 30000 });
   await page.waitForLoadState("networkidle", { timeout: 2000 }).catch(() => {});
-  fs.mkdirSync(path.dirname(outputArg), { recursive: true });
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
   if (mode === "viewport") {
-    await page.screenshot({ path: outputArg, fullPage: false });
+    await page.screenshot({ path: outputPath, fullPage: false });
     metadata.captureMode = "viewport";
   } else {
     try {
-      await page.screenshot({ path: outputArg, fullPage: true });
+      await page.screenshot({ path: outputPath, fullPage: true });
       metadata.captureMode = "full-page";
     } catch (error) {
       const dimensions = await page.evaluate(() => ({
@@ -114,7 +117,7 @@ try {
         width: Math.max(1, Math.min(dimensions.width, width)),
         height: Math.max(1, Math.min(dimensions.height, fallbackMaxHeight)),
       };
-      await page.screenshot({ path: outputArg, clip });
+      await page.screenshot({ path: outputPath, clip });
       metadata.captureMode = "clipped-full-document-fallback";
       metadata.clippedFallback = true;
       metadata.fullPageError = String(error?.message || error);
@@ -130,13 +133,13 @@ try {
     await browser.close();
     metadata.cleanup = "closed";
   }
-  if (jsonPath) {
-    fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
-    fs.writeFileSync(jsonPath, `${JSON.stringify(metadata, null, 2)}\n`);
+  if (metadataJsonPath) {
+    fs.mkdirSync(path.dirname(metadataJsonPath), { recursive: true });
+    fs.writeFileSync(metadataJsonPath, `${JSON.stringify(metadata, null, 2)}\n`);
   }
 }
 
-console.log(`Captured ${outputArg} (${metadata.captureMode})`);
+console.log(`Captured ${outputPath} (${metadata.captureMode})`);
 if (metadata.clippedFallback) {
   console.log("Capture used clipped fallback; record this in review notes.");
 }

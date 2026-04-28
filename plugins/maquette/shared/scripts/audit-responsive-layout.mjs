@@ -62,6 +62,10 @@ if (!targetArg || widths.length === 0 || !Number.isFinite(height)) {
   process.exit(1);
 }
 
+const outputJsonPath = jsonPath ? path.resolve(jsonPath) : null;
+const outputScreenshotsDir = screenshotsDir ? path.resolve(screenshotsDir) : null;
+screenshotsDir = outputScreenshotsDir;
+
 let chromium;
 try {
   ({ chromium } = await import("playwright"));
@@ -300,7 +304,7 @@ async function auditResponsiveNavigation(page, width, screenshotsDir) {
 
     if (screenshotsDir) {
       fs.mkdirSync(screenshotsDir, { recursive: true });
-      openScreenshotPath = path.join(screenshotsDir, `responsive-nav-open-${width}.png`);
+      openScreenshotPath = path.resolve(screenshotsDir, `responsive-nav-open-${width}.png`);
       await page.screenshot({ path: openScreenshotPath, fullPage: true });
     }
   }
@@ -490,7 +494,7 @@ try {
     let screenshotPath = null;
     if (screenshotsDir) {
       fs.mkdirSync(screenshotsDir, { recursive: true });
-      screenshotPath = path.join(screenshotsDir, `responsive-${width}.png`);
+      screenshotPath = path.resolve(screenshotsDir, `responsive-${width}.png`);
       await page.screenshot({ path: screenshotPath, fullPage: true });
     }
 
@@ -523,9 +527,9 @@ const output = {
     && (results.every((result) => result.passResponsiveNavigation) || allowNavFailures),
 };
 
-if (jsonPath) {
-  fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
-  fs.writeFileSync(jsonPath, `${JSON.stringify(output, null, 2)}\n`);
+if (outputJsonPath) {
+  fs.mkdirSync(path.dirname(outputJsonPath), { recursive: true });
+  fs.writeFileSync(outputJsonPath, `${JSON.stringify(output, null, 2)}\n`);
 }
 
 for (const result of results) {
@@ -564,8 +568,8 @@ for (const result of results) {
   }
 }
 
-if (jsonPath) {
-  console.log(`JSON: ${jsonPath}`);
+if (outputJsonPath) {
+  console.log(`JSON: ${outputJsonPath}`);
 }
 
 if (!output.pass) {

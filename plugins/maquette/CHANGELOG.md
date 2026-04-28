@@ -8,7 +8,9 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
-No notable changes yet.
+### Fixed
+
+- Clarified Maquette image display guidance so generated images are inspected and shown with absolute filesystem paths rather than repo-relative paths.
 
 ## 0.3.5 - 2026-04-26
 

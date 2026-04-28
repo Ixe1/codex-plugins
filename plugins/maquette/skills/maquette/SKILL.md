@@ -25,7 +25,7 @@ The component-library phase uses focused 1:1 CSS-contract posters by default. Pr
 
 Before component or page implementation, the optional QA tooling decision must be explicit when any planned automated QA path is blocked. Partial availability is not enough: if Playwright is available but `ajv` or `ajv-formats` is missing, ask for an install decision before replacing schema validation with manual JSON checks, unless the user already declined installation for the current run or installation is impossible.
 
-When subagent tooling is available, follow `shared/image-gen-workflow.md` to resolve the image-worker decision before the first Maquette `image_gen` create or edit call. If the user has not already explicitly authorized subagents and has not explicitly declined or requested unattended/no-question mode, ask once whether to use Maquette image-worker subagents. Do not treat "not explicitly authorized" as permission to skip image workers. If authorized, run Maquette image creation and image editing in a dedicated image worker subagent, then have the main workflow inspect the returned project-local image path. This applies to brand boards, CSS-contract posters, visual component sheets, page concepts, and generated page raster assets. Continue in the main workflow only when image workers are explicitly declined, unavailable after the required question, or explicitly bypassed by unattended/no-question language, and record the reason.
+When subagent tooling is available, follow `shared/image-gen-workflow.md` to resolve the image-worker decision before the first Maquette `image_gen` create or edit call. If the user has not already explicitly authorized subagents and has not explicitly declined or requested unattended/no-question mode, ask once whether to use Maquette image-worker subagents. Do not treat "not explicitly authorized" as permission to skip image workers. If authorized, run Maquette image creation and image editing in a dedicated image worker subagent, then have the main workflow inspect the returned project-local image using its absolute filesystem path. This applies to brand boards, CSS-contract posters, visual component sheets, page concepts, and generated page raster assets. Continue in the main workflow only when image workers are explicitly declined, unavailable after the required question, or explicitly bypassed by unattended/no-question language, and record the reason.
 
 Brand boards and page concepts are user approval gates. After the main workflow inspects the generated image, ask whether to use it or make a new one before deriving downstream artifacts. Do not include a separate revise choice in the approval buttons. Do not treat one-shot provisional runs as implicit approval unless the user explicitly requested an unattended run.
 
@@ -78,7 +78,7 @@ Use existing website references to extract:
 - useful interaction patterns
 - visual cues worth preserving
 
-Do not treat copied CSS values, notes, or screenshots as the final design system. First convert the reference into a generated brand board, inspect it with `view_image`, then derive the design-system JSON and CSS tokens from that inspected artifact.
+Do not treat copied CSS values, notes, or screenshots as the final design system. First convert the reference into a generated brand board, inspect it with `view_image` using its absolute filesystem path, then derive the design-system JSON and CSS tokens from that inspected artifact.
 
 ## One-shot requests
 
@@ -101,4 +101,4 @@ Do not ask the user to manually rerun separate commands unless you are blocked.
 
 Follow `shared/image-gen-workflow.md` for every generated artifact.
 
-After each `image_gen` create or edit step, inspect the generated image with `view_image` before using it as the source for later artifacts.
+After each `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before using it as the source for later artifacts.

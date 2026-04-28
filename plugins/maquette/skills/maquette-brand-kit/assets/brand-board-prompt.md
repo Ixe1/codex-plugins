@@ -33,4 +33,4 @@ Constraints:
 Reference rules:
 - if an approved board is visible, preserve its palette, typography personality, spacing rhythm, radius style, and control language unless the user explicitly asked to change them
 - if inspiration images are visible, borrow mood and hierarchy only; do not copy trademarks or logos
-- if a local reference image is relevant, it should first be loaded into the conversation with view_image, then edit the visible image rather than starting from scratch
+- if a local reference image is relevant, it should first be loaded into the conversation with `view_image` using its absolute filesystem path, then edit the visible image rather than starting from scratch

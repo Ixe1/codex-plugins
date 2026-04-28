@@ -11,7 +11,7 @@ It is intentionally **image-guided**:
 
 The default workflow is therefore:
 1. **Generate or edit a visual artifact first** with `image_gen`
-2. **Inspect the generated artifact** with `view_image`
+2. **Inspect the generated artifact** with `view_image` using its absolute filesystem path
 3. **Convert that artifact into machine-readable design contracts** such as JSON and CSS tokens
 4. **Build a componentized visual reference** for each component artifact using reusable HTML/CSS/JS from the start
 5. **Document reusable APIs, slots, states, and usage examples** before moving to the next artifact
@@ -58,7 +58,7 @@ Each phase must use it as follows unless the user explicitly asks to skip image 
 - components phase -> create one focused 1:1 text-only **CSS-contract poster** at a time, starting with core primitives, then additional focused 1:1 navigation/layout, data/display, or cards/composites posters when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them. Create visual component sheet images only when explicitly requested or when a CSS-contract poster is too generic to guide implementation.
 - pages phase -> create or edit a **page concept image**, then write a page layout contract before implementation
 
-After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
+After every generated or edited image, inspect the actual result with `view_image` using its absolute filesystem path before using it as the basis for tokens, component specs, page blueprints, or code. If you render a generated local image in chat Markdown, use an absolute filesystem path such as `![alt](/absolute/path.png)`, not a repo-relative path. Do not continue from the prompt alone.
 Brand-board and page-concept images are explicit user approval gates. After Maquette generates and inspects one, it should ask whether to use it or make a new one before deriving tokens, page blueprints, layout contracts, assets, or code. The approval buttons should not include a separate revise choice, though free-form revision notes may still be handled if the user provides them. CSS-contract posters remain internal implementation artifacts unless the user explicitly asks to approve each one.
 Maquette should only skip these questions when the user explicitly asks for an unattended run with wording such as "do not ask questions", "no pauses", or "skip approval questions". Requests for a "one pass", "full workflow", "final homepage", "fresh disposable test", or "Maquette test" are not unattended requests by themselves.
 Generated boards and sheets should be readable at normal preview size. Maquette should regenerate, edit, or split visual artifacts that are cluttered, logo-like, or not inspectable enough to guide implementation.

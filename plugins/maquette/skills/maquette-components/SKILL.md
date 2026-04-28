@@ -36,7 +36,7 @@ Default CSS-contract workflow:
 - generate one focused 1:1 black-background CSS-contract poster from the approved brand board, design-system tokens, product brief, current component family, and a strict selector allowlist
 - use `assets/component-css-contract-prompt.md` by default
 - do not render a visual component sheet for that batch unless the user asks for one or the CSS-contract poster is too generic to guide implementation
-- inspect the generated poster with `view_image` before writing code
+- inspect the generated poster with `view_image` using its absolute filesystem path before writing code
 - translate any raw colors, sizes, or font stacks back to approved token variables before writing final CSS
 - record in the batch review that the source artifact is a CSS contract, not a visual component sheet
 - treat the coded browser screenshot as the primary visual validation artifact, since the source poster only describes CSS
@@ -52,12 +52,12 @@ The component-library phase has one implementation target:
 
 Do not build a throwaway visual replica and then a separate simplified gallery. The coded replica/reference must use reusable classes, tokens, component slots, state hooks, and JS behaviors from the start so pages can consume the component API without copying the sheet layout.
 
-If a local board or sheet image must be edited, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
+If a local board or sheet image must be edited, first make it visible in the conversation with `view_image` using its absolute filesystem path, then ask `image_gen` to edit the visible image.
 
-After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive component specifications or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive component specifications or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 Reject, regenerate, or split a sheet before implementation if it is not readable and useful at normal preview size.
 
-When image-worker subagents are explicitly authorized for the current run, run component CSS-contract poster generation, visual component-sheet generation, and image editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/components/component-sheet-*-vN.png` path. The main workflow must inspect the returned image with `view_image`, inventory it, transcribe CSS-contract posters when applicable, and perform implementation and QA. Generate in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
+When image-worker subagents are explicitly authorized for the current run, run component CSS-contract poster generation, visual component-sheet generation, and image editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/components/component-sheet-*-vN.png` artifact. The main workflow must inspect the returned image with `view_image` using that absolute path, inventory it, transcribe CSS-contract posters when applicable, and perform implementation and QA. Generate in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
 
 Only skip image generation if:
 - the user explicitly tells you not to use it, or
@@ -120,7 +120,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Default workflow: generate a focused 1:1 text-only CSS-contract poster using `assets/component-css-contract-prompt.md` and the batch selector allowlist.
    - Visual fallback or explicit visual-sheet workflow: generate a focused 1:1 visual component sheet using `assets/component-sheet-prompt.md`.
    - It is a workflow violation to generate the navigation/layout, data/display, cards/composites, or follow-up artifact before the current sheet or poster has completed batch evidence.
-   - Inspect the generated sheet or poster with `view_image` before implementing any code from it.
+   - Inspect the generated sheet or poster with `view_image` using its absolute filesystem path before implementing any code from it.
    - Update `.maquette/components/sheet-inventory.md` for that artifact with visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, required raster asset types, and the decision to implement, regenerate, or create another focused artifact.
    - When the artifact is a CSS-contract poster, transcribe the inspected poster into `.maquette/components/contracts/<batch-slug>.contract.css` before writing implementation CSS. This file is the human-readable bridge from image text to code: preserve selector intent, states, slots, and sizing guidance, remove OCR mistakes, omit any rejected non-component selectors, and annotate any unreadable or intentionally normalized rule.
    - Reject, regenerate, or split a visual sheet if labels are too small, unrelated families are crammed into tiny cells, components overlap, full tables or dashboards crowd out primitives, implementation notes dominate, decorative details obscure component anatomy, or the image cannot guide implementation without heavy zooming.

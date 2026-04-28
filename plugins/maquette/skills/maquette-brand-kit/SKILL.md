@@ -23,11 +23,11 @@ Use image generation in one of these modes:
 - **Generate** a new brand board from the brief
 - **Edit** an existing or previously approved brand board to evolve the direction
 
-If you need to edit a local image file, ensure it is first made visible in the conversation with `view_image`, then instruct `image_gen` to edit the visible image.
+If you need to edit a local image file, ensure it is first made visible in the conversation with `view_image` using its absolute filesystem path, then instruct `image_gen` to edit the visible image.
 
-After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/brand/brand-board-vN.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive tokens.
+When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/brand/brand-board-vN.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, ask the approval question, and only then derive tokens.
 
 After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -76,7 +76,7 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - accessibility requirements
 3. If `image_gen` is available, create or edit a **focused structured brand board** using `assets/brand-board-prompt.md`.
    - Use the board as the creative exploration and approval artifact.
-   - Inspect the generated board with `view_image` before writing the design-system JSON or CSS tokens.
+   - Inspect the generated board with `view_image` using its absolute filesystem path before writing the design-system JSON or CSS tokens.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.

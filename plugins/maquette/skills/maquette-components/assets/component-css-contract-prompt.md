@@ -2,7 +2,7 @@ Generate a focused website component CSS-contract poster.
 
 Use a 1:1 square composition. Exact generated pixel dimensions are not controllable; prioritize a clearly square poster with no cropping, letterboxing, or extra content outside the poster.
 
-This is an experimental direct-contract mode for Maquette components. Do not render a visual component sheet. The output should be a readable CSS-like text poster that the implementation model can inspect with `view_image` and translate into tokenized HTML/CSS/JS.
+This is an experimental direct-contract mode for Maquette components. Do not render a visual component sheet. The output should be a readable CSS-like text poster that the implementation model can inspect with `view_image` using its absolute filesystem path and translate into tokenized HTML/CSS/JS.
 
 Visual format:
 - black or near-black background
