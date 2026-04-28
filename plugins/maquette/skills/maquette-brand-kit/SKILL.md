@@ -25,9 +25,9 @@ Use image generation in one of these modes:
 
 If you need to edit a local image file, ensure it is first made visible in the conversation with `view_image` using its absolute filesystem path, then instruct `image_gen` to edit the visible image.
 
-After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+After every `image_gen` create or edit step, save or preserve the raw output as `.maquette/brand/brand-board-vN.png`, record a JSON sidecar for the raw artifact, inspect the raw image only when needed for rejection/recovery checks, then inspect the final approval artifact with `view_image` using its absolute filesystem path before treating it as the design source. Prefer `.maquette/brand/brand-board-vN-2k.png` for approval and transcription when the 2K derivative exists. Do not derive tokens or design-system details from the prompt alone. If the final approval artifact cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/brand/brand-board-vN.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, create and inspect the 2K derivative when optional image-prep tooling is available, ask the approval question, and only then derive tokens.
+When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. Each image worker may create or edit exactly one brand-board artifact. The worker must return structured metadata: raw source path, project raw path, derivative paths if any, dimensions when known, derivative method, JSON sidecar path, and which artifact the main workflow should inspect downstream. The main workflow must then create the 2K derivative when optional image-prep tooling is available or accepted, inspect the final approval artifact with `view_image`, ask the approval question, and only then derive tokens.
 
 After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -62,7 +62,9 @@ Always create or update these files when you finish a pass:
 When `image_gen` is available, also create or update:
 
 - `.maquette/brand/brand-board-vN.png`
+- `.maquette/brand/brand-board-vN.json`
 - `.maquette/brand/brand-board-vN-2k.png` when optional image-prep tooling is available or the user approves installing it
+- `.maquette/brand/brand-board-vN-2k.json` when a 2K derivative exists
 
 The JSON file must validate against `shared/design-system.schema.json`.
 
@@ -84,10 +86,10 @@ The JSON file must validate against `shared/design-system.schema.json`.
 4. Before asking for approval, create a 2048x2048 safe-upscaled derivative of the generated board when optional image-prep tooling is available.
    - Run `shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep` or an equivalent project-local check.
    - If project-local `sharp` is missing, ask whether to install `sharp` before creating the 2K derivative unless the user already declined optional installs for this run.
-   - If the user agrees, run `npm i -D sharp`, then continue with the 2K derivative when the package is available.
-   - If `sharp` is available, run `shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-vN.png .maquette/brand/brand-board-vN-2k.png --project . --size 2048 --json .maquette/brand/brand-board-vN-2k.json`.
+   - If the user agrees, run the project-local install command reported by the tooling check, such as `npm --prefix <projectRoot> i -D sharp`, then continue with the 2K derivative when the package is available. Do not run plain `npm i -D sharp` from a workspace without `package.json`.
+   - If `sharp` is available, run `shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-vN.png .maquette/brand/brand-board-vN-2k.png --project . --size 2048 --json .maquette/brand/brand-board-vN-2k.json --role brand-board-approval`.
    - Inspect the 2K derivative with `view_image` using its absolute filesystem path before asking for approval.
-   - Preserve the original generated board untouched as the ground-truth creative artifact. If image-prep tooling is unavailable or the user declines installation, continue with the original inspected board and record the missing 2K derivative in `approved.md`.
+   - Preserve the original generated board untouched as the ground-truth creative artifact. If image-prep tooling is unavailable or the user declines installation, continue with the original board as the final approval artifact only after viewing it and record the missing 2K derivative in `approved.md`.
 5. Ask the user whether to use the inspected brand board, preferring the inspected 2K derivative as the approval artifact when it exists.
    - Use the approval choices from the non-negotiable image policy.
    - Record the user's decision in `.maquette/brand/approved.md`.

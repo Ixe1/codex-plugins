@@ -7,9 +7,18 @@
       "kind": "concept-screenshot",
       "status": "generated",
       "required_by": "page concept review",
-      "path": "pages/homepage/concept.png",
+      "path": "pages/homepage/concept-v1.png",
       "source": "image_gen",
-      "notes": "Inspected before implementation."
+      "notes": "Raw page-concept reference. Use concept-v1-2k.png for approval/transcription when present."
+    },
+    {
+      "id": "concept-2k",
+      "kind": "concept-reference-derivative",
+      "status": "generated",
+      "required_by": "page concept approval",
+      "path": "pages/homepage/concept-v1-2k.png",
+      "source": "safe-upscale",
+      "notes": "Safe-upscaled Maquette reference derivative; not a final website asset."
     },
     {
       "id": "hero-product",

@@ -18,9 +18,9 @@ The default workflow is therefore:
 6. **Render and screenshot the implementation**
 7. **Compare implementation against the approved visual artifact** and iterate
 
-The components phase now defaults to focused direct CSS-contract posters for this experiment. Maquette generates a focused 1:1 black-background CSS-contract poster for one component family, inspects it, transcribes the recovered rules into a reviewable `.maquette/components/contracts/<batch>.contract.css` bridge file, implements the reusable component batch, and uses browser screenshots as the visual correction target. Visual component sheets are fallback or explicit-request artifacts.
+The components phase defaults to focused visual component sheets. Maquette generates one 1:1 visual sheet for a component family or pattern, inspects the final downstream artifact, derives a reviewable `.maquette/components/contracts/<batch>.contract.css` bridge file deterministically from that visual inspection, implements the reusable component batch, and uses browser screenshots as the visual correction target. CSS-contract poster images are optional supplemental references, not the primary source of truth.
 
-When subagent tooling is available but the runtime requires explicit user authorization before spawning subagents, Maquette should ask once near the start of the run whether to use image-worker subagents. Lack of prior subagent authorization is a prompt condition, not a reason to skip image workers. If the user authorizes image workers, Maquette should run image creation and image editing in a dedicated image worker subagent. The worker generates or edits the image, locates the saved file on disk, copies or preserves it under the expected `.maquette/` path, and returns the exact source and project-local paths. The main workflow then inspects the returned image and continues with approval, contracts, coding, and QA. Maquette should use the main workflow for image generation only when the user declines image workers, subagent tooling is unavailable after the question, or the user explicitly requests an unattended/no-question run, and it should record that reason.
+When subagent tooling is available but the runtime requires explicit user authorization before spawning subagents, Maquette should ask once near the start of the run whether to use image-worker subagents. Lack of prior subagent authorization is a prompt condition, not a reason to skip image workers. If the user authorizes image workers, Maquette should run image creation and image editing in a dedicated image worker subagent, with exactly one image artifact assigned to each worker. The worker generates or edits the image, locates the saved file on disk, copies or preserves it under the expected raw `.maquette/...-vN.png` path, and returns structured metadata: source path, project raw path, derivative paths, dimensions, derivative method, sidecar path, and the downstream artifact to inspect. The main workflow then creates any available/accepted reference derivative, inspects the exact downstream artifact, and continues with approval, contracts, coding, and QA. Maquette should use the main workflow for image generation only when the user declines image workers, subagent tooling is unavailable after the question, or the user explicitly requests an unattended/no-question run, and it should record that reason.
 
 This plugin includes a root workflow skill plus three focused phase skills:
 - `maquette`
@@ -55,23 +55,25 @@ If the `image_gen` tool is available in the environment, it is **not optional** 
 
 Each phase must use it as follows unless the user explicitly asks to skip image generation or the environment genuinely lacks the tool:
 - brand-kit phase -> create or edit a focused foundational 1:1 **brand board image** with no logo, wordmark, brand mark, large product-name treatment, or detailed component inventory; record explicit typography recommendations and fallback strategy
-- components phase -> create one focused 1:1 text-only **CSS-contract poster** at a time, starting with core primitives, then additional focused 1:1 navigation/layout, data/display, or cards/composites posters when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them. Create visual component sheet images only when explicitly requested or when a CSS-contract poster is too generic to guide implementation.
+- components phase -> create one focused 1:1 **visual component sheet** at a time, starting with core primitives, then additional focused navigation/layout, data/display, or cards/composites sheets when dense data, larger composites, navigation, repeated cards, newsletter modules, or footer/social modules need them. Derive deterministic CSS contracts after inspecting the visual sheet. Create CSS-contract poster images only as supplemental/non-authoritative references when explicitly requested or justified after the visual sheet exists.
 - pages phase -> create or edit a **page concept image**, then write a page layout contract before implementation
 
 After every generated or edited image, inspect the actual result with `view_image` using its absolute filesystem path before using it as the basis for tokens, component specs, page blueprints, or code. If you render a generated local image in chat Markdown, use an absolute filesystem path such as `![alt](/absolute/path.png)`, not a repo-relative path. Do not continue from the prompt alone.
-Brand-board and page-concept images are explicit user approval gates. After Maquette generates and inspects one, it should ask whether to use it or make a new one before deriving tokens, page blueprints, layout contracts, assets, or code. The approval buttons should not include a separate revise choice, though free-form revision notes may still be handled if the user provides them. CSS-contract posters remain internal implementation artifacts unless the user explicitly asks to approve each one.
+For Maquette reference artifacts, strict naming applies: `...-vN.png` is the raw image_gen artifact, `...-vN-2k.png` is a safe-upscale derivative, and `...-vN-rendered.png` is a deterministic rendered derivative. Workers must not overwrite raw artifacts with derivatives. Every generated or derived reference image needs a JSON sidecar with source paths, derivative paths, dimensions, method, creation time, main-inspection status, and approval/transcription/implementation role.
+The 2K derivative workflow applies only to Maquette reference artifacts: brand boards, visual component sheets, optional CSS-contract posters, and page concepts. It does not automatically apply to final website assets such as logos, icons, product images, hero banners, illustrations, textures, transparent cutouts, or other page/media assets.
+Brand-board and page-concept images are explicit user approval gates. After Maquette generates one, it saves the raw project artifact, checks optional image-prep, creates the 2K derivative when accepted or available, views the exact final approval artifact, and only then asks whether to use it or make a new one before deriving tokens, page blueprints, layout contracts, assets, or code. The approval buttons should not include a separate revise choice, though free-form revision notes may still be handled if the user provides them. CSS-contract posters remain supplemental implementation artifacts unless the user explicitly asks to approve each one.
 Maquette should only skip these questions when the user explicitly asks for an unattended run with wording such as "do not ask questions", "no pauses", or "skip approval questions". Requests for a "one pass", "full workflow", "final homepage", "fresh disposable test", or "Maquette test" are not unattended requests by themselves.
 Generated boards and sheets should be readable at normal preview size. Maquette should regenerate, edit, or split visual artifacts that are cluttered, logo-like, or not inspectable enough to guide implementation.
 Sites with primary navigation should define responsive navigation before page implementation: desktop inline nav, tablet/mobile menu toggle, expanded panel or drawer, accessible states, and no document-level horizontal scrolling for nav.
 Repeated card grids should define equal-height cards and bottom-pinned action rows before page implementation. Footer social links should use recognizable social icons, and page typography should follow the approved font strategy rather than crude defaults such as `Impact`.
-Component implementation includes hard gates per artifact: first make the optional QA tooling decision, then generate one 1:1 CSS-contract poster by default, render an artifact-specific componentized replica/reference using reusable CSS/JS, write batch artifacts, and only then move to the next artifact. Every poster must use a strict selector allowlist.
+Component implementation includes hard gates per artifact: first make the optional QA tooling decision, then generate one 1:1 visual component sheet by default, derive a deterministic contract, render an artifact-specific componentized replica/reference using reusable CSS/JS, write batch artifacts, and only then move to the next artifact.
 Page implementation includes a fidelity gate: inventory visible concept regions, write a page layout contract for section compactness, image fit/crop behavior, terminal regions, and responsive structure, create an asset manifest for required raster assets, then document section-by-section screenshot comparison notes before approval.
 
 ## Output philosophy
 
 The brand board is the 1:1 visual-system contract.
-The CSS-contract poster is the default 1:1 text source for selectors, states, slots, and dimensions, not a full visual design target. The transcribed contract CSS is the implementation bridge from inspected image text to final tokenized component CSS.
-An explicit visual component sheet is the 1:1 visual target for a coded componentized reference when that fallback path is used.
+The visual component sheet is the 1:1 component reference target for real anatomy, states, density, responsive navigation, repeated-card alignment, tables/cards/forms, and footer/social modules.
+The deterministic contract CSS is the implementation bridge from inspected visual sheet to final tokenized component CSS.
 The reusable component library is the CSS/JS/catalog API proven by that reference and consumed by pages.
 The structured JSON/CSS files are the machine-readable source of truth.
 The coded reference/page screenshots are the verification artifacts.
@@ -116,7 +118,7 @@ brand/approved.md
 ```
 
 Review the generated brand direction, then approve it or ask Maquette to make a new one.
-Maquette should ask for approval immediately after viewing the generated board, before writing design-system JSON or CSS tokens.
+Maquette should ask for approval immediately after viewing the final brand-board approval artifact, preferring the 2K derivative when available, before writing design-system JSON or CSS tokens.
 
 ### 2. Build the component library
 
@@ -126,10 +128,10 @@ After the brand kit is approved, use `$maquette-components`:
 $maquette-components Make a component library.
 ```
 
-This pass creates a focused core CSS-contract poster first, builds and reviews a componentized visual reference with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats that loop for focused data/composite/form/navigation/repeated-card/newsletter/footer-social artifacts when the product needs them.
+This pass creates a focused core visual component sheet first, builds and reviews a componentized visual reference with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats that loop for focused data/composite/form/navigation/repeated-card/newsletter/footer-social artifacts when the product needs them.
 When a site has global navigation, the component pass should include responsive nav variants for desktop, tablet, and mobile.
-Every default CSS-contract poster is 1:1; explicit visual component sheets are also 1:1 when used. Maquette should not generate all component artifacts before implementation. Each multi-poster or multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `contracts/<batch-slug>.contract.css` for CSS-contract batches, `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
-Each batch must complete screenshot review or documented manual visual review against its source sheet or poster before Maquette generates the next component artifact.
+Every default visual component sheet is 1:1. Maquette should not generate all component artifacts before implementation. Each multi-sheet batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `contracts/<batch-slug>.contract.css`, `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to `css/components.css` and `js/components.js`; pages should use the cataloged component API rather than copying that reference layout.
+Each batch must complete screenshot review or documented manual visual review against its source sheet before Maquette generates the next component artifact.
 
 ### 3. Create pages
 
@@ -146,7 +148,7 @@ $maquette-pages Make a homepage with a proof-led hero, services section, client 
 ```
 
 This pass creates a page concept image, writes a page layout contract for section density, media crops, terminal sections, and responsive behavior, implements the page with the approved brand and component references, captures screenshots when possible, and records review notes.
-Maquette should ask for approval immediately after viewing the page concept, before writing the blueprint, inventory, layout contract, asset manifest, or page code.
+Maquette should ask for approval immediately after viewing the final page-concept approval artifact, preferring the 2K derivative when available, before writing the blueprint, inventory, layout contract, asset manifest, or page code.
 
 ## Invocation
 
@@ -168,14 +170,14 @@ Maquette can use project-local Node dependencies for automated screenshot captur
 If your project does not already have the optional QA dependencies installed, add them in the project where Maquette is generating UI files:
 
 ```sh
-npm i -D playwright ajv ajv-formats
-npx playwright install chromium
+npm --prefix <projectRoot> i -D playwright ajv ajv-formats
+npm --prefix <projectRoot> exec playwright install chromium
 ```
 
 If the run will preprocess low-resolution raster references before visual transcription or QA, install `sharp` in the same project:
 
 ```sh
-npm i -D sharp
+npm --prefix <projectRoot> i -D sharp
 ```
 
 You can check whether the current project has the optional QA tooling available without installing anything:
@@ -185,17 +187,17 @@ node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-b
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep --json .maquette/image-prep-tooling.json
 ```
 
-During a Maquette run, Codex should check optional QA tooling before component sheets, CSS-contract posters, or component code are generated. Partial availability still counts as missing QA tooling: if Playwright is available but `ajv-formats` is missing, browser QA can run but schema validation is blocked. When low-resolution raster references would benefit from preprocessing, run the tooling check with `--check-image-prep`; missing `sharp` blocks only the `reference-image-preprocessing` capability. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, Codex should ask before installing dependencies or skipping those automated checks, unless the user already declined for the run or installation is impossible. If the user agrees, Codex can run the project-local install commands and continue with automated QA. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
+During a Maquette run, Codex should check optional QA tooling before component sheets, supplemental CSS-contract posters, or component code are generated. Partial availability still counts as missing QA tooling: if Playwright is available but `ajv-formats` is missing, browser QA can run but schema validation is blocked. When low-resolution Maquette reference artifacts would benefit from preprocessing, run the tooling check with `--check-image-prep`; missing `sharp` blocks only the `reference-image-preprocessing` capability. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, Codex should ask before installing dependencies or skipping those automated checks, unless the user already declined for the run or installation is impossible. If the user agrees, Codex can run the project-local install commands and continue with automated QA, including `sharp` when image-prep will be used. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
 
 Project-local installs are the recommended path. Global npm installs are not recommended because Node usually will not resolve global packages from plugin scripts unless the user also configures environment-specific module lookup such as `NODE_PATH`.
 
-The bundled browser scripts load `playwright` from the current project when available and launch Chromium in headless mode. The JSON validation helper loads `ajv` and `ajv-formats` from the current project when available. The safe-upscale helper loads `sharp` from the current project when available and creates a separate 2x Lanczos + mild-unsharp PNG without overwriting the original reference:
+The bundled browser scripts load `playwright` from the current project when available and launch Chromium in headless mode. The JSON validation helper loads `ajv` and `ajv-formats` from the current project when available. Parent and global `node_modules` do not count as project-local unless an explicit documented override is used. The safe-upscale helper loads `sharp` from the current project when available and creates a separate 2K Lanczos + mild-unsharp PNG for Maquette reference artifacts without overwriting the original reference:
 
 ```sh
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep
-node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/components/component-closeup.png .maquette/components/component-closeup-2x-safe.png --project . --json .maquette/components/component-closeup-2x-safe.json
-node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-v1.png .maquette/brand/brand-board-v1-2k.png --project . --size 2048 --json .maquette/brand/brand-board-v1-2k.json
+node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/components/component-sheet-core-v1.png .maquette/components/component-sheet-core-v1-2k.png --project . --size 2048 --json .maquette/components/component-sheet-core-v1-2k.json --role component-sheet-transcription
+node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-v1.png .maquette/brand/brand-board-v1-2k.png --project . --size 2048 --json .maquette/brand/brand-board-v1-2k.json --role brand-board-approval
 node plugins/maquette/shared/scripts/capture-browser.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png --json .maquette/components/reference-capture.json
 node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png
 node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs .maquette/pages/homepage/page.html .maquette/pages/homepage/page.png

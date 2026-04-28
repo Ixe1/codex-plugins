@@ -1,7 +1,7 @@
 # Concept Region Inventory
 
 Page: `<page-name>`
-Concept image: `pages/<page-name>/concept.png`
+Concept image: `pages/<page-name>/concept-vN.png` or `pages/<page-name>/concept-vN-2k.png` when a safe-upscale derivative was used for approval/transcription
 
 Use this before coding. Every visible concept region defaults to implementation.
 

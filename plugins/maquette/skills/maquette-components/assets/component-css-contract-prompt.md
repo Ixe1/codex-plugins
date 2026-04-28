@@ -1,8 +1,8 @@
-Generate a focused website component CSS-contract poster.
+Generate a focused supplemental website component CSS-contract poster.
 
 Use a 1:1 square composition. Exact generated pixel dimensions are not controllable; prioritize a clearly square poster with no cropping, letterboxing, or extra content outside the poster.
 
-This is an experimental direct-contract mode for Maquette components. Do not render a visual component sheet. The output should be a readable CSS-like text poster that the implementation model can inspect with `view_image` using its absolute filesystem path and translate into tokenized HTML/CSS/JS.
+This is a supplemental Maquette component reference, not the primary component artifact. It should only be generated after a visual component sheet exists or when explicitly requested. Do not render a visual component sheet in this poster. The output should be a readable CSS-like text poster that the implementation model can inspect with `view_image` using its absolute filesystem path and use only to clarify a narrow deterministic contract derived from the visual sheet.
 
 Visual format:
 - black or near-black background
@@ -64,4 +64,4 @@ Reject and regenerate or split the poster before implementation if:
 - unrelated component families are crowded together
 - the poster is too generic to guide component CSS beyond common defaults
 
-This CSS-contract poster is a machine-readable component contract, not a final stylesheet and not the final visual source of truth for complex visual design. The coded replica/reference must still be reviewed in a browser, corrected after screenshots, and documented in the component catalog.
+This CSS-contract poster is supplemental and non-authoritative unless explicitly requested by the user. It is not a final stylesheet and not the final visual source of truth for component design. The coded replica/reference must follow the visual component sheet, be reviewed in a browser, corrected after screenshots, and documented in the component catalog.

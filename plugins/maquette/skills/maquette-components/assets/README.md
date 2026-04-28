@@ -4,5 +4,5 @@ The coded componentized reference should be reviewed as a faithful implementatio
 
 Prompt assets:
 
-- `component-css-contract-prompt.md`: default direct CSS-contract poster prompt for component-family implementation.
-- `component-sheet-prompt.md`: visual component sheet fallback prompt for explicit visual-sheet requests or blocked CSS-contract runs.
+- `component-sheet-prompt.md`: default visual component sheet prompt for component-family implementation.
+- `component-css-contract-prompt.md`: optional supplemental CSS-contract poster prompt for explicit requests or narrow follow-up clarification after a visual sheet exists.

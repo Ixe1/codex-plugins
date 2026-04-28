@@ -53,7 +53,7 @@
           "implementation_quality": 5
         },
         "corrections_made": [
-          "Adjusted card action rows to align with the CSS-contract poster and rendered screenshot."
+          "Adjusted card action rows to align with the visual component sheet, derived contract, and rendered screenshot."
         ],
         "simplifications": [],
         "deferred_items": [],
@@ -150,10 +150,10 @@
         "responsive_match": 5,
         "implementation_quality": 5
       },
-      "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy from the approved CSS-contract posters.",
+      "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy from the approved visual component sheets.",
       "failed_categories": [],
       "corrections_made": [
-        "Adjusted card action rows to align with the CSS-contract poster and rendered screenshot.",
+        "Adjusted card action rows to align with the visual component sheet, derived contract, and rendered screenshot.",
         "Increased icon contrast in active and disabled states after screenshot review."
       ],
       "simplifications": [],
@@ -429,7 +429,7 @@
           "components/component-sheet-core-primitives-css-contract-v1.png"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
-        "similarity_notes": "Card surfaces and CTA styling follow the CSS-contract poster and rendered screenshot.",
+        "similarity_notes": "Card surfaces and CTA styling follow the visual component sheet, derived contract, and rendered screenshot.",
         "qa_notes": [
           "Componentized reference includes at least three product cards with varied copy length.",
           "Screenshot review confirms quantity and Add to Cart rows share the same vertical position across the row."

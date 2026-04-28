@@ -22,7 +22,7 @@
     },
     {
       "kind": "page-concept",
-      "path": "pages/homepage/concept.png"
+      "path": "pages/homepage/concept-v1-2k.png"
     }
   ],
   "viewports": [
@@ -125,7 +125,7 @@
     "notes": "Record screenshot evidence and any intentional exceptions in review.md."
   },
   "assets": {
-    "concept_path": "pages/homepage/concept.png",
+    "concept_path": "pages/homepage/concept-v1-2k.png",
     "html_path": "pages/homepage/page.html",
     "css_path": "pages/homepage/page.css",
     "js_path": "pages/homepage/page.js",

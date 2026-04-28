@@ -15,14 +15,14 @@ Preferred inputs:
 - `.maquette/brand/design-system.json`
 - `.maquette/components/component-catalog.json`
 - approved brand-board image
-- approved CSS-contract poster image or images, or approved visual component-sheet images when that fallback path was used
+- approved visual component-sheet image or images and deterministic component contracts
 
 Hard gate:
 - If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
-- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected component sheet/CSS-contract poster image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
+- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected visual component sheet image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
 - If the component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Run or request `maquette-components` to complete reusable component coverage first.
 - If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
-- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused sheet or CSS-contract poster. Do not silently invent significant new component language inside the page phase.
+- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused visual component sheet. Do not silently invent significant new component language inside the page phase.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
 - In a one-shot unattended `maquette` workflow where the user explicitly asked not to pause, earlier phases may be marked provisional, but they still must exist before this phase starts. Otherwise, generated brand-board and page-concept approval gates still require explicit user decisions.
 
@@ -34,14 +34,14 @@ Do not skip directly to code-only page design unless the user explicitly asks yo
 The page concept image is the creative design artifact for the page and should guide layout, hierarchy, density, and style.
 
 Use image generation to:
-- create a new page concept from the approved brand board and component sheet, sheets, or CSS-contract-backed component references, or
+- create a new page concept from the approved brand board, visual component sheet or sheets, deterministic contracts, and componentized references, or
 - edit an existing concept image to refine the page while preserving the approved visual language
 
 If editing a local reference image, first make it visible in the conversation with `view_image` using its absolute filesystem path, then ask `image_gen` to edit the visible image.
 
-After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
+After every page-concept `image_gen` create or edit step, save or preserve the raw output as a project-local `...-vN.png`, record a JSON sidecar, inspect the raw image only when needed for rejection/recovery checks, then inspect the final approval artifact with `view_image` using its absolute filesystem path before treating it as the design source. Prefer a `...-vN-2k.png` derivative for approval and transcription when available. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the final approval artifact cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run page-concept image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/pages/<page-name>/concept.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, ask the approval question, and only then derive page artifacts or code.
+When image-worker subagents are explicitly authorized for the current run, run page-concept image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. Each image worker may create or edit exactly one page concept or page asset. The worker must return structured metadata: raw source path, project raw path, derivative paths if any, dimensions when known, derivative method, JSON sidecar path, and which artifact the main workflow should inspect downstream. For page concepts, the main workflow must create any accepted/available 2K reference derivative, inspect the final approval artifact with `view_image`, ask the approval question, and only then derive page artifacts or code.
 
 After inspecting a generated or edited page concept that passes rejection checks, ask the user whether to use it before writing the page blueprint, concept-region inventory, page layout contract, asset manifest, or page code. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -68,7 +68,9 @@ For each page, create or update a folder like:
 
 When applicable, also create:
 
-- `.maquette/pages/<page-name>/concept.png`
+- `.maquette/pages/<page-name>/concept-vN.png`
+- `.maquette/pages/<page-name>/concept-vN.json`
+- `.maquette/pages/<page-name>/concept-vN-2k.png` and `.maquette/pages/<page-name>/concept-vN-2k.json` when optional reference image-prep tooling is available or approved
 - `.maquette/pages/<page-name>/page.png`
 
 The blueprint JSON must validate against `shared/page-blueprint.schema.json`.
@@ -84,7 +86,9 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If the page has a header or primary navigation, verify that the component catalog covers responsive navigation variants before concept or implementation work.
    - If missing coverage is significant, run or request `maquette-components` to create the focused component/composite sheet before continuing.
 3. If `image_gen` is available, create or edit a page concept using the approved references and `assets/page-concept-prompt.md`.
-   - Inspect the generated page concept with `view_image` using its absolute filesystem path before writing the page blueprint or implementation.
+   - Save or preserve the raw page concept as the project-local concept artifact and record a JSON sidecar.
+   - Check optional image-prep tooling before approval. If project-local `sharp` is available or the user approves installing it, create a separate 2K page-concept derivative and inspect that derivative before asking approval.
+   - Inspect the generated page concept final approval artifact with `view_image` using its absolute filesystem path before writing the page blueprint or implementation. Prefer `...-vN-2k.png` when it exists.
    - A concept with header or primary navigation is incomplete if it only shows desktop navigation. It must define desktop, tablet, and mobile nav behavior, including the collapsed and expanded tablet/mobile state.
 4. Ask the user whether to use the inspected page concept.
    - Use the approval choices from the non-negotiable image policy.
@@ -108,6 +112,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - List every required raster image: logo if supplied or explicitly requested, hero images, product-card images, promo images, lifestyle/story images, footer/app/device images, background textures, decorative rasters, and generated concept/page screenshots.
    - If the user asked for generated image assets, generate all required project-local assets or document why each missing asset was not generated.
    - When image-worker subagents are explicitly authorized for the current run, generate or edit required raster assets through the dedicated image worker handoff from `shared/image-gen-workflow.md`, then inspect or verify each returned project-local artifact by resolving it to an absolute filesystem path before using it in HTML, CSS, JS, or review notes. Generate these assets in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
+   - Do not automatically create 2K safe-upscale derivatives for final website assets such as logos, icons, product images, hero banners, illustrations, textures, transparent assets, or other page/media assets. Preserve intended dimensions and semantics unless the user explicitly requests an image optimization/export step.
    - If Maquette policy forbids an asset, such as generating a new logo during the brand-kit phase, record the reason and use a permissible fallback only when it still matches the concept.
    - Every asset referenced by HTML, CSS, JS, or review notes must exist locally before final review.
 8. Reuse existing components first.
@@ -128,10 +133,10 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
 12. Capture screenshots when possible and compare them to the concept and approved references.
    - Use Maquette's bundled scripts where possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/safe-upscale-image.mjs`, `shared/scripts/capture-browser.mjs`, or `skills/maquette-pages/scripts/capture-page.mjs`.
    - Check optional project-local QA dependencies before reporting automated screenshot QA as unavailable. Do not assume global npm installs are available.
-   - When raster page concepts or component references are near 1k resolution and detailed visual transcription would benefit from more pixels, check `ensure-qa-tooling.mjs --project . --check-image-prep`. If `sharp` is available, create a separate 2x safe-upscaled reference with `safe-upscale-image.mjs`; keep the original image as ground truth and do not overwrite it.
+   - When raster page concepts or component references are near 1k resolution and detailed visual transcription would benefit from more pixels, check `ensure-qa-tooling.mjs --project . --check-image-prep`. If `sharp` is available, create a separate 2K safe-upscaled reference with `safe-upscale-image.mjs`; keep the original image as ground truth and do not overwrite it.
    - If `sharp` is missing but image preprocessing would materially improve fidelity, ask before installing `sharp` in the project or continuing with the original reference.
    - Treat partial QA availability as missing QA tooling. For example, if browser QA can run but `ajv-formats` is missing, schema validation for page blueprints or asset manifests is still blocked.
-   - If optional QA dependencies are missing and automated screenshot, responsive, schema, or reference-image-preprocessing QA would materially improve confidence, ask the user through the Codex user-input/question tool whether to install the missing project-local packages. Use explicit yes/no choices. If the user agrees, run the install command reported by `ensure-qa-tooling.mjs`, such as `npm i -D playwright ajv ajv-formats`, `npm i -D sharp`, and `npx playwright install chromium` when Chromium is required, then continue automated QA. If the user declines, continue with manual review and record the missing tooling.
+   - If optional QA dependencies are missing and automated screenshot, responsive, schema, or reference-image-preprocessing QA would materially improve confidence, ask the user through the Codex user-input/question tool whether to install the missing project-local packages. Use explicit yes/no choices. If the user agrees, run the install command reported by `ensure-qa-tooling.mjs`, such as `npm --prefix <projectRoot> i -D playwright ajv ajv-formats sharp`, and `npm --prefix <projectRoot> exec playwright install chromium` when Chromium is required, then continue automated QA. Include `sharp` when image-prep will be used. Do not run plain `npm i -D ...` from a workspace without `package.json`. If the user declines, continue with manual review and record the missing tooling.
    - Do not silently replace schema validation with JSON syntax validation when only `ajv` or `ajv-formats` is missing. Ask first, unless the user already declined installation for this run or the environment cannot install packages.
    - Keep Playwright/Chromium screenshot capture headless.
    - Ensure every browser/session opened for screenshot capture is closed before finishing.
@@ -175,7 +180,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Prefer bundled Maquette scripts over generated run-local `.mjs` scripts for capture and responsive auditing. If a fallback script is generated, list it in `review.md` with the reason.
    - For each major section, write concept-to-code comparison notes in `review.md`: `matches`, `deviates`, `missing`, `simplified`, or `fixed`.
    - If a footer, header, terminal section, image asset, or any other visible concept region is simplified from the concept, either fix it or record the intentional reason and recommended follow-up in `review.md`.
-14. Record generated asset manifest status and missing assets, page concept approval decision, page concept region inventory, page layout contract status, component sheet/CSS-contract poster vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
+14. Record generated asset manifest status and missing assets, page concept approval decision, page concept region inventory, page layout contract status, component sheet vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
 
 ## Low-resolution reference rule
 

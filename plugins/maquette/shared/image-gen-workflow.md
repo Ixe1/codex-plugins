@@ -12,12 +12,13 @@ When `image_gen` is available, each phase must use it:
 1. Brand kit
    - generate or edit a focused 1:1 brand board
 2. Components
-   - generate one focused 1:1 text-only CSS-contract poster at a time by default, starting with core primitives, plus additional focused 1:1 posters when the product needs them
-   - generate a focused 1:1 visual component sheet only when the user explicitly asks for visual component sheets or when the component skill documents that the CSS-contract route was blocked
+   - generate one focused 1:1 visual component sheet at a time by default, starting with core primitives, plus additional focused 1:1 sheets when the product needs them
+   - derive deterministic component contracts and implementation artifacts after inspecting the visual sheet
+   - create CSS-contract poster images only as supplemental, non-authoritative references when explicitly requested or when the component skill documents why a poster would materially help
 3. Pages
    - generate or edit a page concept
 
-Only after the visual artifact or CSS-contract poster exists should the workflow proceed to code implementation.
+Only after the visual artifact exists, and any supplemental CSS-contract poster has been treated as non-authoritative, should the workflow proceed to code implementation.
 
 For brand kits, token creation is not script-led extraction. The inspected brand-board image is the visual authority; `design-system.json` and `tokens.css` are machine-readable artifacts derived from that viewed image. Helper scripts may serialize approved JSON into CSS, but they must not infer, normalize, or override palette, typography, spacing, radius, surface, shadow, or state decisions from a predetermined design file unless the user explicitly provides that file as an approved constraint.
 
@@ -27,10 +28,33 @@ Maquette-owned artifacts must be written under `.maquette/` in the current proje
 
 Do not create, overwrite, or rely on `index.html` in the project root for Maquette output. If the user later wants to integrate a Maquette page into the real app or root site entrypoint, treat that as a separate explicit integration task.
 
+## Reference artifact handling
+
+Maquette reference artifacts are brand boards, visual component sheets, optional CSS-contract poster supplements, and page concepts. These are the only image_gen artifacts that should use the safe 2K derivative workflow.
+
+Final website assets are different. Do not automatically 2K-upscale logos, icons, product images, hero banners, illustrations, textures, transparent cutouts, background media, or other final page/media assets. Preserve their intended dimensions and asset semantics unless the user explicitly requests a separate image optimization or export step.
+
+Use strict reference image naming:
+- `...-vN.png` is the raw `image_gen` artifact copied or preserved in the project.
+- `...-vN-2k.png` is a Maquette safe-upscale derivative.
+- `...-vN-rendered.png` is a deterministic rendered derivative, when one exists.
+
+Never overwrite a raw `...-vN.png` with a derivative. Workers and main workflow notes must not report a `-2k` or `-rendered` file as the raw generated artifact.
+
+Every generated or derived Maquette reference image must have a JSON sidecar. Record the raw source path, project raw path, derivative paths, dimensions, method (`raw-image-gen`, `safe-upscale`, or `deterministic-render`), `created_at`, `inspected_by_main`, and the artifact role for approval, transcription, implementation, or supplemental reference. The helper `shared/scripts/reference-artifact-contract.mjs` defines the expected naming and sidecar shape, and `shared/scripts/safe-upscale-image.mjs --json` writes safe-upscale derivative metadata.
+
+Before any approval, transcription, or implementation inspection gate, determine the downstream artifact:
+- If project-local `sharp` is available or the user approves installing it for reference image preprocessing, create the `...-vN-2k.png` derivative first.
+- Inspect the final downstream artifact with `view_image`, preferring `...-vN-2k.png` when it exists.
+- Inspect the raw image only for rejection/recovery checks, such as detecting an unusable generation before spending time on a derivative.
+- Record in the sidecar and phase notes which artifact was inspected by the main workflow and which role it served.
+
 ## Mandatory image inspection
 
 After every `image_gen` create or edit step:
-- inspect the generated image with `view_image` using its full absolute filesystem path before treating it as the design source
+- save or preserve the raw result as the project-local `...-vN.png` artifact before it is used downstream
+- inspect the generated raw image with `view_image` only when needed for rejection/recovery checks
+- inspect the final downstream artifact with `view_image` using its full absolute filesystem path before treating it as the design source, preferring a `...-vN-2k.png` reference derivative when available
 - do not derive tokens, component specifications, page blueprints, or implementation details from the prompt alone
 - if the generated file cannot be inspected, state that limitation and treat the image as unverified
 - when revising a prior artifact, inspect both the prior reference and the new generated result when possible
@@ -60,10 +84,12 @@ If the user chooses image workers, that is explicit authorization for Maquette i
 When authorized and available, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
 
 Use this handoff pattern:
-- start a bounded image worker with the specific Maquette artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
+- start a bounded image worker with exactly one Maquette image artifact to create or edit, the specific artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
 - instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the expected `.maquette/` artifact path, and return the exact source path plus the absolute filesystem path to the project-local artifact
+- instruct the worker to return structured metadata: raw source path, project raw path, derivative paths, raw and derivative dimensions when known, derivative method, sidecar path, and the exact artifact path the main workflow should inspect or use downstream
+- do not assign multiple image artifacts to a single image worker; create one worker per image artifact so one stalled generation cannot block an unrelated artifact batch
 - capture the worker start time and worker/subagent id when available; if the worker cannot directly report a saved path, use those details to locate the matching file in the Codex generated-images directory by timestamp and filename metadata
-- after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image` using the returned absolute filesystem path
+- after the worker returns, the main workflow agent must create any accepted/available reference derivative, then display or inspect the exact downstream artifact with `view_image` using the returned absolute filesystem path
 - the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
 - if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
 - if subagents are unavailable after asking, explicitly declined, or explicitly bypassed by unattended/no-question language, perform image generation in the main workflow and record the exact reason the image-worker path was not used
@@ -74,9 +100,11 @@ Do not delegate approval decisions to the image worker. The worker creates or ed
 
 Brand boards and page concepts require explicit user approval after generation and inspection.
 
-After a generated or edited brand-board image passes internal rejection checks and has been inspected with `view_image` using its absolute filesystem path, ask the user whether to use it before writing `design-system.json` or `tokens.css`.
+Brand approval ordering is strict: `image_gen` output -> save raw project artifact -> inspect/check raw only if needed for rejection or recovery -> check optional image-prep tooling -> ask/install if needed -> create the 2K derivative when accepted or available -> `view_image` the final approval artifact -> ask approval -> only then write the design-system JSON or tokens.
 
-After a generated or edited page-concept image passes internal rejection checks and has been inspected with `view_image` using its absolute filesystem path, ask the user whether to use it before writing `page-blueprint.json`, `concept-region-inventory.md`, `page-layout-contract.md`, `asset-manifest.json`, or page code.
+After a generated or edited brand-board image passes internal rejection checks, inspect the final approval artifact with `view_image` using its absolute filesystem path, preferring `...-vN-2k.png` when available, then ask the user whether to use it before writing `design-system.json` or `tokens.css`.
+
+After a generated or edited page-concept image passes internal rejection checks, inspect the final approval artifact with `view_image` using its absolute filesystem path, preferring `...-vN-2k.png` when available, then ask the user whether to use it before writing `page-blueprint.json`, `concept-region-inventory.md`, `page-layout-contract.md`, `asset-manifest.json`, or page code.
 
 Use the Codex user-input/question tool when available. Provide choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -88,18 +116,18 @@ An unattended run requires explicit language such as `unattended`, `do not ask q
 
 ## Inspectability gates
 
-Generated boards, sheets, and CSS-contract posters are approval artifacts only when they are readable at normal preview size.
+Generated boards, sheets, and supplemental CSS-contract posters are usable reference artifacts only when they are readable at normal preview size.
 
 - Brand boards are the visual-system contract. They must use a 1:1 square composition by default and focus on visual-system fundamentals, not exhaustive component inventories.
 - Brand boards must specify font direction and fallback strategy, but must not show detailed component inventories or button/input/card variant specs.
 - Brand boards must not contain logo-like marks, brand-name mastheads, large product-name treatments, monograms, seals, badges, app icons, emblems, or trademark-like elements.
-- CSS-contract posters are the default implementation contracts for selectors, states, slots, dimensions, and token intent. They must use 1:1 square composition, black or near-black background, readable white monospace CSS-like text, and a strict selector allowlist. They must not include `body`, `html`, reset, page layout, gallery, panel, note, or documentation CSS.
-- Visual component sheets are optional fallback or explicit-request artifacts. They must use 1:1 square composition and be split into focused 1:1 sheets when a single sheet would become cluttered or uninspectable.
+- Visual component sheets are the primary component image artifacts. They must show real component anatomy, density, states, layout, repeated-card alignment, responsive navigation states, tables/cards/forms, and footer/social modules as needed. They must use 1:1 square composition and be split into focused 1:1 sheets when a single sheet would become cluttered or uninspectable.
+- CSS contracts are deterministic code/text artifacts derived after inspecting the visual sheet. Optional CSS-contract poster images are supplemental and non-authoritative unless the user explicitly requests them. Do not rely on image-generated CSS text as the only component-sheet source of truth.
 - Component sheets should be categorized when needed: core primitives, navigation/layout, data/display, and cards/composites. The core primitives sheet comes first; focused follow-up sheets are preferred over crowded mega-sheets.
-- Multi-sheet or multi-poster component work must be sequential: inspect, inventory, build a componentized reference, review, and document reusable component APIs from the current artifact before generating the next artifact. The current artifact must produce concrete category-prefixed batch artifacts under `.maquette/components/` before the next artifact is generated, with transcribed contracts under `.maquette/components/contracts/`, CSS under `.maquette/components/css/`, and JS under `.maquette/components/js/`; retrospective logs after all artifacts are generated are not sufficient.
-- Each component sheet or CSS-contract poster batch must complete screenshot review or documented manual visual review against the generated artifact before the next artifact is generated.
-- CSS-contract posters are the default source of truth for selectors, states, slots, dimensions, and token intent, and the rendered browser screenshot becomes the primary visual correction target. If a visual component sheet is explicitly used, coded componentized references must match the sheet's component families, variants, states, anatomy, density, spacing, radius, shadows, polish, and composites while using reusable CSS/JS and cataloged APIs from the start.
-- Every inspected CSS-contract poster must be transcribed into `.maquette/components/contracts/<batch-slug>.contract.css` before implementation CSS is written. The transcription is the reviewable bridge from image text to code: preserve selector intent, normalize OCR mistakes, remove rejected non-component selectors, and note any unreadable rules.
+- Multi-sheet component work must be sequential: inspect, inventory, derive a deterministic contract, build a componentized reference, review, and document reusable component APIs from the current artifact before generating the next artifact. The current artifact must produce concrete category-prefixed batch artifacts under `.maquette/components/` before the next artifact is generated, with deterministic contracts under `.maquette/components/contracts/`, CSS under `.maquette/components/css/`, and JS under `.maquette/components/js/`; retrospective logs after all artifacts are generated are not sufficient.
+- Each component sheet batch must complete screenshot review or documented manual visual review against the generated visual sheet before the next artifact is generated.
+- Coded componentized references must match the sheet's component families, variants, states, anatomy, density, spacing, radius, shadows, polish, and composites while using reusable CSS/JS and cataloged APIs from the start.
+- Every inspected visual component sheet must be translated into `.maquette/components/contracts/<batch-slug>.contract.css` or an equivalent deterministic contract before implementation CSS is written. The contract is the reviewable bridge from image inspection to code: preserve visible component anatomy, selectors, states, slots, sizing guidance, responsive behavior, and any normalized implementation decisions.
 - Repeated-card sheets must show shared media/header/body/footer/action anatomy, consistent badge or eyebrow placement, equal-height cards, and bottom-pinned action rows when card grids are relevant.
 - Sites or pages with global navigation need inspectable responsive navigation coverage before implementation: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and visible icons.
 - Page concepts with headers or primary navigation must define desktop, tablet, and mobile behavior. A desktop-only navigation concept is incomplete.
@@ -114,18 +142,18 @@ Before page implementation, create a concept-region inventory, page layout contr
 
 The page layout contract should translate the inspected page concept into implementable layout rules before code is written: section order, relative section heights, density/compactness, background bands, grid behavior, image aspect ratios, image crop and fit behavior, footer structure, legal/bottom rows, and mobile stacking. Terminal sections such as impact strips, newsletter blocks, rich footers, app/download areas, social areas, and legal rows must be included. Blank image-container bands or letterboxing are deviations unless the contract explicitly accepts them.
 
-Before component coding, write a sheet inventory that lists visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, and the decision to implement, regenerate, or create another focused sheet or poster.
+Before component coding, write a sheet inventory that lists visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, and the decision to implement, regenerate, create another focused sheet, or optionally create a supplemental poster.
 
-Before accepting component implementation, compare the coded componentized reference screenshots against the approved 1:1 CSS-contract posters or visual component sheets with the component fidelity rubric:
+Before accepting component implementation, compare the coded componentized reference screenshots against the approved 1:1 visual component sheets with the component fidelity rubric:
 - coverage: visible component families, variants, and states are implemented
-- visual match: match the poster contract and approved brand closely enough after screenshot review, or match the visual sheet when one was explicitly used
+- visual match: match the visual sheet and approved brand closely enough after screenshot review
 - anatomy match: cards, navigation, forms, tables, and composites preserve visible structure
 - responsive match: mobile, tablet, and navigation behavior shown or implied by the sheet is represented
 - implementation quality: semantic HTML, token usage, working icons, readable active/selected/inverse states, no unintended overflow, and no unreadable or overlapping text
 
 After the componentized reference passes review, ensure the component CSS/JS and component catalog expose the reusable APIs, slots, states, JS behavior, and usage examples proven by that reference. Page implementations should consume the reusable catalog, CSS, and JS, not copy the reference page layout.
 
-Use Maquette's bundled scripts for optional QA tooling checks, safe reference-image preprocessing, screenshot capture, linked asset validation, responsive audits, contrast/API checks, JSON validation, and page-consumption smoke checks when available. Optional Node dependencies should be resolved from the current project; do not rely on global npm installs. For component workflows, check optional QA tooling immediately after the brand kit exists and before component sheets, CSS-contract posters, or component code are generated. Treat partial QA availability as missing QA tooling: if browser QA can run but `ajv` or `ajv-formats` is missing, schema validation is still blocked and requires an install decision. When generated raster references are near 1k resolution or otherwise too small for confident visual transcription, run `ensure-qa-tooling.mjs --check-image-prep`; if project-local `sharp` is available, use `safe-upscale-image.mjs` to create separate 2x Lanczos + mild-unsharp references while preserving originals as ground truth. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, ask the user through the Codex user-input/question tool before installing project-local dependencies or skipping those checks, unless the user already declined for this run or installation is impossible. If the user agrees, install the missing packages reported by the tooling check, such as `playwright`, `ajv`, `ajv-formats`, or `sharp`, and install Chromium only when browser QA requires it; if the user declines, continue with manual review and record the missing tooling. Generated run-local scripts are fallback-only and must be documented in the relevant approval notes with the reason the bundled helper did not cover the scenario.
+Use Maquette's bundled scripts for optional QA tooling checks, safe reference-image preprocessing, screenshot capture, linked asset validation, responsive audits, contrast/API checks, JSON validation, and page-consumption smoke checks when available. Optional Node dependencies should be resolved from the current project; do not rely on parent or global npm installs. For component workflows, check optional QA tooling immediately after the brand kit exists and before component sheets, supplemental CSS-contract posters, or component code are generated. Treat partial QA availability as missing QA tooling: if browser QA can run but `ajv` or `ajv-formats` is missing, schema validation is still blocked and requires an install decision. When Maquette reference artifacts are near 1k resolution or otherwise too small for confident visual transcription, run `ensure-qa-tooling.mjs --check-image-prep`; if project-local `sharp` is available, use `safe-upscale-image.mjs` to create separate 2K Lanczos + mild-unsharp references while preserving originals as ground truth. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, ask the user through the Codex user-input/question tool before installing project-local dependencies or skipping those checks, unless the user already declined for this run or installation is impossible. If the user agrees, run the project-local install commands reported by the tooling check, including `sharp` when image-prep will be used and browser/schema dependencies as needed; install Chromium only when browser QA requires it. If the user declines, continue with manual review and record the missing tooling. Generated run-local scripts are fallback-only and must be documented in the relevant approval notes with the reason the bundled helper did not cover the scenario.
 
 No silent simplification is allowed across brand, component, or page phases. If implementation cannot match a generated artifact, record the deviation, reason, and recommended follow-up in the relevant `approved.md` or `review.md`.
 
@@ -148,7 +176,7 @@ When browser tooling is available, page and component QA must include responsive
 
 ## Final review requirements
 
-Final component and page review files must summarize the generated asset manifest and missing assets, concept-region inventory, page layout contract status, component sheet or CSS-contract poster vs replica fidelity, reusable component readiness, card anatomy alignment, terminal-section compactness, media-container fit/crop results, footer fidelity, mobile drawer scrollability, responsive overflow measurements, open nav screenshots, visual deviations, and fixes. "Screenshots captured" alone is not a sufficient review.
+Final component and page review files must summarize the generated asset manifest and missing assets, concept-region inventory, page layout contract status, component sheet vs replica fidelity, reusable component readiness, card anatomy alignment, terminal-section compactness, media-container fit/crop results, footer fidelity, mobile drawer scrollability, responsive overflow measurements, open nav screenshots, visual deviations, and fixes. "Screenshots captured" alone is not a sufficient review.
 
 ## Transparent image requests
 

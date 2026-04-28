@@ -14,6 +14,8 @@ function usage() {
     "  --json <path>          Write JSON output",
     "  --check-browser        Launch Chromium headlessly to verify browser install",
     "  --check-image-prep     Check optional sharp dependency for reference image preprocessing",
+    "  --allow-ancestor-node-modules",
+    "                         Allow packages resolved outside the project root",
   ].join("\n"));
 }
 
@@ -21,6 +23,7 @@ let projectRoot = process.cwd();
 let jsonPath;
 let checkBrowser = false;
 let checkImagePrep = false;
+let allowAncestorNodeModules = false;
 
 for (let index = 0; index < args.length; index += 1) {
   const arg = args[index];
@@ -35,6 +38,8 @@ for (let index = 0; index < args.length; index += 1) {
     checkBrowser = true;
   } else if (arg === "--check-image-prep") {
     checkImagePrep = true;
+  } else if (arg === "--allow-ancestor-node-modules") {
+    allowAncestorNodeModules = true;
   } else {
     console.error(`Unknown option: ${arg}`);
     usage();
@@ -43,24 +48,43 @@ for (let index = 0; index < args.length; index += 1) {
 }
 
 const requireFromProject = createRequire(path.join(projectRoot, "package.json"));
-const installCommand = "npm i -D playwright ajv ajv-formats";
-const imagePrepInstallCommand = "npm i -D sharp";
-const browserInstallCommand = "npx playwright install chromium";
+const quotedProjectRoot = JSON.stringify(projectRoot);
+const installCommand = `npm --prefix ${quotedProjectRoot} i -D playwright ajv ajv-formats`;
+const imagePrepInstallCommand = `npm --prefix ${quotedProjectRoot} i -D sharp`;
+const browserInstallCommand = `npm --prefix ${quotedProjectRoot} exec playwright install chromium`;
+
+function isInsideProjectRoot(resolvedPath) {
+  const relativePath = path.relative(projectRoot, resolvedPath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
 
 function checkPackage(name, importPath = name) {
   try {
     const resolvedPath = requireFromProject.resolve(importPath);
+    const projectLocal = isInsideProjectRoot(resolvedPath);
+    if (!allowAncestorNodeModules && !projectLocal) {
+      return {
+        name,
+        importPath,
+        available: false,
+        resolvedPath,
+        projectLocal,
+        error: "resolved_outside_project_root",
+      };
+    }
     return {
       name,
       importPath,
       available: true,
       resolvedPath,
+      projectLocal,
     };
   } catch (error) {
     return {
       name,
       importPath,
       available: false,
+      projectLocal: false,
       error: error.code || String(error?.message || error),
     };
   }
@@ -87,6 +111,10 @@ let browserCheck = {
 if (checkBrowser) {
   let browser;
   try {
+    const playwrightPackageCheck = packageChecks.find((item) => item.name === "playwright");
+    if (!playwrightPackageCheck?.available) {
+      throw new Error(playwrightPackageCheck?.error || "playwright_not_project_local");
+    }
     const { chromium } = requireFromProject("playwright");
     browser = await chromium.launch({ headless: true });
     browserCheck = {
@@ -116,6 +144,17 @@ const missingImagePrepPackages = imagePrepPackageChecks
 
 const missingBrowserQaPackages = missingPackages.filter((name) => name === "playwright");
 const missingSchemaQaPackages = missingPackages.filter((name) => name === "ajv" || name === "ajv-formats");
+const missingInstallPackages = [...new Set([
+  ...missingPackages,
+  ...missingImagePrepPackages,
+])];
+const combinedInstallCommand = missingInstallPackages.length > 0
+  ? `npm --prefix ${quotedProjectRoot} i -D ${missingInstallPackages.join(" ")}`
+  : null;
+const recommendedInstallCommands = [
+  combinedInstallCommand,
+  browserCheck.available === false || missingBrowserQaPackages.length > 0 ? browserInstallCommand : null,
+].filter(Boolean);
 const blockedQaCapabilities = [
   missingBrowserQaPackages.length > 0 || browserCheck.available === false ? "browser-screenshot-and-responsive-qa" : null,
   missingSchemaQaPackages.length > 0 ? "json-schema-validation" : null,
@@ -124,6 +163,8 @@ const blockedQaCapabilities = [
 
 const output = {
   projectRoot,
+  projectLocalOnly: !allowAncestorNodeModules,
+  allowAncestorNodeModules,
   packageChecks,
   imagePrepPackageChecks,
   browserCheck,
@@ -135,13 +176,15 @@ const output = {
   installDecisionRequired: blockedQaCapabilities.length > 0,
   installCommand,
   imagePrepInstallCommand,
+  combinedInstallCommand,
+  recommendedInstallCommands,
   browserInstallCommand,
   globalInstallRecommended: false,
   notes: [
     "Maquette does not bundle Node dependencies or create node_modules.",
-    "Install optional QA dependencies in the project where Maquette generates UI files.",
+    "Install optional QA dependencies in the project where Maquette generates UI files. The recommended commands use npm --prefix so npm writes a project-local package manifest and node_modules even when package.json does not already exist.",
     "Install optional image preprocessing dependencies only when the run will upscale or sharpen raster references.",
-    "Global npm installs are not recommended because Node usually will not resolve them from plugin scripts without extra environment configuration.",
+    "Parent and global node_modules do not satisfy project-local checks unless --allow-ancestor-node-modules is explicitly supplied for a documented local exception.",
   ],
   pass: missingPackages.length === 0 && missingImagePrepPackages.length === 0 && (browserCheck.available !== false),
 };
@@ -164,6 +207,9 @@ if (output.pass) {
   }
   if (blockedQaCapabilities.length > 0) {
     console.log(`Blocked Maquette QA capabilities: ${blockedQaCapabilities.join(", ")}`);
+    if (recommendedInstallCommands.length > 0) {
+      console.log(`Recommended project-local install command: ${recommendedInstallCommands[0]}`);
+    }
     console.log("Ask the user for an install decision before skipping these automated QA checks.");
   }
   if (browserCheck.available === false) {

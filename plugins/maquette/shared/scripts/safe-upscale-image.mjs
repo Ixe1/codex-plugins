@@ -17,6 +17,10 @@ function usage() {
     "  --height <pixels>      Exact output height; requires --width and overrides --scale",
     "  --no-sharpen           Disable mild unsharp mask after resizing",
     "  --json <path>          Write JSON output",
+    "  --raw-source <path>    Original image_gen source path for reference sidecar metadata",
+    "  --project-raw <path>   Project-local raw vN.png path for reference sidecar metadata",
+    "  --role <role>          approval, transcription, implementation, or supplemental",
+    "  --inspected-by-main    Mark the derivative as inspected by the main workflow",
   ].join("\n"));
 }
 
@@ -28,6 +32,10 @@ let targetWidth;
 let targetHeight;
 let sharpen = true;
 let jsonPath;
+let rawSourcePath;
+let projectRawPath;
+let role = "supplemental";
+let inspectedByMain = false;
 
 for (let index = 0; index < args.length; index += 1) {
   const arg = args[index];
@@ -50,6 +58,14 @@ for (let index = 0; index < args.length; index += 1) {
     sharpen = false;
   } else if (arg === "--json") {
     jsonPath = args[++index];
+  } else if (arg === "--raw-source") {
+    rawSourcePath = path.resolve(args[++index]);
+  } else if (arg === "--project-raw") {
+    projectRawPath = path.resolve(args[++index]);
+  } else if (arg === "--role") {
+    role = args[++index];
+  } else if (arg === "--inspected-by-main") {
+    inspectedByMain = true;
   } else if (!inputPath) {
     inputPath = path.resolve(arg);
   } else if (!outputPath) {
@@ -73,11 +89,20 @@ if (!inputPath || !outputPath || (!hasExplicitSize && (!Number.isFinite(scale) |
 const requireFromProject = createRequire(path.join(projectRoot, "package.json"));
 let sharp;
 
+function isInsideProjectRoot(resolvedPath) {
+  const relativePath = path.relative(projectRoot, resolvedPath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
 try {
+  const sharpPath = requireFromProject.resolve("sharp");
+  if (!isInsideProjectRoot(sharpPath)) {
+    throw new Error(`sharp resolved outside the project root: ${sharpPath}`);
+  }
   sharp = requireFromProject("sharp");
 } catch (error) {
   console.error("sharp is not installed in the current project.");
-  console.error("Install with: npm i -D sharp");
+  console.error(`Install with: npm --prefix ${JSON.stringify(projectRoot)} i -D sharp`);
   console.error(String(error?.message || error));
   process.exit(1);
 }
@@ -120,6 +145,15 @@ const output = {
   inputPath,
   outputPath,
   projectRoot,
+  rawSourcePath: rawSourcePath ?? inputPath,
+  projectRawPath: projectRawPath ?? inputPath,
+  derivativePaths: {
+    safeUpscale: outputPath,
+  },
+  method: "safe-upscale",
+  created_at: new Date().toISOString(),
+  inspected_by_main: inspectedByMain,
+  role,
   scale: hasExplicitSize ? null : scale,
   targetWidth: width,
   targetHeight: height,
@@ -134,6 +168,21 @@ const output = {
     height: info.height,
     format: info.format,
     size: info.size,
+  },
+  dimensions: {
+    raw: {
+      width: metadata.width,
+      height: metadata.height,
+      format: metadata.format,
+    },
+    derivatives: {
+      safeUpscale: {
+        width: info.width,
+        height: info.height,
+        format: info.format,
+        size: info.size,
+      },
+    },
   },
 };
 

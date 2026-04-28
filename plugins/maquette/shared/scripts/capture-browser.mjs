@@ -69,7 +69,7 @@ try {
     const requireFromProject = createRequire(path.join(process.cwd(), "package.json"));
     ({ chromium } = requireFromProject("playwright"));
   } catch (fallbackError) {
-    console.error("Playwright is not installed. Run `npm i -D playwright` and `npx playwright install chromium`, or run a manual visual review.");
+    console.error("Playwright is not installed in the project. Run `npm --prefix <projectRoot> i -D playwright` and `npm --prefix <projectRoot> exec playwright install chromium`, or run a manual visual review.");
     process.exit(2);
   }
 }

@@ -8,15 +8,27 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
+## 0.3.7 - 2026-04-28
+
 ### Added
 
-- Added optional `sharp`-based safe reference-image preprocessing for Maquette workflows, including tooling checks and a bundled 2x Lanczos + mild-unsharp helper that preserves original references.
-- Bumped the Maquette plugin to `0.3.6-alpha.1` for development installs so Codex refreshes the installed plugin cache instead of reusing `0.3.5`.
+- Added optional `sharp`-based safe reference-image preprocessing for Maquette workflows, including tooling checks and a bundled 2K Lanczos + mild-unsharp helper that preserves original references.
+- Bumped the Maquette plugin to `0.3.7` for development installs so Codex refreshes the installed plugin cache.
 - Added a brand-kit workflow rule to create and inspect a 2048x2048 safe-upscaled brand-board derivative when optional `sharp` image-prep tooling is available or approved for install.
+- Added strict Maquette reference-artifact naming and sidecar metadata guidance, plus a helper for raw, 2K, and deterministic-render artifact paths.
+- Added tests covering project-local dependency resolution, project-local install command generation, reference artifact naming, and reference sidecar metadata.
+
+### Changed
+
+- Restored visual component sheets as the primary component imagegen artifact, with deterministic CSS contracts derived after visual inspection and CSS-contract poster images treated as optional supplemental references.
+- Tightened image-worker guidance so each worker handles exactly one image artifact and returns structured artifact metadata for the main workflow to inspect the correct downstream artifact.
+- Scoped 2K derivatives to Maquette reference artifacts only, avoiding automatic upscaling for final website/media assets.
 
 ### Fixed
 
 - Clarified Maquette image display guidance so generated images are inspected and shown with absolute filesystem paths rather than repo-relative paths.
+- Fixed optional QA tooling checks so packages resolved from parent or global `node_modules` do not count as project-local by default.
+- Fixed optional install guidance so npm commands use `npm --prefix <projectRoot>` and install into the active project even when no `package.json` exists yet.
 
 ## 0.3.5 - 2026-04-26
 
