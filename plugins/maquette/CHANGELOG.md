@@ -11,6 +11,8 @@ Entries before this changelog was introduced were backfilled from git history an
 ### Added
 
 - Added optional `sharp`-based safe reference-image preprocessing for Maquette workflows, including tooling checks and a bundled 2x Lanczos + mild-unsharp helper that preserves original references.
+- Bumped the Maquette plugin to `0.3.6-alpha.1` for development installs so Codex refreshes the installed plugin cache instead of reusing `0.3.5`.
+- Added a brand-kit workflow rule to create and inspect a 2048x2048 safe-upscaled brand-board derivative when optional `sharp` image-prep tooling is available or approved for install.
 
 ### Fixed
 

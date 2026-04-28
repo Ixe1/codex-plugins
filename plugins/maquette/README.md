@@ -195,6 +195,7 @@ The bundled browser scripts load `playwright` from the current project when avai
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep
 node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/components/component-closeup.png .maquette/components/component-closeup-2x-safe.png --project . --json .maquette/components/component-closeup-2x-safe.json
+node plugins/maquette/shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-v1.png .maquette/brand/brand-board-v1-2k.png --project . --size 2048 --json .maquette/brand/brand-board-v1-2k.json
 node plugins/maquette/shared/scripts/capture-browser.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png --json .maquette/components/reference-capture.json
 node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png
 node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs .maquette/pages/homepage/page.html .maquette/pages/homepage/page.png

@@ -27,7 +27,7 @@ If you need to edit a local image file, ensure it is first made visible in the c
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` using its absolute filesystem path before treating it as the design source. Do not derive tokens or design-system details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/brand/brand-board-vN.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, ask the approval question, and only then derive tokens.
+When image-worker subagents are explicitly authorized for the current run, run brand-board image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the absolute filesystem path for the project-local `.maquette/brand/brand-board-vN.png` artifact. The main workflow must then inspect the returned image with `view_image` using that absolute path, create and inspect the 2K derivative when optional image-prep tooling is available, ask the approval question, and only then derive tokens.
 
 After inspecting a generated or edited brand board that passes rejection checks, ask the user whether to use it before writing `design-system.json` or `tokens.css`. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -62,6 +62,7 @@ Always create or update these files when you finish a pass:
 When `image_gen` is available, also create or update:
 
 - `.maquette/brand/brand-board-vN.png`
+- `.maquette/brand/brand-board-vN-2k.png` when optional image-prep tooling is available or the user approves installing it
 
 The JSON file must validate against `shared/design-system.schema.json`.
 
@@ -80,16 +81,23 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
-4. Ask the user whether to use the inspected brand board.
+4. Before asking for approval, create a 2048x2048 safe-upscaled derivative of the generated board when optional image-prep tooling is available.
+   - Run `shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep` or an equivalent project-local check.
+   - If project-local `sharp` is missing, ask whether to install `sharp` before creating the 2K derivative unless the user already declined optional installs for this run.
+   - If the user agrees, run `npm i -D sharp`, then continue with the 2K derivative when the package is available.
+   - If `sharp` is available, run `shared/scripts/safe-upscale-image.mjs .maquette/brand/brand-board-vN.png .maquette/brand/brand-board-vN-2k.png --project . --size 2048 --json .maquette/brand/brand-board-vN-2k.json`.
+   - Inspect the 2K derivative with `view_image` using its absolute filesystem path before asking for approval.
+   - Preserve the original generated board untouched as the ground-truth creative artifact. If image-prep tooling is unavailable or the user declines installation, continue with the original inspected board and record the missing 2K derivative in `approved.md`.
+5. Ask the user whether to use the inspected brand board, preferring the inspected 2K derivative as the approval artifact when it exists.
    - Use the approval choices from the non-negotiable image policy.
    - Record the user's decision in `.maquette/brand/approved.md`.
    - Do not create the design-system JSON or tokens until the user approves the board, unless the user explicitly requested an unattended run.
-5. Create or update `.maquette/brand/design-system.json` so it matches the approved board.
+6. Create or update `.maquette/brand/design-system.json` so it matches the approved board.
    - The inspected brand board is the visual source of truth for palette, typography direction, spacing, radius, surfaces, shadows, and state principles.
    - Do not use a script, existing CSS file, Figma/design export, or predetermined token file to infer or override brand tokens unless the user explicitly provides it as an approved constraint.
-6. Export `.maquette/brand/tokens.css` from the board-derived design system JSON. Use `scripts/export-tokens.mjs` if present.
+7. Export `.maquette/brand/tokens.css` from the board-derived design system JSON. Use `scripts/export-tokens.mjs` if present.
    - The export script is only a deterministic JSON-to-CSS serializer. It must not be treated as token extraction, visual analysis, or design decision-making.
-7. Summarize what changed and record the approved board, token status, and any user revision notes in `.maquette/brand/approved.md`.
+8. Summarize what changed and record the approved board, 2K derivative status, token status, and any user revision notes in `.maquette/brand/approved.md`.
 
 ## Board rules
 

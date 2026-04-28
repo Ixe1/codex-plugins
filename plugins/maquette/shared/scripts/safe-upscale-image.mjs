@@ -12,6 +12,9 @@ function usage() {
     "Options:",
     "  --project <path>       Project root for resolving sharp, default current directory",
     "  --scale <number>       Upscale factor, default 2",
+    "  --size <pixels>        Exact square output size; overrides --scale",
+    "  --width <pixels>       Exact output width; requires --height and overrides --scale",
+    "  --height <pixels>      Exact output height; requires --width and overrides --scale",
     "  --no-sharpen           Disable mild unsharp mask after resizing",
     "  --json <path>          Write JSON output",
   ].join("\n"));
@@ -21,6 +24,8 @@ let inputPath;
 let outputPath;
 let projectRoot = process.cwd();
 let scale = 2;
+let targetWidth;
+let targetHeight;
 let sharpen = true;
 let jsonPath;
 
@@ -33,6 +38,14 @@ for (let index = 0; index < args.length; index += 1) {
     projectRoot = path.resolve(args[++index]);
   } else if (arg === "--scale") {
     scale = Number(args[++index]);
+  } else if (arg === "--size") {
+    const size = Number(args[++index]);
+    targetWidth = size;
+    targetHeight = size;
+  } else if (arg === "--width") {
+    targetWidth = Number(args[++index]);
+  } else if (arg === "--height") {
+    targetHeight = Number(args[++index]);
   } else if (arg === "--no-sharpen") {
     sharpen = false;
   } else if (arg === "--json") {
@@ -48,7 +61,11 @@ for (let index = 0; index < args.length; index += 1) {
   }
 }
 
-if (!inputPath || !outputPath || !Number.isFinite(scale) || scale <= 1) {
+const hasExplicitSize = targetWidth !== undefined || targetHeight !== undefined;
+const hasValidExplicitSize = Number.isInteger(targetWidth) && targetWidth > 0
+  && Number.isInteger(targetHeight) && targetHeight > 0;
+
+if (!inputPath || !outputPath || (!hasExplicitSize && (!Number.isFinite(scale) || scale <= 1)) || (hasExplicitSize && !hasValidExplicitSize)) {
   usage();
   process.exit(1);
 }
@@ -75,8 +92,8 @@ if (!metadata.width || !metadata.height) {
   throw new Error(`Could not read dimensions from ${inputPath}`);
 }
 
-const width = Math.round(metadata.width * scale);
-const height = Math.round(metadata.height * scale);
+const width = hasExplicitSize ? targetWidth : Math.round(metadata.width * scale);
+const height = hasExplicitSize ? targetHeight : Math.round(metadata.height * scale);
 
 let pipeline = input.resize({
   width,
@@ -103,7 +120,9 @@ const output = {
   inputPath,
   outputPath,
   projectRoot,
-  scale,
+  scale: hasExplicitSize ? null : scale,
+  targetWidth: width,
+  targetHeight: height,
   sharpen,
   input: {
     width: metadata.width,
