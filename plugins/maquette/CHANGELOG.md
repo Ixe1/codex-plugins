@@ -8,6 +8,17 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
+## 0.3.8 - 2026-04-28
+
+### Added
+
+- Added aspect-preserving safe-upscale modes for non-square Maquette references, including `--long-edge`, proportional `--width`, distortion guardrails, and sidecar resize/aspect metadata.
+
+### Changed
+
+- Clarified Maquette workflow guidance so square brand boards and component sheets continue using `--size 2048`, while page concepts use aspect-preserving safe-upscale options.
+- Bumped the Maquette plugin to `0.3.8` for development installs so Codex refreshes the installed plugin cache.
+
 ## 0.3.7 - 2026-04-28
 
 ### Added

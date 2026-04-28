@@ -11,10 +11,12 @@ function usage() {
     "",
     "Options:",
     "  --project <path>       Project root for resolving sharp, default current directory",
-    "  --scale <number>       Upscale factor, default 2",
-    "  --size <pixels>        Exact square output size; overrides --scale",
-    "  --width <pixels>       Exact output width; requires --height and overrides --scale",
-    "  --height <pixels>      Exact output height; requires --width and overrides --scale",
+    "  --scale <number>       Aspect-preserving upscale factor, default 2",
+    "  --size <pixels>        Exact square output size for square artifacts only; overrides --scale",
+    "  --long-edge <pixels>   Aspect-preserving output with longest edge set to pixels",
+    "  --width <pixels>       Aspect-preserving output width; auto-calculates height unless --height is also set",
+    "  --height <pixels>      Exact output height when used with --width",
+    "  --allow-distort        Permit non-square --size or exact --width/--height distortion",
     "  --no-sharpen           Disable mild unsharp mask after resizing",
     "  --json <path>          Write JSON output",
     "  --raw-source <path>    Original image_gen source path for reference sidecar metadata",
@@ -28,8 +30,11 @@ let inputPath;
 let outputPath;
 let projectRoot = process.cwd();
 let scale = 2;
+let size;
+let longEdge;
 let targetWidth;
 let targetHeight;
+let allowDistort = false;
 let sharpen = true;
 let jsonPath;
 let rawSourcePath;
@@ -47,13 +52,15 @@ for (let index = 0; index < args.length; index += 1) {
   } else if (arg === "--scale") {
     scale = Number(args[++index]);
   } else if (arg === "--size") {
-    const size = Number(args[++index]);
-    targetWidth = size;
-    targetHeight = size;
+    size = Number(args[++index]);
+  } else if (arg === "--long-edge") {
+    longEdge = Number(args[++index]);
   } else if (arg === "--width") {
     targetWidth = Number(args[++index]);
   } else if (arg === "--height") {
     targetHeight = Number(args[++index]);
+  } else if (arg === "--allow-distort") {
+    allowDistort = true;
   } else if (arg === "--no-sharpen") {
     sharpen = false;
   } else if (arg === "--json") {
@@ -77,11 +84,34 @@ for (let index = 0; index < args.length; index += 1) {
   }
 }
 
-const hasExplicitSize = targetWidth !== undefined || targetHeight !== undefined;
-const hasValidExplicitSize = Number.isInteger(targetWidth) && targetWidth > 0
-  && Number.isInteger(targetHeight) && targetHeight > 0;
+function isPositiveInteger(value) {
+  return Number.isInteger(value) && value > 0;
+}
 
-if (!inputPath || !outputPath || (!hasExplicitSize && (!Number.isFinite(scale) || scale <= 1)) || (hasExplicitSize && !hasValidExplicitSize)) {
+const requestedSizeModes = [
+  size !== undefined,
+  longEdge !== undefined,
+  targetWidth !== undefined,
+].filter(Boolean).length;
+const resizeMode = size !== undefined
+  ? "exact-square"
+  : longEdge !== undefined
+    ? "long-edge"
+    : targetWidth !== undefined
+      ? "width"
+      : "scale";
+
+const invalidArguments = !inputPath
+  || !outputPath
+  || requestedSizeModes > 1
+  || (resizeMode === "scale" && (!Number.isFinite(scale) || scale <= 1))
+  || (size !== undefined && !isPositiveInteger(size))
+  || (longEdge !== undefined && !isPositiveInteger(longEdge))
+  || (targetWidth !== undefined && !isPositiveInteger(targetWidth))
+  || (targetHeight !== undefined && !isPositiveInteger(targetHeight))
+  || (targetHeight !== undefined && targetWidth === undefined);
+
+if (invalidArguments) {
   usage();
   process.exit(1);
 }
@@ -117,8 +147,51 @@ if (!metadata.width || !metadata.height) {
   throw new Error(`Could not read dimensions from ${inputPath}`);
 }
 
-const width = hasExplicitSize ? targetWidth : Math.round(metadata.width * scale);
-const height = hasExplicitSize ? targetHeight : Math.round(metadata.height * scale);
+function roundedAspectRatio(width, height) {
+  return Number((width / height).toFixed(6));
+}
+
+function aspectDifference(inputWidth, inputHeight, outputWidth, outputHeight) {
+  return Math.abs((inputWidth / inputHeight) - (outputWidth / outputHeight));
+}
+
+if (resizeMode === "exact-square" && metadata.width !== metadata.height && !allowDistort) {
+  console.error(
+    `Refusing to distort non-square input ${metadata.width}x${metadata.height} with --size. `
+      + "Use --long-edge, --scale, or --width for aspect-preserving page concepts, "
+      + "or pass --allow-distort to force exact square output.",
+  );
+  process.exit(1);
+}
+
+let width;
+let height;
+
+if (resizeMode === "exact-square") {
+  width = size;
+  height = size;
+} else if (resizeMode === "long-edge") {
+  const factor = longEdge / Math.max(metadata.width, metadata.height);
+  width = Math.round(metadata.width * factor);
+  height = Math.round(metadata.height * factor);
+} else if (resizeMode === "width") {
+  width = targetWidth;
+  height = targetHeight ?? Math.round(metadata.height * (targetWidth / metadata.width));
+} else {
+  width = Math.round(metadata.width * scale);
+  height = Math.round(metadata.height * scale);
+}
+
+const aspectRatioTolerance = 0.001;
+const aspectPreserved = aspectDifference(metadata.width, metadata.height, width, height) <= aspectRatioTolerance;
+
+if (resizeMode === "width" && targetHeight !== undefined && !aspectPreserved && !allowDistort) {
+  console.error(
+    `Refusing to distort input ${metadata.width}x${metadata.height} with exact --width/--height `
+      + `target ${width}x${height}. Omit --height for proportional output or pass --allow-distort.`,
+  );
+  process.exit(1);
+}
 
 let pipeline = input.resize({
   width,
@@ -154,18 +227,27 @@ const output = {
   created_at: new Date().toISOString(),
   inspected_by_main: inspectedByMain,
   role,
-  scale: hasExplicitSize ? null : scale,
+  aspect_preserved: aspectPreserved,
+  resize_mode: resizeMode,
+  aspectRatio: {
+    original: roundedAspectRatio(metadata.width, metadata.height),
+    output: roundedAspectRatio(info.width, info.height),
+  },
+  allowDistort,
+  scale: resizeMode === "scale" ? scale : null,
   targetWidth: width,
   targetHeight: height,
   sharpen,
   input: {
     width: metadata.width,
     height: metadata.height,
+    aspectRatio: roundedAspectRatio(metadata.width, metadata.height),
     format: metadata.format,
   },
   output: {
     width: info.width,
     height: info.height,
+    aspectRatio: roundedAspectRatio(info.width, info.height),
     format: info.format,
     size: info.size,
   },
@@ -173,12 +255,14 @@ const output = {
     raw: {
       width: metadata.width,
       height: metadata.height,
+      aspectRatio: roundedAspectRatio(metadata.width, metadata.height),
       format: metadata.format,
     },
     derivatives: {
       safeUpscale: {
         width: info.width,
         height: info.height,
+        aspectRatio: roundedAspectRatio(info.width, info.height),
         format: info.format,
         size: info.size,
       },

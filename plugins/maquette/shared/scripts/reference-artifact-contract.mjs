@@ -30,6 +30,9 @@ export function createReferenceArtifactSidecar({
   projectRawPath,
   derivativePaths = {},
   dimensions = {},
+  aspectPreserved,
+  resizeMode,
+  aspectRatio,
   method,
   role,
   inspectedByMain = false,
@@ -39,7 +42,7 @@ export function createReferenceArtifactSidecar({
     throw new Error("rawSourcePath, projectRawPath, method, and role are required");
   }
 
-  return {
+  const sidecar = {
     rawSourcePath,
     projectRawPath,
     derivativePaths,
@@ -49,6 +52,18 @@ export function createReferenceArtifactSidecar({
     inspected_by_main: Boolean(inspectedByMain),
     role,
   };
+
+  if (aspectPreserved !== undefined) {
+    sidecar.aspect_preserved = Boolean(aspectPreserved);
+  }
+  if (resizeMode) {
+    sidecar.resize_mode = resizeMode;
+  }
+  if (aspectRatio) {
+    sidecar.aspectRatio = aspectRatio;
+  }
+
+  return sidecar;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

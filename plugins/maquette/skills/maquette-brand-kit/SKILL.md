@@ -83,7 +83,7 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
-4. Before asking for approval, create a 2048x2048 safe-upscaled derivative of the generated board when optional image-prep tooling is available.
+4. Before asking for approval, create a 2048x2048 safe-upscaled derivative of the generated 1:1 board when optional image-prep tooling is available. `--size 2048` is appropriate here because brand boards are square artifacts.
    - Run `shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep` or an equivalent project-local check.
    - If project-local `sharp` is missing, ask whether to install `sharp` before creating the 2K derivative unless the user already declined optional installs for this run.
    - If the user agrees, run the project-local install command reported by the tooling check, such as `npm --prefix <projectRoot> i -D sharp`, then continue with the 2K derivative when the package is available. Do not run plain `npm i -D sharp` from a workspace without `package.json`.
