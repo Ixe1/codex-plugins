@@ -13,12 +13,14 @@ function usage() {
     "  --project <path>       Project root, default current directory",
     "  --json <path>          Write JSON output",
     "  --check-browser        Launch Chromium headlessly to verify browser install",
+    "  --check-image-prep     Check optional sharp dependency for reference image preprocessing",
   ].join("\n"));
 }
 
 let projectRoot = process.cwd();
 let jsonPath;
 let checkBrowser = false;
+let checkImagePrep = false;
 
 for (let index = 0; index < args.length; index += 1) {
   const arg = args[index];
@@ -31,6 +33,8 @@ for (let index = 0; index < args.length; index += 1) {
     jsonPath = args[++index];
   } else if (arg === "--check-browser") {
     checkBrowser = true;
+  } else if (arg === "--check-image-prep") {
+    checkImagePrep = true;
   } else {
     console.error(`Unknown option: ${arg}`);
     usage();
@@ -40,6 +44,7 @@ for (let index = 0; index < args.length; index += 1) {
 
 const requireFromProject = createRequire(path.join(projectRoot, "package.json"));
 const installCommand = "npm i -D playwright ajv ajv-formats";
+const imagePrepInstallCommand = "npm i -D sharp";
 const browserInstallCommand = "npx playwright install chromium";
 
 function checkPackage(name, importPath = name) {
@@ -66,6 +71,12 @@ const packageChecks = [
   checkPackage("ajv", "ajv/dist/2020.js"),
   checkPackage("ajv-formats"),
 ];
+
+const imagePrepPackageChecks = checkImagePrep
+  ? [
+      checkPackage("sharp"),
+    ]
+  : [];
 
 let browserCheck = {
   requested: checkBrowser,
@@ -99,32 +110,40 @@ if (checkBrowser) {
 const missingPackages = packageChecks
   .filter((item) => !item.available)
   .map((item) => item.name);
+const missingImagePrepPackages = imagePrepPackageChecks
+  .filter((item) => !item.available)
+  .map((item) => item.name);
 
 const missingBrowserQaPackages = missingPackages.filter((name) => name === "playwright");
 const missingSchemaQaPackages = missingPackages.filter((name) => name === "ajv" || name === "ajv-formats");
 const blockedQaCapabilities = [
   missingBrowserQaPackages.length > 0 || browserCheck.available === false ? "browser-screenshot-and-responsive-qa" : null,
   missingSchemaQaPackages.length > 0 ? "json-schema-validation" : null,
+  missingImagePrepPackages.length > 0 ? "reference-image-preprocessing" : null,
 ].filter(Boolean);
 
 const output = {
   projectRoot,
   packageChecks,
+  imagePrepPackageChecks,
   browserCheck,
   missingPackages,
+  missingImagePrepPackages,
   missingBrowserQaPackages,
   missingSchemaQaPackages,
   blockedQaCapabilities,
   installDecisionRequired: blockedQaCapabilities.length > 0,
   installCommand,
+  imagePrepInstallCommand,
   browserInstallCommand,
   globalInstallRecommended: false,
   notes: [
     "Maquette does not bundle Node dependencies or create node_modules.",
     "Install optional QA dependencies in the project where Maquette generates UI files.",
+    "Install optional image preprocessing dependencies only when the run will upscale or sharpen raster references.",
     "Global npm installs are not recommended because Node usually will not resolve them from plugin scripts without extra environment configuration.",
   ],
-  pass: missingPackages.length === 0 && (browserCheck.available !== false),
+  pass: missingPackages.length === 0 && missingImagePrepPackages.length === 0 && (browserCheck.available !== false),
 };
 
 if (jsonPath) {
@@ -138,6 +157,10 @@ if (output.pass) {
   if (missingPackages.length > 0) {
     console.log(`Missing project-local QA packages: ${missingPackages.join(", ")}`);
     console.log(`Install with: ${installCommand}`);
+  }
+  if (missingImagePrepPackages.length > 0) {
+    console.log(`Missing project-local image preprocessing packages: ${missingImagePrepPackages.join(", ")}`);
+    console.log(`Install with: ${imagePrepInstallCommand}`);
   }
   if (blockedQaCapabilities.length > 0) {
     console.log(`Blocked Maquette QA capabilities: ${blockedQaCapabilities.join(", ")}`);

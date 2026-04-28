@@ -8,6 +8,10 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
+### Added
+
+- Added optional `sharp`-based safe reference-image preprocessing for Maquette workflows, including tooling checks and a bundled 2x Lanczos + mild-unsharp helper that preserves original references.
+
 ### Fixed
 
 - Clarified Maquette image display guidance so generated images are inspected and shown with absolute filesystem paths rather than repo-relative paths.

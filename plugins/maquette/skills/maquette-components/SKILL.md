@@ -99,11 +99,13 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 
 1. Read `.maquette/brand/design-system.json` and `.maquette/brand/tokens.css`.
 2. Run the optional QA tooling check before generating component sheets, CSS-contract posters, or component code.
-   - Use `shared/scripts/ensure-qa-tooling.mjs --project . --check-browser` when the script is available.
+   - Use `shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --check-image-prep` when the script is available and generated raster references are likely to be inspected or transcribed at low resolution.
+   - If `sharp` is available, Maquette may preprocess raster reference images with `shared/scripts/safe-upscale-image.mjs` to create a separate 2x Lanczos + mild-unsharp PNG before visual transcription or screenshot comparison. Keep the original reference as ground truth and do not overwrite it.
+   - If `sharp` is missing but image preprocessing would materially improve fidelity, ask before installing `sharp` in the project or continuing with the original reference.
    - Treat partial QA availability as missing QA tooling. For example, if `playwright` and `ajv` are available but `ajv-formats` is missing, browser QA can run but schema validation is still blocked.
-   - If `ensure-qa-tooling.mjs` reports any missing packages, blocked QA capabilities, or `installDecisionRequired: true`, ask the user through the Codex user-input/question tool whether to install `playwright`, `ajv`, and `ajv-formats` in the current project before generating component sheets or CSS-contract posters. Use explicit yes/no choices.
+   - If `ensure-qa-tooling.mjs` reports any missing packages, blocked QA capabilities, or `installDecisionRequired: true`, ask the user through the Codex user-input/question tool whether to install the missing project-local packages before generating component sheets or CSS-contract posters. Use explicit yes/no choices.
    - Do not silently continue with manual JSON syntax validation in place of schema validation when only `ajv-formats` or `ajv` is missing. Ask first, unless the user already declined installation for this run or the environment cannot install packages.
-   - If the user agrees, run `npm i -D playwright ajv ajv-formats` and `npx playwright install chromium`, then continue with automated QA.
+   - If the user agrees, run the install command reported by `ensure-qa-tooling.mjs`, such as `npm i -D playwright ajv ajv-formats`, `npm i -D sharp`, and `npx playwright install chromium` when Chromium is required, then continue with automated QA.
    - If the user declines or the install is not possible, continue with manual review and record the missing tooling in `.maquette/components/approved.md`.
    - Do not postpone this decision until after component implementation.
 3. Determine the ordered sheet batches needed for the product before generating images.
