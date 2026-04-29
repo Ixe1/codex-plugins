@@ -8,7 +8,13 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
-No notable changes yet.
+### Added
+
+- Added optional `sharp`-based same-size reference-image sharpening for Maquette workflows, including QA tooling checks and a bundled helper that preserves raw generated references.
+
+### Changed
+
+- Updated Maquette QA guidance so missing `sharp` requires an install-or-skip decision only when reference sharpening is planned.
 
 ## 0.3.5 - 2026-04-26
 

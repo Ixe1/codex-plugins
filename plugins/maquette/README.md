@@ -163,7 +163,7 @@ Use `@Maquette` or `$maquette` when you want the full staged workflow. Use the i
 
 ## Optional QA tooling
 
-Maquette can use project-local Node dependencies for automated screenshot capture, responsive overflow QA, component API smoke checks, page-consumption smoke checks, and JSON schema validation. These dependencies are **not** bundled with the plugin, and installing Maquette does not create `node_modules`.
+Maquette can use project-local Node dependencies for automated screenshot capture, responsive overflow QA, component API smoke checks, page-consumption smoke checks, JSON schema validation, and same-size reference-image sharpening. These dependencies are **not** bundled with the plugin, and installing Maquette does not create `node_modules`.
 
 If your project does not already have the optional QA dependencies installed, add them in the project where Maquette is generating UI files:
 
@@ -172,20 +172,29 @@ npm i -D playwright ajv ajv-formats
 npx playwright install chromium
 ```
 
+If the run will sharpen soft or compressed raster references before visual transcription or QA, install `sharp` in the same project:
+
+```sh
+npm --prefix <projectRoot> i -D sharp
+```
+
 You can check whether the current project has the optional QA tooling available without installing anything:
 
 ```sh
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --json .maquette/qa-tooling.json
+node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep --json .maquette/image-prep-tooling.json
 ```
 
-During a Maquette run, Codex should check optional QA tooling before component sheets, CSS-contract posters, or component code are generated. Partial availability still counts as missing QA tooling: if Playwright is available but `ajv-formats` is missing, browser QA can run but schema validation is blocked. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, Codex should ask before installing dependencies or skipping those automated checks, unless the user already declined for the run or installation is impossible. If the user agrees, Codex can run the project-local install commands and continue with automated QA. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
+During a Maquette run, Codex should check optional QA tooling before component sheets, CSS-contract posters, or component code are generated. Partial availability still counts as missing QA tooling: if Playwright is available but `ajv-formats` is missing, browser QA can run but schema validation is blocked. When a generated raster reference would benefit from sharpening before visual transcription or QA, run the tooling check with `--check-image-prep`; missing `sharp` blocks only the `reference-image-preprocessing` capability. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, Codex should ask before installing dependencies or skipping those automated checks, unless the user already declined for the run or installation is impossible. If the user agrees, Codex can run the project-local install commands and continue with automated QA, including `sharp` when image prep will be used. If the user declines, Maquette should continue with manual screenshot/schema review and record that automated QA tooling was unavailable.
 
 Project-local installs are the recommended path. Global npm installs are not recommended because Node usually will not resolve global packages from plugin scripts unless the user also configures environment-specific module lookup such as `NODE_PATH`.
 
-The bundled browser scripts load `playwright` from the current project when available and launch Chromium in headless mode. The JSON validation helper loads `ajv` and `ajv-formats` from the current project when available:
+The bundled browser scripts load `playwright` from the current project when available and launch Chromium in headless mode. The JSON validation helper loads `ajv` and `ajv-formats` from the current project when available. The reference sharpening helper loads `sharp` from the current project when available and creates a separate same-size PNG derivative without overwriting the raw reference. It sharpens only; it does not upscale or resize Maquette artifacts:
 
 ```sh
 node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-browser
+node plugins/maquette/shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep
+node plugins/maquette/shared/scripts/sharpen-reference-image.mjs .maquette/components/component-sheet-core-v1.png .maquette/components/component-sheet-core-v1-sharpened.png --project . --json .maquette/components/component-sheet-core-v1-sharpened.json --role component-sheet-transcription
 node plugins/maquette/shared/scripts/capture-browser.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png --json .maquette/components/reference-capture.json
 node plugins/maquette/skills/maquette-components/scripts/capture-gallery.mjs .maquette/components/replica-gallery.html .maquette/components/replica-gallery.png
 node plugins/maquette/skills/maquette-pages/scripts/capture-page.mjs .maquette/pages/homepage/page.html .maquette/pages/homepage/page.png

@@ -77,6 +77,8 @@ The JSON file must validate against `shared/design-system.schema.json`.
 3. If `image_gen` is available, create or edit a **focused structured brand board** using `assets/brand-board-prompt.md`.
    - Use the board as the creative exploration and approval artifact.
    - Inspect the generated board with `view_image` before writing the design-system JSON or CSS tokens.
+   - If the generated board is soft or compressed enough that approval/transcription would benefit from sharpening, run `shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep`. If project-local `sharp` is available, create a separate same-size sharpened derivative with `shared/scripts/sharpen-reference-image.mjs` and inspect that derivative. Preserve the raw board as the ground-truth creative artifact and do not overwrite, upscale, or resize it.
+   - If `sharp` is missing but sharpening would materially improve fidelity, ask whether to install `sharp` before creating the sharpened derivative unless the user already declined optional installs for this run.
    - If revising an existing board, preserve continuity unless the user asked for a new direction.
    - Inspect the generated board before using it. If it contains any logo-like mark, wordmark, brand-name masthead, large product-name treatment, monogram, mascot mark, seal, badge, app icon, emblem, or trademark-like element, reject that image for brand-kit approval and regenerate or edit it out before continuing.
    - If the board is visually cluttered or unreadable at normal preview size, reject it as an approval artifact and regenerate with narrower scope before continuing.
