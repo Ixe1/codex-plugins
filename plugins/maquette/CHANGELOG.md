@@ -8,6 +8,15 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
+### Added
+
+- Added component sheet inventory and batch review templates for region-by-region sheet-to-replica fidelity checks.
+- Added component-catalog schema fields and artifact validation checks for visible region coverage, contract region coverage, and `completed_before_next_sheet` gating.
+
+### Changed
+
+- Tightened Maquette component workflow guidance so visual component sheets are fidelity targets: every visible region, state, responsive variant, and pattern must be inventoried, contracted, implemented, and reviewed before the next sheet.
+
 ## 0.3.8 - 2026-04-28
 
 ### Added

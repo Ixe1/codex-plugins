@@ -44,6 +44,8 @@ When a page or site has global navigation, responsive navigation primitives are 
 
 The visual component sheet is the default source of truth for component anatomy, variants, states, density, spacing, radius, shadows, polish, responsive behavior, and layout relationships. If it conflicts with the brand board, preserve the brand foundation where possible, but the current component artifact wins for component anatomy, variants, state styling, density, spacing, radius, shadows, and polish; record the inconsistency and resolution in `.maquette/components/approved.md`.
 
+Component sheets are fidelity targets, not loose inspiration or a menu of reusable ideas. Every visible region in the sheet must be accounted for region-by-region before the batch can be accepted: component cells, state strips, annotations, responsive mockups, composite examples, repeated-card rows, table sections, footer/social modules, and any visible pattern or variant. Reusable component API extraction happens after the faithful sheet replica proves that visible sheet composition; it must not replace the full replica.
+
 CSS-contract poster images are brittle because image generation often renders exact CSS text poorly. Use deterministic code/text contracts derived after visual inspection as the implementation bridge. Supplemental CSS-contract posters may exist only as non-authoritative references unless the user explicitly requests them; they do not replace visual sheet inspection.
 
 The component-library phase has one implementation target:
@@ -124,8 +126,8 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Optional supplemental workflow: generate a focused 1:1 CSS-contract poster using `assets/component-css-contract-prompt.md` only when explicitly requested or justified after the visual sheet exists.
    - It is a workflow violation to generate the navigation/layout, data/display, cards/composites, or follow-up artifact before the current sheet has completed batch evidence.
    - Inspect the generated sheet with `view_image` using its absolute filesystem path before implementing any code from it, preferring `...-vN-2k.png` when a safe-upscale derivative exists.
-   - Update `.maquette/components/sheet-inventory.md` for that artifact with visible component families, variants, states, larger patterns, unclear or cramped areas, missing coverage, required raster asset types, and the decision to implement, regenerate, or create another focused artifact.
-   - Derive `.maquette/components/contracts/<batch-slug>.contract.css` from the inspected visual sheet before writing implementation CSS. This file is the human-readable bridge from visual inspection to code: preserve component anatomy, selector intent, states, slots, sizing guidance, responsive behavior, and intentionally normalized implementation decisions.
+   - Update `.maquette/components/sheet-inventory.md` for that artifact with every visible region/component/state/pattern in the sheet, including component cells, state strips, annotations, responsive mockups, composite examples, repeated-card rows, table sections, footer/social modules, unclear or cramped areas, missing coverage, required raster asset types, and the implementation status for each region: implemented, partial, simplified, omitted, approved omission, needs regeneration, or blocked with reason.
+   - Derive `.maquette/components/contracts/<batch-slug>.contract.css` from the inspected visual sheet before writing implementation CSS. This file is the human-readable bridge from visual inspection to code: preserve every visible region's component anatomy, selector intent, slots, states, sizing guidance, responsive behavior, and intentionally normalized implementation decisions. The contract must include selectors, slots, and state hooks for every visible sheet region, not only the components needed by the first page.
    - Reject, regenerate, or split a visual sheet if labels are too small, unrelated families are crammed into tiny cells, components overlap, full tables or dashboards crowd out primitives, implementation notes dominate, decorative details obscure component anatomy, or the image cannot guide implementation without heavy zooming.
    - Reject, regenerate, or omit a supplemental CSS-contract poster if text is too small, non-component selectors appear, `body`/`html`/gallery/panel/reset/page-layout rules dominate, selectors outside the allowlist appear, unrelated families are crowded together, or the poster is too generic to clarify the deterministic contract.
    - If the current artifact passes inspection, build that batch's artifacts and complete screenshot/manual review before generating the next sheet.
@@ -133,6 +135,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Maintain `.maquette/components/replica-gallery.html` as the combined component reference.
    - For multi-artifact runs, first create `.maquette/components/<batch-slug>.replica.html` for the current sheet, with CSS in `.maquette/components/css/<batch-slug>.components.css` and JS in `.maquette/components/js/<batch-slug>.components.js` when behavior is needed. The combined `replica-gallery.html` can be assembled or updated after the batch replica exists.
    - In the default workflow, the replica should make the visual sheet and derived contract reviewable in the browser while using reusable component classes, slots, state attributes, and minimal JS hooks from the start.
+   - The batch replica must recreate the full visible sheet composition for the current artifact before reusable API extraction is considered complete. Implement selected page-needed families only after the full sheet has been faithfully represented, not instead of representing the whole sheet.
    - The replica should implement the derived contract's selector contract, states, slots, dimensions, token intent, and visual anatomy, then use the rendered browser screenshot as the visual correction target. Do not copy raw visual colors or font impressions when matching approved tokens exist.
    - Page implementations should consume the component catalog, CSS, JS, and usage examples extracted from this componentized reference. They should not copy the reference page layout.
    - Batch replica HTML should link brand tokens directly from `../brand/tokens.css`, batch CSS from `css/<batch-slug>.components.css`, and batch JS from `js/<batch-slug>.components.js`. Prefer HTML stylesheet links over CSS `@import` so local file paths stay shallow and inspectable.
@@ -143,9 +146,10 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Capture desktop, tablet, and mobile reference screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
    - For every sheet batch, capture or manually review the batch replica before generating the next sheet. Record the screenshot paths, manual artifacts, or blocked screenshot reason in `<batch-slug>.review.md`.
    - Do not mark `completed_before_next_sheet: true` unless the batch HTML, CSS, JS, catalog snapshot, review file, and screenshot/manual review evidence exist before the next sheet is generated.
+   - Do not mark `completed_before_next_sheet: true` unless the visual sheet exists, the sheet inventory covers every visible region, the deterministic contract covers every visible region, the batch replica visually recreates the full sheet composition, CSS/JS/catalog/review artifacts exist, screenshot or manual visual evidence exists, and omissions are zero or explicitly approved and documented.
 7. Compare the current coded replica against the current approved visual sheet and make focused corrections.
    - Use the component fidelity rubric: coverage, visual match, anatomy match, responsive match, and implementation quality.
-   - Coverage means every visible component family, important variant, and major state from the sheet is implemented or explicitly deferred.
+   - Coverage means every visible sheet region, component family, important variant, major state, pattern, and responsive mockup from the sheet is implemented in the batch replica or explicitly approved and documented as an omission. Partial, simplified, missing, or deferred regions fail coverage unless the review names the exact region and reason.
    - Visual match means color, typography, spacing, radius, shadow, density, polish, and layout relationships visibly follow the inspected sheet and approved brand.
    - Anatomy match means cards, navigation, forms, tables, and composites preserve the visible structure and slot placement.
    - Responsive match means mobile, tablet, and navigation behavior shown or implied by the sheets is represented in the componentized reference.
@@ -153,6 +157,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - A score of 5 is a strong match, 4 is acceptable, 3 requires a fix or explicit documented block, and below 3 requires regeneration or rework before approval.
    - Make at least one focused correction pass when any rubric category fails before recording final status.
    - Do not generate the next component sheet until this review is complete and the current replica visibly matches the current artifact well enough to pass the rubric or has documented, intentional simplifications.
+   - Do not generate the next component sheet when any visible sheet region is missing, simplified, or only partially represented without an explicit documented approval reason.
 8. Merge the approved current-batch componentized replica/reference into reusable website primitives and patterns before moving to the next sheet:
    - buttons
    - links
@@ -177,7 +182,8 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Write the current batch's component proof files under `.maquette/components/`: `contracts/<batch-slug>.contract.css`, `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`.
    - The batch `<batch-slug>.replica.html` should be both the visual/contract fidelity proof and the reusable API proof for the current sheet. The batch `<batch-slug>.component-catalog.json` should snapshot only the components covered so far or clearly mark the current batch slice.
    - Update `.maquette/components/sheet-implementation-log.md` after each batch with the sheet path, deterministic contract path, replica artifact paths, component artifact paths, catalog snapshot path, screenshot/manual review artifacts, rubric scores, corrections made, simplifications, deferred items, and status.
-   - Mark the batch as `completed_before_next_sheet: true` in the final catalog only if these batch artifacts and screenshot/manual review evidence existed before the next component sheet was generated.
+   - Update `.maquette/components/sheet-implementation-log.md` after each batch with the sheet path, deterministic contract path, replica artifact paths, component artifact paths, catalog snapshot path, screenshot/manual review artifacts, rubric scores, visible region inventory status, visible region implementation status, state-variant representation, desktop/tablet/mobile representation when shown, corrections made, simplifications, deferred items, and status.
+   - Mark the batch as `completed_before_next_sheet: true` in the final catalog only if these batch artifacts and screenshot/manual review evidence existed before the next component sheet was generated and every visible region is implemented or explicitly approved and documented as an omission.
    - Only then continue to the next planned sheet batch.
 9. Keep component primitives and larger patterns conceptually separate:
    - component sheet: reusable primitives and core states
@@ -197,6 +203,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Capture desktop, tablet, and mobile reference screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
 14. Run the required component QA pass:
    - Fail and fix if the implementation omits derived contract selectors, states, slots, dimensions, token intent, or visible sheet anatomy, or if the screenshot is visually too generic for the approved brand. Also fail and fix when the reference is significantly simpler, sparser, less polished, or less sophisticated than that sheet.
+   - Fail and fix if the sheet inventory does not list every visible region, if the deterministic contract omits selectors/slots/states for any visible region, if state variants shown on the sheet are not represented, if desktop/tablet/mobile variants shown on the sheet are not represented, or if any simplification is not explicitly approved and documented.
    - Fail and fix the componentized reference if it lacks reusable component APIs, slots, states, accessibility hooks, or realistic usage examples.
    - Check visual component sheet coverage: every visible component family, important variant, major state, repeated-card anatomy pattern, responsive navigation state, product-card pattern, newsletter module, and footer/social module shown in the artifact should appear in the componentized reference or be documented as intentionally deferred with a reason.
    - Check icon and icon-button contrast in every visible state, especially active, selected, disabled, inverse, and dark-background states.
@@ -228,6 +235,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Record `.maquette/components/replica-gallery.html` in `assets.replica_gallery_html_path` and `assets.component_reference_html_path`.
    - Record the implementation log with `assets.sheet_implementation_log_path`.
    - Record each sheet batch in `assets.sheet_implementation_batches`, including category, sheet path in the schema's `sheet_path` field, deterministic contract path, replica artifact paths, component artifact paths, catalog snapshot path, review path, review artifact paths, screenshot paths when available, reusable components added, rubric scores, corrections made, simplifications, deferred items, `completed_before_next_sheet`, and status.
+   - For each batch, record `visible_region_coverage` and `contract_region_coverage` entries that list every visible region/component/state/pattern, its selectors, slots, represented states, responsive variants when shown, implementation status, evidence paths, and any approved omission reason.
    - Record component sheet vs replica fidelity in `assets.replica_fidelity_review`, including reference sheet paths, review mode, screenshots or manual artifacts, rubric scores, failed categories, corrections made, coverage summary, simplifications, and status.
    - Record reusable component readiness in `assets.reusable_component_review`, including whether component APIs, slots, states, JS behavior, accessibility hooks, and usage examples are ready for page implementation.
    - Each component's `visual_review.reference_image_paths` should include the sheet or sheets that guided that component.
@@ -242,11 +250,13 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 - Do not invent a new visual language.
 - Treat 1:1 visual component sheets as componentized reference targets, not loose inspiration.
 - Treat deterministic CSS contracts as the implementation bridge derived from visual inspection, not as replacements for visual sheets.
+- Reusable component API extraction happens after the coded replica faithfully recreates the sheet composition. Do not skip visible sheet regions because the first page does not need them.
 - Keep the reference page layout and reusable component API conceptually separate; page implementations should consume the catalog, CSS, JS, and usage examples, not copy the reference layout.
 - Reuse shared tokens everywhere instead of hard-coded one-off values.
 - Focus treatments and disabled states must remain consistent across controls.
 - The coded componentized reference should be visually pulled toward the approved sheet and brand while honoring the deterministic contract.
 - The componentized reference must not silently simplify generated component details. Any missing family, variant, state, density detail, selector, slot, or composite shown in the component sheet must be implemented or explicitly documented with a concrete reason and follow-up.
+- Every visible region in the sheet must appear in the inventory, deterministic contract, batch replica, batch review, and catalog coverage data. Missing, partial, or simplified regions block acceptance unless they are explicitly approved/documented with a reason.
 - Every icon-only control must have sufficient foreground/background contrast in default, hover, active, selected, disabled, and inverse states.
 - Active, selected, and current navigation links must remain readable against their active background, especially on dark or inverse navigation surfaces.
 - Component variants should share the same anatomy, spacing rhythm, and action placement unless the catalog explicitly records why a variant differs.
@@ -268,6 +278,7 @@ If a reference board, component sheet, or supplemental CSS-contract poster exist
 
 Before finishing:
 - Verify that the implementation matches the deterministic contract's selector contract, states, slots, token intent, and the sheet's component families, variants, states, density, and polish. Use screenshots to correct visual quality. A basic selector page is not sufficient.
+- Verify the sheet inventory and batch review explicitly list visible regions, visible regions implemented, state variants represented, desktop/tablet/mobile variants represented when shown, and no unapproved simplification.
 - Verify the same componentized reference exposes reusable component APIs, slots, states, JS behavior, accessibility hooks, and usage examples for page implementation.
 - Record the component fidelity rubric result for coverage, visual match, anatomy match, responsive match, and implementation quality.
 - Verify no icon disappears into its background.

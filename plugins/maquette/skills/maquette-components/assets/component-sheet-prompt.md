@@ -2,7 +2,7 @@ Edit the visible approved brand board into a focused website component-sheet ima
 
 Use a 1:1 square composition for every component sheet. Exact generated pixel dimensions are not controllable; prioritize a clearly square board with no cropping, letterboxing, or extra content outside the board.
 
-Generate only the current requested sheet category. Do not include teaser panels for later sheet categories. In multi-sheet workflows, the implementation model will inspect, implement a componentized replica/reference, review, and document reusable components from this sheet before requesting the next focused sheet.
+Generate only the current requested sheet category. Do not include teaser panels for later sheet categories. In multi-sheet workflows, the implementation model will inspect this sheet, inventory every visible region, implement a faithful componentized replica/reference of the full sheet composition, review it region-by-region, and only then document reusable components from this sheet before requesting the next focused sheet.
 
 Preserve:
 - approved palette
@@ -37,7 +37,8 @@ Adaptive sheet rules:
 
 Quality requirements:
 - component sheets define component styling; they should not contradict the approved brand board, and any unavoidable contradiction must be noted for `approved.md`
-- component sheets are componentized reference targets, not mood references; the later coded reference should reproduce the visible component families, anatomy, variants, states, density, spacing, radius, shadows, and polish using reusable CSS/JS from the start
+- component sheets are componentized reference targets, not mood references or loose inspiration; the later coded reference must reproduce every visible region, component family, anatomy, variant, state, responsive mockup, composite pattern, density, spacing, radius, shadow, and polish using reusable CSS/JS from the start
+- every visible area you include is expected to be implemented, reviewed, and cataloged; do not add decorative or speculative regions that cannot be faithfully recreated in HTML/CSS
 - foreground/background contrast must remain readable in active, selected, focus, disabled, inverse, and dark navigation states
 - the later coded componentized reference and reusable component API must be able to match this sheet's sophistication; do not show component details, density, states, or composites that are too ambiguous to implement
 - icon-only controls must have readable icon/background contrast in default, hover, active, selected, disabled, and inverse states
@@ -49,5 +50,5 @@ Quality requirements:
 - table cells, badges, labels, icons, and buttons must remain readable without overlap
 - reject the layout direction if labels are too small, unrelated families are crammed into tiny cells, components overlap, full tables or dashboards crowd out primitives, implementation notes dominate, or the image cannot guide implementation without heavy zooming
 
-This component sheet is a creative design artifact that the later coded componentized reference should match while exposing reusable component APIs.
+This component sheet is a creative design artifact and fidelity target that the later coded componentized reference should match before reusable component APIs are extracted from it.
 Do not create a new visual direction.

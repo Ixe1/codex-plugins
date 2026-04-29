@@ -18,7 +18,7 @@
     "sheet_implementation_batches": [
       {
         "category": "core-primitives",
-        "sheet_path": "components/component-sheet-core-primitives-css-contract-v1.png",
+        "sheet_path": "components/component-sheet-core-primitives-v1.png",
         "contract_path": "components/contracts/core-primitives.contract.css",
         "replica_artifact_paths": [
           "components/core-primitives.replica.html"
@@ -39,6 +39,134 @@
           "components/screenshots/core-primitives-1440.png"
         ],
         "review_mode": "screenshot",
+        "visible_region_coverage": [
+          {
+            "region_id": "core-buttons",
+            "label": "Button family with primary, secondary, ghost, danger, link, size, loading, disabled, hover, active, and focus states",
+            "kind": "component",
+            "sheet_location": "upper-left button/state grid",
+            "implementation_status": "implemented",
+            "contract_selectors": [
+              ".btn",
+              ".btn--primary",
+              ".btn--secondary",
+              ".btn--ghost",
+              ".btn--danger",
+              ".btn[aria-busy='true']"
+            ],
+            "contract_slots": [
+              "icon-start",
+              "label",
+              "icon-end"
+            ],
+            "represented_states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "active",
+              "disabled",
+              "loading"
+            ],
+            "responsive_variants": [],
+            "evidence_paths": [
+              "components/core-primitives.replica.html",
+              "components/screenshots/core-primitives-1440.png"
+            ]
+          },
+          {
+            "region_id": "core-responsive-nav",
+            "label": "Desktop inline navigation plus tablet/mobile collapsed and expanded states",
+            "kind": "responsive",
+            "sheet_location": "right navigation strip",
+            "implementation_status": "implemented",
+            "contract_selectors": [
+              ".site-nav",
+              ".site-nav__toggle",
+              ".site-nav__panel",
+              ".site-nav__link"
+            ],
+            "contract_slots": [
+              "brand",
+              "primary-links",
+              "actions",
+              "mobile-panel"
+            ],
+            "represented_states": [
+              "default",
+              "active",
+              "focus-visible",
+              "expanded",
+              "collapsed"
+            ],
+            "responsive_variants": [
+              "desktop",
+              "tablet",
+              "mobile"
+            ],
+            "evidence_paths": [
+              "components/core-primitives.replica.html",
+              "components/screenshots/responsive-nav-open-390.png"
+            ]
+          }
+        ],
+        "contract_region_coverage": [
+          {
+            "region_id": "core-buttons",
+            "label": "Button family",
+            "selectors": [
+              ".btn",
+              ".btn--primary",
+              ".btn--secondary",
+              ".btn--ghost",
+              ".btn--danger",
+              ".btn[aria-busy='true']"
+            ],
+            "slots": [
+              "icon-start",
+              "label",
+              "icon-end"
+            ],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "active",
+              "disabled",
+              "loading"
+            ],
+            "responsive_variants": [],
+            "status": "covered"
+          },
+          {
+            "region_id": "core-responsive-nav",
+            "label": "Responsive navigation family",
+            "selectors": [
+              ".site-nav",
+              ".site-nav__toggle",
+              ".site-nav__panel",
+              ".site-nav__link"
+            ],
+            "slots": [
+              "brand",
+              "primary-links",
+              "actions",
+              "mobile-panel"
+            ],
+            "states": [
+              "default",
+              "active",
+              "focus-visible",
+              "expanded",
+              "collapsed"
+            ],
+            "responsive_variants": [
+              "desktop",
+              "tablet",
+              "mobile"
+            ],
+            "status": "covered"
+          }
+        ],
         "reusable_components_added": [
           "button",
           "text-input",
@@ -62,7 +190,7 @@
       },
       {
         "category": "data-display",
-        "sheet_path": "components/component-sheet-data-display-css-contract-v1.png",
+        "sheet_path": "components/component-sheet-data-display-v1.png",
         "contract_path": "components/contracts/data-display.contract.css",
         "replica_artifact_paths": [
           "components/data-display.replica.html"
@@ -83,6 +211,76 @@
           "components/screenshots/data-display-1440.png"
         ],
         "review_mode": "screenshot",
+        "visible_region_coverage": [
+          {
+            "region_id": "data-table-density",
+            "label": "Dense data table with header, sortable columns, status badge, empty/loading/error examples, filters, and pagination",
+            "kind": "pattern",
+            "sheet_location": "full-width data row",
+            "implementation_status": "implemented",
+            "contract_selectors": [
+              ".data-table",
+              ".data-table__toolbar",
+              ".data-table__status",
+              ".pagination"
+            ],
+            "contract_slots": [
+              "toolbar",
+              "header",
+              "body",
+              "status",
+              "pagination"
+            ],
+            "represented_states": [
+              "default",
+              "sorted",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "responsive_variants": [
+              "desktop",
+              "tablet",
+              "mobile-scroll"
+            ],
+            "evidence_paths": [
+              "components/data-display.replica.html",
+              "components/screenshots/data-display-1440.png"
+            ]
+          }
+        ],
+        "contract_region_coverage": [
+          {
+            "region_id": "data-table-density",
+            "label": "Dense data table pattern",
+            "selectors": [
+              ".data-table",
+              ".data-table__toolbar",
+              ".data-table__status",
+              ".pagination"
+            ],
+            "slots": [
+              "toolbar",
+              "header",
+              "body",
+              "status",
+              "pagination"
+            ],
+            "states": [
+              "default",
+              "sorted",
+              "empty",
+              "loading",
+              "error"
+            ],
+            "responsive_variants": [
+              "desktop",
+              "tablet",
+              "mobile-scroll"
+            ],
+            "status": "covered"
+          }
+        ],
         "reusable_components_added": [
           "data-table",
           "status-badge"
@@ -108,10 +306,10 @@
     "gallery_screenshot_paths": [
       "components/replica-gallery.png"
     ],
-    "component_sheet_path": "components/component-sheet-core-primitives-css-contract-v1.png",
+    "component_sheet_path": "components/component-sheet-core-primitives-v1.png",
     "component_sheet_paths": [
-      "components/component-sheet-core-primitives-css-contract-v1.png",
-      "components/component-sheet-data-display-css-contract-v1.png"
+      "components/component-sheet-core-primitives-v1.png",
+      "components/component-sheet-data-display-v1.png"
     ],
     "component_contract_paths": [
       "components/contracts/core-primitives.contract.css",
@@ -130,8 +328,8 @@
     ],
     "replica_fidelity_review": {
       "reference_sheet_paths": [
-        "components/component-sheet-core-primitives-css-contract-v1.png",
-        "components/component-sheet-data-display-css-contract-v1.png"
+        "components/component-sheet-core-primitives-v1.png",
+        "components/component-sheet-data-display-v1.png"
       ],
       "gallery_screenshot_paths": [
         "components/replica-gallery.png",
@@ -151,6 +349,14 @@
         "implementation_quality": 5
       },
       "coverage_summary": "The componentized replica/reference renders the component families, variants, states, responsive navigation, and repeated-card anatomy from the approved visual component sheets.",
+      "visible_region_review": {
+        "visible_regions_listed": true,
+        "visible_regions_implemented": true,
+        "state_variants_represented": true,
+        "responsive_variants_represented_when_shown": true,
+        "no_unapproved_simplification": true,
+        "omissions": []
+      },
       "failed_categories": [],
       "corrections_made": [
         "Adjusted card action rows to align with the visual component sheet, derived contract, and rendered screenshot.",
@@ -161,11 +367,19 @@
     },
     "sheet_fidelity_review": {
       "reference_sheet_paths": [
-        "components/component-sheet-core-primitives-css-contract-v1.png",
-        "components/component-sheet-data-display-css-contract-v1.png"
+        "components/component-sheet-core-primitives-v1.png",
+        "components/component-sheet-data-display-v1.png"
       ],
       "review_mode": "screenshot",
       "coverage_summary": "Compatibility summary for older Maquette consumers; see replica_fidelity_review for the detailed rubric.",
+      "visible_region_review": {
+        "visible_regions_listed": true,
+        "visible_regions_implemented": true,
+        "state_variants_represented": true,
+        "responsive_variants_represented_when_shown": true,
+        "no_unapproved_simplification": true,
+        "omissions": []
+      },
       "simplifications": [],
       "status": "matches"
     },
@@ -238,7 +452,7 @@
       "visual_review": {
         "reference_image_paths": [
           "brand/brand-board-v1.png",
-          "components/component-sheet-core-primitives-css-contract-v1.png"
+          "components/component-sheet-core-primitives-v1.png"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Button density and radius match the approved board. Ghost hover treatment is intentionally subtle."
@@ -361,7 +575,7 @@
       ],
       "visual_review": {
         "reference_image_paths": [
-          "components/component-sheet-core-primitives-css-contract-v1.png"
+          "components/component-sheet-core-primitives-v1.png"
         ],
         "latest_screenshot_path": "components/screenshots/responsive-nav-open-390.png",
         "similarity_notes": "Responsive navigation keeps desktop inline links and uses a collapsed tablet/mobile panel with visible tap targets."
@@ -426,7 +640,7 @@
       },
       "visual_review": {
         "reference_image_paths": [
-          "components/component-sheet-core-primitives-css-contract-v1.png"
+          "components/component-sheet-core-primitives-v1.png"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Card surfaces and CTA styling follow the visual component sheet, derived contract, and rendered screenshot.",

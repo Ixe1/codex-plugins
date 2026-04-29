@@ -13,6 +13,7 @@ import {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const ensureQaToolingPath = path.resolve(scriptDir, "ensure-qa-tooling.mjs");
 const safeUpscalePath = path.resolve(scriptDir, "safe-upscale-image.mjs");
+const validateArtifactsPath = path.resolve(scriptDir, "validate-artifacts.mjs");
 
 function writePackage(root, name, files = { "index.js": "module.exports = {};\n" }) {
   const packageRoot = path.join(root, "node_modules", name);
@@ -62,6 +63,156 @@ module.exports = function sharp(inputPath) {
 };
 `,
   });
+}
+
+function writeFakeAjv(root) {
+  writePackage(root, "ajv", {
+    "dist/2020.js": `
+module.exports = class Ajv2020 {
+  compile() {
+    const validate = () => true;
+    validate.errors = null;
+    return validate;
+  }
+};
+`,
+  });
+  writePackage(root, "ajv-formats", {
+    "index.js": "module.exports = function addFormats() {};\n",
+  });
+}
+
+function writeProjectFile(root, relativePath, contents = "") {
+  const targetPath = path.join(root, relativePath);
+  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+  fs.writeFileSync(targetPath, contents);
+}
+
+function createComponentCatalog(regionStatus = "implemented") {
+  return {
+    meta: {
+      system_name: "Validator Fixture",
+      version: "1.0.0",
+      based_on_design_system_version: "1.0.0",
+      status: "draft",
+    },
+    tech: {
+      html_strategy: "semantic-html",
+      css_strategy: "css-custom-properties",
+      js_strategy: "vanilla-js",
+    },
+    assets: {
+      tokens_css_path: "brand/tokens.css",
+      sheet_inventory_path: "components/sheet-inventory.md",
+      sheet_implementation_batches: [
+        {
+          category: "core-primitives",
+          sheet_path: "components/component-sheet-core-v1.png",
+          contract_path: "components/contracts/core-primitives.contract.css",
+          replica_artifact_paths: ["components/core-primitives.replica.html"],
+          component_artifact_paths: [
+            "components/core-primitives.replica.html",
+            "components/css/core-primitives.components.css",
+            "components/js/core-primitives.components.js",
+          ],
+          catalog_snapshot_path: "components/core-primitives.component-catalog.json",
+          review_path: "components/core-primitives.review.md",
+          review_artifact_paths: [
+            "components/core-primitives.review.md",
+            "components/screenshots/core-primitives-1440.png",
+          ],
+          screenshot_paths: ["components/screenshots/core-primitives-1440.png"],
+          review_mode: "screenshot",
+          visible_region_coverage: [
+            {
+              region_id: "core-buttons",
+              label: "Button state strip",
+              kind: "component",
+              sheet_location: "upper-left",
+              implementation_status: regionStatus,
+              contract_selectors: [".btn"],
+              contract_slots: ["label"],
+              represented_states: ["default", "hover", "focus-visible"],
+              responsive_variants: [],
+              evidence_paths: ["components/core-primitives.replica.html"],
+            },
+          ],
+          contract_region_coverage: [
+            {
+              region_id: "core-buttons",
+              label: "Button state strip",
+              selectors: [".btn"],
+              slots: ["label"],
+              states: ["default", "hover", "focus-visible"],
+              responsive_variants: [],
+              status: "covered",
+            },
+          ],
+          completed_before_next_sheet: true,
+          status: "implemented",
+        },
+      ],
+      replica_gallery_html_path: "components/replica-gallery.html",
+      component_reference_html_path: "components/replica-gallery.html",
+      replica_fidelity_review: {
+        reference_sheet_paths: ["components/component-sheet-core-v1.png"],
+        gallery_screenshot_paths: ["components/screenshots/core-primitives-1440.png"],
+        review_mode: "screenshot",
+        coverage_summary: "Every visible region is represented.",
+        visible_region_review: {
+          visible_regions_listed: true,
+          visible_regions_implemented: true,
+          state_variants_represented: true,
+          responsive_variants_represented_when_shown: true,
+          no_unapproved_simplification: true,
+          omissions: [],
+        },
+        status: "matches",
+      },
+      reusable_component_review: {
+        status: "ready",
+        ready_for_pages: true,
+      },
+      review_notes_path: "components/approved.md",
+    },
+    components: [
+      {
+        name: "button",
+        source_required_component: "button",
+        files: ["components/css/components.css"],
+        selectors: [".btn"],
+        implemented_variants: ["primary"],
+        implemented_sizes: ["md"],
+        implemented_states: ["default", "hover", "focus-visible"],
+        status: "reviewed",
+      },
+    ],
+  };
+}
+
+function writeValidationFixture(root, regionStatus = "implemented") {
+  fs.writeFileSync(path.join(root, "package.json"), "{}\n");
+  writeFakeAjv(root);
+  writeProjectFile(root, ".maquette/brand/design-system.json", "{}\n");
+  const catalog = createComponentCatalog(regionStatus);
+  const artifactPaths = [
+    "brand/tokens.css",
+    "components/sheet-inventory.md",
+    "components/component-sheet-core-v1.png",
+    "components/contracts/core-primitives.contract.css",
+    "components/core-primitives.replica.html",
+    "components/css/core-primitives.components.css",
+    "components/js/core-primitives.components.js",
+    "components/core-primitives.component-catalog.json",
+    "components/core-primitives.review.md",
+    "components/screenshots/core-primitives-1440.png",
+    "components/replica-gallery.html",
+    "components/approved.md",
+  ];
+  for (const artifactPath of artifactPaths) {
+    writeProjectFile(root, path.join(".maquette", artifactPath), `${artifactPath}\n`);
+  }
+  writeProjectFile(root, ".maquette/components/component-catalog.json", `${JSON.stringify(catalog, null, 2)}\n`);
 }
 
 function createFakeImage(root, name, width, height) {
@@ -204,6 +355,38 @@ test("safe-upscale refuses non-square --size without explicit distortion overrid
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Refusing to distort non-square input 864x1821 with --size/);
+});
+
+test("validate-artifacts rejects completed component batches with partial visible regions", () => {
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), "maquette-visible-region-fail-"));
+  writeValidationFixture(projectRoot, "partial");
+
+  const result = spawnSync(process.execPath, [
+    validateArtifactsPath,
+    "--project",
+    projectRoot,
+  ], {
+    encoding: "utf8",
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout, /completed_before_next_sheet cannot include unapproved missing, partial, simplified, blocked, or regenerated regions/);
+});
+
+test("validate-artifacts accepts completed component batches with implemented visible regions", () => {
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), "maquette-visible-region-pass-"));
+  writeValidationFixture(projectRoot, "implemented");
+
+  const result = spawnSync(process.execPath, [
+    validateArtifactsPath,
+    "--project",
+    projectRoot,
+  ], {
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.match(result.stdout, /PASS component-catalog/);
 });
 
 test("reference artifact paths keep raw, 2k, and rendered derivatives distinct", () => {
