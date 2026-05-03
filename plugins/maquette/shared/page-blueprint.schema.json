@@ -63,6 +63,9 @@
             "type": "string",
             "enum": [
               "brand-board",
+              "direction-inventory",
+              "component-contract",
+              "component-contract-poster",
               "component-sheet",
               "page-layout-contract",
               "page-concept",
@@ -229,6 +232,9 @@
           "type": "string"
         },
         "component_sheet_gallery_fidelity": {
+          "type": "string"
+        },
+        "component_contract_gallery_fidelity": {
           "type": "string"
         },
         "repeated_card_alignment": {

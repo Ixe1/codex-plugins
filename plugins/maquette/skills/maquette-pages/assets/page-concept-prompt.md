@@ -1,8 +1,8 @@
-Edit the visible approved brand board and component-sheet reference or references into a website page concept.
+Edit the visible approved brand board, structured component contract summary, and any visual component-sheet references into a website page concept.
 
 Requirements:
 - use only components and styling consistent with the approved system
-- treat existing components as the first source of truth
+- treat existing component contracts, catalog APIs, and approved components as the first source of truth
 - only introduce a new composite if it is truly necessary for the page goal and a component/composite reference already exists or is created first
 - do not silently invent significant new component language that is absent from the approved or provisional component references
 - prioritize hierarchy, layout, density, and state clarity

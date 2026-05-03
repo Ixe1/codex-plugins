@@ -1,4 +1,11 @@
-Generate a focused website component CSS-contract poster.
+Legacy fallback only: generate a focused website component CSS-contract poster.
+
+Prefer the structured-contract workflow instead:
+- write `.maquette/components/contracts/<batch-slug>.contract.json`
+- validate it against `shared/component-contract.schema.json` when possible
+- render a deterministic `.contract.svg` poster with `shared/scripts/render-component-contract-poster.mjs` when a visual review aid is useful
+
+Use this image prompt only when the user explicitly asks for an image-generated CSS poster or when deterministic contract rendering is unavailable and the fallback is documented.
 
 Use a 1:1 square composition. Exact generated pixel dimensions are not controllable; prioritize a clearly square poster with no cropping, letterboxing, or extra content outside the poster.
 
@@ -64,4 +71,4 @@ Reject and regenerate or split the poster before implementation if:
 - unrelated component families are crowded together
 - the poster is too generic to guide component CSS beyond common defaults
 
-This CSS-contract poster is a machine-readable component contract, not a final stylesheet and not the final visual source of truth for complex visual design. The coded replica/reference must still be reviewed in a browser, corrected after screenshots, and documented in the component catalog.
+This legacy CSS-contract poster is a visual fallback, not a final stylesheet and not the source of CSS truth. The coded replica/reference must still be grounded in structured contract notes, reviewed in a browser, corrected after screenshots, and documented in the component catalog.

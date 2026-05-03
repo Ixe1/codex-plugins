@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "contract_name": "Core Actions Contract",
+    "version": "1.0.0",
+    "status": "draft",
+    "based_on_design_system_version": "1.0.0",
+    "source_direction_inventory_path": ".maquette/direction/direction-inventory.json",
+    "notes": "Example structured contract for buttons and links."
+  },
+  "batch": {
+    "slug": "core-actions",
+    "category": "core-primitives",
+    "selector_allowlist": [
+      ".mq-button",
+      ".mq-button__icon",
+      ".mq-link"
+    ],
+    "critical_path": true
+  },
+  "selectors": [
+    {
+      "selector": ".mq-button",
+      "role": "button base",
+      "slots": [
+        "label",
+        "leading-icon",
+        "trailing-icon",
+        "spinner"
+      ],
+      "rules": [
+        {
+          "property": "display",
+          "value": "inline-flex",
+          "token_source": "normalized"
+        },
+        {
+          "property": "min-height",
+          "value": "var(--size-control-md)",
+          "token_source": "component"
+        },
+        {
+          "property": "padding-inline",
+          "value": "var(--space-4)",
+          "token_source": "design-system"
+        },
+        {
+          "property": "border-radius",
+          "value": "var(--radius-md)",
+          "token_source": "design-system"
+        }
+      ]
+    },
+    {
+      "selector": ".mq-button__icon",
+      "role": "button icon slot",
+      "rules": [
+        {
+          "property": "width",
+          "value": "1rem",
+          "token_source": "normalized"
+        },
+        {
+          "property": "height",
+          "value": "1rem",
+          "token_source": "normalized"
+        }
+      ]
+    },
+    {
+      "selector": ".mq-link",
+      "role": "text link",
+      "rules": [
+        {
+          "property": "color",
+          "value": "var(--color-semantic-text-link)",
+          "token_source": "design-system"
+        },
+        {
+          "property": "text-underline-offset",
+          "value": "0.18em",
+          "token_source": "normalized"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "selector": ".mq-button:focus-visible",
+      "state": "focus-visible",
+      "rules": [
+        {
+          "property": "box-shadow",
+          "value": "var(--shadow-focus)",
+          "token_source": "design-system"
+        }
+      ]
+    },
+    {
+      "selector": ".mq-button[disabled]",
+      "state": "disabled",
+      "rules": [
+        {
+          "property": "opacity",
+          "value": "var(--opacity-disabled)",
+          "token_source": "design-system"
+        }
+      ]
+    }
+  ],
+  "accessibility": [
+    "Buttons require visible focus states and 40px or larger tap targets unless the design system specifies a stricter target.",
+    "Icon-only buttons must include accessible names."
+  ],
+  "responsive": [
+    "Buttons may wrap text, but text must not overflow the control.",
+    "Primary actions should remain reachable without horizontal scrolling at 390px viewport width."
+  ],
+  "implementation_notes": [
+    "Snap component values to approved tokens before writing final CSS.",
+    "Keep page-local campaign effects out of the reusable button contract unless repeated in multiple contexts."
+  ]
+}

@@ -8,7 +8,18 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
-No notable changes yet.
+### Added
+
+- Added Greenfield Website Mode with a new `maquette-direction` phase, direction concept prompt, direction inventory schema/example, and direction-aware workflow guidance.
+- Added structured component contract schema/example and a deterministic SVG poster renderer for component-contract review aids.
+- Added design-system token decision metadata for global, component, and page-local scope/maturity/source tracking.
+
+### Changed
+
+- Changed the default greenfield flow from brand-first to page-direction-first, then constrained brand kit, critical-path components, page implementation, and final system backfill.
+- Clarified Existing Brand Mode so existing websites and supplied brand assets use a preservation-first reference inventory before brand-board normalization.
+- Changed component guidance from image-generated CSS-contract posters as implementation source to structured component contracts as source of truth, with visual sheets used only for explicit requests or creative clarification.
+- Updated Maquette README, root marketplace README, plugin metadata, prompts, schemas, and validation guidance for direction-first and contract-first workflows.
 
 ## 0.3.6 - 2026-04-29
 

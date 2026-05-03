@@ -336,7 +336,6 @@
       "additionalProperties": false,
       "required": [
         "category",
-        "sheet_path",
         "replica_artifact_paths",
         "catalog_snapshot_path",
         "review_path",
@@ -498,6 +497,12 @@
       "additionalProperties": false,
       "properties": {
             "reference_sheet_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "reference_contract_paths": {
               "type": "array",
               "items": {
                 "type": "string"

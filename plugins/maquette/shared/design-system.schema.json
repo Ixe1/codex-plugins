@@ -45,9 +45,16 @@
           "type": "string",
           "enum": [
             "greenfield",
+            "greenfield-page-seeded",
+            "existing-brand",
+            "one-shot-fast",
+            "design-system",
             "existing-site-refresh",
             "reference-derived"
           ]
+        },
+        "source_direction_inventory_path": {
+          "type": "string"
         },
         "created_at": {
           "type": "string",
@@ -154,6 +161,8 @@
             "enum": [
               "screenshot",
               "brand-board",
+              "direction-concept",
+              "direction-inventory",
               "component-sheet",
               "page-concept",
               "inspiration",
@@ -684,6 +693,12 @@
         "$ref": "#/$defs/componentSpec"
       }
     },
+    "token_decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tokenDecision"
+      }
+    },
     "board": {
       "type": "object",
       "additionalProperties": false,
@@ -921,6 +936,51 @@
               "type": "string"
             }
           }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "tokenDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "scope",
+        "maturity",
+        "source"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "global",
+            "component",
+            "page-local"
+          ]
+        },
+        "maturity": {
+          "type": "string",
+          "enum": [
+            "core",
+            "provisional",
+            "experimental"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "direction-concept",
+            "brand-board",
+            "accessibility-adjustment",
+            "implementation",
+            "user-provided"
+          ]
         },
         "notes": {
           "type": "string"

@@ -4,7 +4,8 @@
     "platform": "web",
     "version": "1.0.0",
     "status": "draft",
-    "source_mode": "greenfield",
+    "source_mode": "greenfield-page-seeded",
+    "source_direction_inventory_path": ".maquette/direction/direction-inventory.json",
     "created_at": "2026-04-23T10:00:00Z",
     "last_updated_at": "2026-04-23T10:00:00Z",
     "notes": "Sample brand system for a B2B SaaS dashboard."
@@ -473,6 +474,29 @@
         "notes": "Keep row affordances subtle and preserve scannability."
       },
       "notes": "Rows should feel calm and legible."
+    }
+  ],
+  "token_decisions": [
+    {
+      "name": "core-neutral-and-action-colors",
+      "scope": "global",
+      "maturity": "core",
+      "source": "brand-board",
+      "notes": "Durable palette extracted from the approved board and suitable across pages."
+    },
+    {
+      "name": "hero-product-preview-glow",
+      "scope": "page-local",
+      "maturity": "experimental",
+      "source": "direction-concept",
+      "notes": "Keep as a page-local flourish until a second page repeats the treatment."
+    },
+    {
+      "name": "button-control-density",
+      "scope": "component",
+      "maturity": "provisional",
+      "source": "implementation",
+      "notes": "Confirm after the first component screenshot review."
     }
   ],
   "board": {

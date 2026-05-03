@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "status": "approved",
+    "created_at": "2026-05-03T10:00:00Z",
+    "source_mode": "greenfield-page-seeded",
+    "notes": "Example direction inventory for a greenfield SaaS homepage."
+  },
+  "selected_concept": {
+    "path": ".maquette/direction/direction-concept-v2.png",
+    "approval_status": "approved",
+    "approved_at": "2026-05-03T10:05:00Z",
+    "selected_reason": "Best balance of concrete product hierarchy and durable visual-system potential.",
+    "rejected_alternative_paths": [
+      ".maquette/direction/direction-concept-v1.png",
+      ".maquette/direction/direction-concept-v3.png"
+    ]
+  },
+  "visual_direction": "Quiet operational SaaS with crisp cards, dense but calm information hierarchy, restrained blue-green accents, and high-legibility UI typography.",
+  "page_archetype": "B2B SaaS marketing homepage",
+  "hierarchy": {
+    "primary": "Hero headline, product value proposition, and primary signup CTA.",
+    "secondary": "Feature cards, metrics preview, and proof points.",
+    "tertiary": "Newsletter/footer region and secondary links.",
+    "notes": "The concept relies on scannable operational content rather than atmospheric storytelling."
+  },
+  "color_candidates": [
+    "Pale neutral canvas with white elevated surfaces.",
+    "Blue primary action color with green success/accent highlights.",
+    "Dark inverse footer surface for terminal contrast."
+  ],
+  "type_character": [
+    "Modern geometric headings with moderate compression.",
+    "Neutral UI sans body text optimized for dashboards and dense cards.",
+    "Monospace used only for compact telemetry or code-like labels."
+  ],
+  "layout_observations": [
+    "Twelve-column desktop rhythm with compact section spacing.",
+    "Hero pairs a text block with a product preview card.",
+    "Feature cards need equal-height bodies and bottom-aligned actions."
+  ],
+  "component_families": [
+    {
+      "name": "header-navigation",
+      "priority": "critical-path",
+      "source_region": "header",
+      "notes": "Needs desktop inline links and mobile drawer behavior."
+    },
+    {
+      "name": "buttons-links",
+      "priority": "critical-path",
+      "source_region": "hero and cards",
+      "notes": "Primary, secondary, ghost, focus, hover, disabled."
+    },
+    {
+      "name": "feature-cards",
+      "priority": "critical-path",
+      "source_region": "feature grid",
+      "notes": "Shared header/body/action anatomy with equal heights."
+    },
+    {
+      "name": "footer",
+      "priority": "critical-path",
+      "source_region": "terminal region",
+      "notes": "Link columns, compact legal row, recognizable social icons."
+    }
+  ],
+  "asset_manifest_seed": [
+    {
+      "name": "hero-product-preview",
+      "kind": "css-rendered",
+      "status": "planned",
+      "notes": "Can be implemented with HTML/CSS instead of raster."
+    },
+    {
+      "name": "footer-social-icons",
+      "kind": "svg-icon",
+      "status": "planned",
+      "notes": "Use recognizable inline SVG icons with accessible names."
+    }
+  ],
+  "responsive_implications": [
+    "Primary navigation needs a menu toggle and stacked mobile panel.",
+    "Hero product preview should stack under the copy on narrow screens.",
+    "Cards collapse from three columns to one column with preserved action alignment."
+  ],
+  "accessibility_risks": [
+    "Accent text over tinted cards needs AA contrast checks.",
+    "Compact telemetry labels may become too small on mobile."
+  ],
+  "ambiguities": [
+    "The exact heading font is not identifiable from the concept.",
+    "Some preview chart details should be simplified into real CSS/SVG rather than copied literally."
+  ],
+  "page_local_candidates": [
+    "Hero glow treatment should remain page-local unless reused on another page.",
+    "One-off telemetry background pattern should not become a global token."
+  ],
+  "normalization_notes": [
+    "Brand board should preserve the operational SaaS direction while extracting durable palette, typography, spacing, radius, surface, and state rules.",
+    "Design-system tokens should snap approximate concept spacing to a deliberate scale.",
+    "Critical component work should prioritize header/nav, buttons, cards, section shell, and footer before broader library expansion."
+  ]
+}

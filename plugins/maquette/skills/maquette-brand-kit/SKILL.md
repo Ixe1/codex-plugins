@@ -1,6 +1,6 @@
 ---
 name: maquette-brand-kit
-description: "Create or revise a website brand kit from a brief, screenshots, or an existing site. This skill is image_gen-first: always create or revise a structured board image before finalizing the design-system contract, unless the user explicitly tells you not to use image generation or the tool is unavailable."
+description: "Create or revise a website brand kit from a brief, approved greenfield direction, screenshots, or an existing site. This skill is image_gen-first: always create or revise a structured board image before finalizing the design-system contract, unless the user explicitly tells you not to use image generation or the tool is unavailable."
 ---
 
 You are responsible for the **website brand-kit phase**.
@@ -43,12 +43,17 @@ Only skip image generation if:
 
 You may receive:
 - a short product brief
+- an approved greenfield direction concept and `.maquette/direction/direction-inventory.json`
 - a repo with existing website code
 - existing screenshots
 - a previously approved brand board
 - requests to refresh or evolve the current system
 
 Existing websites, screenshots, and code are references for creating the brand board. They are not a substitute for a generated and inspected brand board, design-system JSON, or CSS tokens.
+
+In Greenfield Website Mode, an approved direction concept is the creative seed for the brand board. Use `.maquette/direction/direction-inventory.json` when present to preserve the selected page direction's hierarchy, visual tone, content density, component needs, asset needs, and page-local cautions. The brand board must normalize the selected direction into reusable brand rules without drifting into a new unrelated style.
+
+In Existing Brand Mode, preserve first and modernize second. When existing websites, screenshots, code, or supplied brand assets are present, write `.maquette/brand/reference-inventory.md` before generating the brand board. Record source references, brand elements to preserve, supplied assets that must not be regenerated, allowed evolution, do-not-change constraints, accessibility issues, and uncertainties that need user approval.
 
 ## Required outputs
 
@@ -59,6 +64,10 @@ Always create or update these files when you finish a pass:
 - `.maquette/brand/tokens.css`
 - `.maquette/brand/approved.md`
 
+When existing brand or site references are used, also create or update:
+
+- `.maquette/brand/reference-inventory.md`
+
 When `image_gen` is available, also create or update:
 
 - `.maquette/brand/brand-board-vN.png`
@@ -68,6 +77,9 @@ The JSON file must validate against `shared/design-system.schema.json`.
 ## Workflow
 
 1. Read the request, repo, and visible references.
+   - If `.maquette/direction/direction-inventory.json` exists, read it before writing the brand brief.
+   - If the direction inventory references a selected concept image, inspect that image with `view_image` when possible before generating or editing the brand board.
+   - If existing website, code, screenshots, or supplied brand assets are present, create or update `.maquette/brand/reference-inventory.md` before generating the brand board.
 2. Write or refresh `.maquette/brand/brief.md` with:
    - product summary
    - audience
@@ -76,6 +88,7 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - accessibility requirements
 3. If `image_gen` is available, create or edit a **focused structured brand board** using `assets/brand-board-prompt.md`.
    - Use the board as the creative exploration and approval artifact.
+   - In Existing Brand Mode, use the board as a preservation and normalization artifact, not a reinvention artifact. Preserve recognizable brand language and record any modernization or accessibility adjustment.
    - Inspect the generated board with `view_image` before writing the design-system JSON or CSS tokens.
    - If the generated board is soft or compressed enough that approval/transcription would benefit from sharpening, run `shared/scripts/ensure-qa-tooling.mjs --project . --check-image-prep`. If project-local `sharp` is available, create a separate same-size sharpened derivative with `shared/scripts/sharpen-reference-image.mjs` and inspect that derivative. Preserve the raw board as the ground-truth creative artifact and do not overwrite, upscale, or resize it.
    - If `sharp` is missing but sharpening would materially improve fidelity, ask whether to install `sharp` before creating the sharpened derivative unless the user already declined optional installs for this run.
@@ -88,6 +101,9 @@ The JSON file must validate against `shared/design-system.schema.json`.
    - Do not create the design-system JSON or tokens until the user approves the board, unless the user explicitly requested an unattended run.
 5. Create or update `.maquette/brand/design-system.json` so it matches the approved board.
    - The inspected brand board is the visual source of truth for palette, typography direction, spacing, radius, surfaces, shadows, and state principles.
+   - In Greenfield Website Mode, set `meta.source_mode` to `greenfield-page-seeded`, record `meta.source_direction_inventory_path`, and add `references` entries for the selected direction concept and direction inventory.
+   - In Existing Brand Mode, set `meta.source_mode` to `existing-brand`, add `references` entries for the reference inventory and inspected site or asset references, and document any intentional modernization or accessibility adjustments in `meta.notes`.
+   - Record token decisions with scope, maturity, and source when a value is global, component-specific, or page-local. Do not promote hero-only or campaign-only visual effects into global tokens unless they clearly belong to the durable brand system.
    - Do not use a script, existing CSS file, Figma/design export, or predetermined token file to infer or override brand tokens unless the user explicitly provides it as an approved constraint.
 6. Export `.maquette/brand/tokens.css` from the board-derived design system JSON. Use `scripts/export-tokens.mjs` if present.
    - The export script is only a deterministic JSON-to-CSS serializer. It must not be treated as token extraction, visual analysis, or design decision-making.
@@ -122,6 +138,17 @@ If a board has already been approved:
 - preserve palette, typography personality, spacing rhythm, radius style, and control language
 - change only the parts the user asked to change
 - do not silently invent a new brand direction
+
+If a greenfield direction has already been approved:
+- preserve its selected visual tone, hierarchy, density, and component priorities unless the user asks for a new direction
+- normalize approximate image details to a durable token scale rather than copying false precision
+- keep one-off page flourishes page-local unless they recur as durable brand language
+
+If existing brand references are present:
+- preserve recognizable palette, type personality, imagery style, layout density, control language, and content hierarchy unless the user asks for a redesign
+- do not generate, redraw, simplify, or reinterpret supplied logos, wordmarks, brand marks, icons, photography, or product screenshots
+- improve accessibility, token consistency, responsive behavior, and component normalization without changing brand personality
+- record any unresolved mismatch between references before approving the board
 
 ## Implementation rules
 

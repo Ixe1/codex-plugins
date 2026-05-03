@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Ixe1/codex-plugins/master/plugins/maquette/shared/direction-inventory.schema.json",
+  "title": "Maquette Direction Inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "selected_concept",
+    "visual_direction",
+    "page_archetype",
+    "hierarchy",
+    "component_families",
+    "asset_manifest_seed",
+    "normalization_notes"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "created_at",
+        "source_mode"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "approved",
+            "provisional",
+            "superseded"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source_mode": {
+          "type": "string",
+          "enum": [
+            "greenfield-page-seeded",
+            "one-shot-fast",
+            "design-system"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "selected_concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "approval_status"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approval_status": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "provisional",
+            "rejected"
+          ]
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "selected_reason": {
+          "type": "string"
+        },
+        "rejected_alternative_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "visual_direction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "page_archetype": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hierarchy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary",
+        "secondary",
+        "tertiary"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string"
+        },
+        "secondary": {
+          "type": "string"
+        },
+        "tertiary": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "color_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "type_character": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "layout_observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "component_families": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "priority",
+          "source_region"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "critical-path",
+              "recommended",
+              "future"
+            ]
+          },
+          "source_region": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "asset_manifest_seed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "kind",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "available",
+              "generated",
+              "css-rendered",
+              "svg-icon",
+              "placeholder",
+              "needs-user-asset"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "available",
+              "blocked",
+              "optional"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responsive_implications": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "accessibility_risks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "page_local_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    },
+    "normalization_notes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    }
+  },
+  "$defs": {
+    "note": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

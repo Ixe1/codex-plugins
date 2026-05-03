@@ -32,5 +32,7 @@ Constraints:
 
 Reference rules:
 - if an approved board is visible, preserve its palette, typography personality, spacing rhythm, radius style, and control language unless the user explicitly asked to change them
+- if an approved greenfield direction concept is visible, preserve its visual tone, hierarchy, density, and component priorities while normalizing them into reusable brand-system rules
+- if existing website screenshots, code references, or supplied brand assets are visible, preserve recognizable brand language and normalize it into reusable rules; do not redesign, redraw, or invent replacements for supplied assets
 - if inspiration images are visible, borrow mood and hierarchy only; do not copy trademarks or logos
 - if a local reference image is relevant, it should first be loaded into the conversation with view_image, then edit the visible image rather than starting from scratch

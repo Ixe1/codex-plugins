@@ -55,8 +55,18 @@ try {
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
+const componentContractSchemaPath = path.join(schemaRoot, "component-contract.schema.json");
+const validateComponentContract = fs.existsSync(componentContractSchemaPath)
+  ? ajv.compile(JSON.parse(fs.readFileSync(componentContractSchemaPath, "utf8")))
+  : null;
 
 const checks = [
+  {
+    name: "direction-inventory",
+    schemaPath: path.join(schemaRoot, "direction-inventory.schema.json"),
+    dataPath: path.join(projectRoot, ".maquette/direction/direction-inventory.json"),
+    optional: true,
+  },
   {
     name: "design-system",
     schemaPath: path.join(schemaRoot, "design-system.schema.json"),
@@ -117,8 +127,28 @@ function collectComponentArtifactPaths(componentCatalog) {
   return paths.filter(Boolean);
 }
 
+function collectComponentContractPaths(componentCatalog) {
+  const assets = componentCatalog.assets ?? {};
+  const paths = [...asArray(assets.component_contract_paths)];
+  for (const batch of asArray(assets.sheet_implementation_batches)) {
+    paths.push(batch.contract_path);
+  }
+  return [...new Set(paths.filter((item) => typeof item === "string" && item.endsWith(".json")))];
+}
+
 const results = checks.map((check) => {
   if (!fs.existsSync(check.dataPath)) {
+    if (check.optional) {
+      return {
+        name: check.name,
+        schemaPath: check.schemaPath,
+        dataPath: check.dataPath,
+        optional: true,
+        skipped: true,
+        pass: true,
+        errors: [],
+      };
+    }
     return {
       name: check.name,
       schemaPath: check.schemaPath,
@@ -145,7 +175,21 @@ const results = checks.map((check) => {
         params: { artifactPath: item.artifactPath },
       }))
     : [];
-  const pass = schemaPass && artifactErrors.length === 0;
+  const contractErrors = check.name === "component-catalog"
+    ? collectComponentContractPaths(data).flatMap((contractPath) => {
+      if (!validateComponentContract) return [];
+      const resolvedPath = resolveArtifactPath(projectRoot, contractPath);
+      if (!resolvedPath || !fs.existsSync(resolvedPath)) return [];
+      const contractData = JSON.parse(fs.readFileSync(resolvedPath, "utf8"));
+      if (validateComponentContract(contractData)) return [];
+      return (validateComponentContract.errors ?? []).map((error) => ({
+        ...error,
+        instancePath: `/assets/component_contract_paths${error.instancePath}`,
+        message: `${contractPath}: ${error.message}`,
+      }));
+    })
+    : [];
+  const pass = schemaPass && artifactErrors.length === 0 && contractErrors.length === 0;
   return {
     name: check.name,
     schemaPath: check.schemaPath,
@@ -154,6 +198,7 @@ const results = checks.map((check) => {
     errors: [
       ...(validate.errors ?? []),
       ...artifactErrors,
+      ...contractErrors,
     ],
   };
 });

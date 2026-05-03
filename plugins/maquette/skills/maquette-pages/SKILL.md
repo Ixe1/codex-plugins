@@ -12,17 +12,19 @@ Write all Maquette-owned page artifacts under `.maquette/pages/<page-name>/` in 
 Use this skill after the component library exists.
 
 Preferred inputs:
+- `.maquette/direction/direction-inventory.json` when the project started in Greenfield Website Mode
 - `.maquette/brand/design-system.json`
 - `.maquette/components/component-catalog.json`
 - approved brand-board image
-- approved CSS-contract poster image or images, or approved visual component-sheet images when that fallback path was used
+- structured component contract paths and deterministic posters when rendered
+- approved visual component-sheet images when creative clarification was used
 
 Hard gate:
 - If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
-- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or a generated and inspected component sheet/CSS-contract poster image is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
+- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or structured component contract evidence is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
 - If the component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Run or request `maquette-components` to complete reusable component coverage first.
 - If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
-- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused sheet or CSS-contract poster. Do not silently invent significant new component language inside the page phase.
+- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused structured contract and visual sheet when useful. Do not silently invent significant new component language inside the page phase.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
 - In a one-shot unattended `maquette` workflow where the user explicitly asked not to pause, earlier phases may be marked provisional, but they still must exist before this phase starts. Otherwise, generated brand-board and page-concept approval gates still require explicit user decisions.
 
@@ -34,7 +36,7 @@ Do not skip directly to code-only page design unless the user explicitly asks yo
 The page concept image is the creative design artifact for the page and should guide layout, hierarchy, density, and style.
 
 Use image generation to:
-- create a new page concept from the approved brand board and component sheet, sheets, or CSS-contract-backed component references, or
+- create a new page concept from the approved brand board, component catalog, structured component contracts, and visual sheets when present, or
 - edit an existing concept image to refine the page while preserving the approved visual language
 
 If editing a local reference image, first make it visible in the conversation with `view_image`, then ask `image_gen` to edit the visible image.
@@ -77,6 +79,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
 ## Workflow
 
 1. Read the approved design system and component catalog.
+   - If `.maquette/direction/direction-inventory.json` exists, read it as directional context only. The design-system tokens and component catalog remain the implementation source of truth.
 2. Check component coverage before page concept work.
    - Reuse existing components first.
    - Use component catalog APIs, slots, variants, states, and usage examples from the componentized reference. Do not copy the `replica-gallery.html` page layout into the page.
@@ -124,8 +127,9 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Primary mobile navigation must not require horizontal page scrolling. Horizontal scrolling may only be accepted for explicit dense data components, not primary nav.
    - Opened mobile/tablet drawers must remain scrollable when content exceeds viewport height; prefer `overflow-y: auto` and `overscroll-behavior: contain` on the drawer or drawer body while any body scroll lock is active.
    - Close controls and links must remain reachable in the opened drawer at mobile and tablet heights.
-11. Update the page blueprint to document composition, concept-region inventory path, page layout contract path, asset manifest path, and any new composites.
-12. Capture screenshots when possible and compare them to the concept and approved references.
+11. Before implementing the full page, build and screenshot-review a thin slice when browser tooling is available: header plus hero plus one representative card, form, data, or content section. Fix major token, typography, spacing, component, or responsive mismatches before continuing to the rest of the page. If this step is skipped, record why in `review.md`.
+12. Update the page blueprint to document composition, concept-region inventory path, page layout contract path, asset manifest path, thin-slice status, and any new composites.
+13. Capture screenshots when possible and compare them to the concept and approved references.
    - Use Maquette's bundled scripts where possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/sharpen-reference-image.mjs`, `shared/scripts/capture-browser.mjs`, or `skills/maquette-pages/scripts/capture-page.mjs`.
    - Check optional project-local QA dependencies before reporting automated screenshot QA as unavailable. Do not assume global npm installs are available.
    - When raster page concepts or component references are soft or compressed enough that detailed visual transcription would benefit from sharpening, check `ensure-qa-tooling.mjs --project . --check-image-prep`. If `sharp` is available, create a separate same-size `*-sharpened.png` reference with `sharpen-reference-image.mjs`; keep the original image as ground truth and do not overwrite, upscale, or resize it.
@@ -138,7 +142,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If cleanup fails, record the failed cleanup command or operation in the final response.
    - Capture desktop, tablet, and mobile page screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
    - If screenshot capture falls back to a clipped full-document image, record the capture metadata and clipped fallback status in `review.md`.
-13. Run the required page QA pass:
+14. Run the required page QA pass:
    - Verify the page concept region inventory against the rendered page. Missing concept regions fail QA unless the inventory records an intentional omission with a concrete reason.
    - Verify the page layout contract against the rendered page. Fail and fix when the implementation violates recorded section order, section density, image crop behavior, footer structure, or terminal-section compactness without a documented reason.
    - Verify the generated asset manifest. Every referenced local raster asset must exist, every generated asset requested by the user must be present or explicitly documented as not generated, and unused generated assets should be noted.
@@ -175,7 +179,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Prefer bundled Maquette scripts over generated run-local `.mjs` scripts for capture and responsive auditing. If a fallback script is generated, list it in `review.md` with the reason.
    - For each major section, write concept-to-code comparison notes in `review.md`: `matches`, `deviates`, `missing`, `simplified`, or `fixed`.
    - If a footer, header, terminal section, image asset, or any other visible concept region is simplified from the concept, either fix it or record the intentional reason and recommended follow-up in `review.md`.
-14. Record generated asset manifest status and missing assets, page concept approval decision, page concept region inventory, page layout contract status, component sheet/CSS-contract poster vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
+15. Record generated asset manifest status and missing assets, page concept approval decision, page concept region inventory, page layout contract status, thin-slice review status, structured contract or visual sheet vs replica fidelity notes, reusable component usage notes, card anatomy alignment, footer fidelity, terminal-section compactness, media container fit/crop results, mobile drawer scrollability, measured responsive overflow results, screenshot paths, open nav screenshot paths, visual deviations and fixes, accepted scroll exceptions, navigation accessibility notes, icon-rendering notes, and chosen font family/fallback rationale in `review.md`.
 
 ## Low-resolution reference rule
 

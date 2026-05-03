@@ -13,8 +13,16 @@
       "path": "brand/brand-board-v1.png"
     },
     {
-      "kind": "component-sheet",
-      "path": "components/component-sheet-v1.png"
+      "kind": "direction-inventory",
+      "path": "direction/direction-inventory.json"
+    },
+    {
+      "kind": "component-contract",
+      "path": "components/contracts/core-primitives.contract.json"
+    },
+    {
+      "kind": "component-contract-poster",
+      "path": "components/contracts/core-primitives.contract.svg"
     },
     {
       "kind": "page-layout-contract",
@@ -117,7 +125,7 @@
     "concept_region_inventory": "Every visible concept region is listed in concept-region-inventory.md with implementation status and reasons for any deviation.",
     "page_layout_contract": "Section density, terminal regions, and media fit/crop behavior are recorded before coding and checked against screenshots.",
     "asset_manifest": "Every required raster asset is listed in asset-manifest.json and every referenced local path is verified before final review.",
-    "component_sheet_gallery_fidelity": "Page uses component implementations that were reviewed against the generated component sheet rather than simplified selector demos.",
+    "component_contract_gallery_fidelity": "Page uses component implementations that were reviewed against structured component contracts and screenshots rather than simplified selector demos.",
     "repeated_card_alignment": "Repeated cards use shared media/header/body/footer/action anatomy, equal-height rows, stable badge placement, and bottom-pinned action regions when they appear in multi-column grids.",
     "footer_fidelity": "Footer regions are compared against the concept for links, social icons, legal rows, app/device modules, and bottom strips when shown.",
     "mobile_drawer_scrollability": "Opened mobile and tablet drawers remain scrollable when content exceeds viewport height and controls remain reachable.",
