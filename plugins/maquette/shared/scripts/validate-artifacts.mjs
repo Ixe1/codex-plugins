@@ -76,6 +76,7 @@ const checks = [
     name: "component-catalog",
     schemaPath: path.join(schemaRoot, "component-catalog.schema.json"),
     dataPath: path.join(projectRoot, ".maquette/components/component-catalog.json"),
+    optional: true,
   },
 ];
 
@@ -181,6 +182,7 @@ function collectPageAssetManifestArtifactPaths(manifest) {
   const paths = [
     review.asset_consistency_path,
     ...asArray(manifest.assets).map((asset) => asset.path),
+    ...asArray(manifest.assets).map((asset) => asset.concept_reference_path),
   ];
   return paths.filter(Boolean);
 }
@@ -188,6 +190,7 @@ function collectPageAssetManifestArtifactPaths(manifest) {
 function collectPageBlueprintArtifactPaths(blueprint) {
   const assets = blueprint.assets ?? {};
   const paths = [
+    ...asArray(blueprint.references).map((reference) => reference.path),
     assets.concept_path,
     assets.html_path,
     assets.css_path,

@@ -7,7 +7,7 @@ Maquette is a Codex plugin by **Ixel** for image-guided website design-system wo
 It is intentionally **image-guided**:
 - `image_gen` is the creative design engine
 - the main workflow is the design owner, orchestrator, approval gate, and final reviewer
-- subagents/workers produce bounded candidates for images, focused component proofs, page slices, or independent QA
+- subagents/workers produce bounded candidates for images, optional focused component proofs, page sections, or independent QA
 - the coding model implements the approved visual contract and refines after screenshot review
 - screenshots of coded output are used for visual comparison and refinement
 
@@ -20,11 +20,11 @@ The default greenfield workflow is therefore:
 6. **Generate a page concept** from the approved brand canon
 7. **Create a visual implementation contract** from the approved page concept
 8. **Generate identity/product assets first**, write asset consistency notes, then generate dependent images in staged parallel waves
-9. **Build a thin browser slice** using the brand canon and accepted assets before the full page
-10. **Create just-in-time component contracts and browser proofs** only for regions required by the approved concept
-11. **Compare implementation against the concept region by region** and iterate before approval
+9. **Implement the page section by section** from the approved concept and accepted assets
+10. **Compare implementation against the concept region by region** and repair visible drift before approval
+11. **Backfill component candidates only when useful** after the page matches
 
-The components phase now defaults to structured contracts plus browser proofs. Maquette writes focused `.maquette/components/contracts/<batch>.contract.json` files, optionally renders deterministic `.contract.svg` posters from those JSON contracts for review, implements browser-rendered component proofs with reusable HTML/CSS/JS, and uses screenshots as the visual correction target. In page-first workflows, these focused component contracts are derived from approved page concept regions. Visual component sheets are no longer part of the default workflow; they are explicit-request presentation artifacts only.
+The first-page workflow now defaults to direct page-section fidelity rather than a separate component proof phase. Maquette should create structured component contracts and browser proofs before the first page only for explicit Design System Mode, immediate multi-page reuse, or complex reusable interactions such as data grids, editors, timelines, calendars, maps, or app shells. Visual component sheets are explicit-request presentation artifacts only.
 
 When subagent tooling is available, Maquette uses image-worker subagents automatically. It does not ask whether to use them. For multiple independent images, Maquette should spawn one worker per image asset or tightly related independent batch and run those workers in parallel waves. The main workflow then inspects every returned image path with `view_image`, accepts/rejects/retries assets, and updates manifests before coding. For pages with identity, packaging, product labels, signage, or visible brand text, Maquette stages asset generation: identity/product references first, asset consistency notes next, then dependent scene images.
 
@@ -39,7 +39,7 @@ This plugin includes a root workflow skill plus focused phase skills:
 
 Maquette helps Codex turn an approved visual direction into reusable website artifacts:
 - brand kits with design-system JSON, CSS tokens, brand primitive CSS, and browser brand proofs
-- just-in-time component contracts with reusable HTML/CSS/JS and reference QA
+- page-local section implementations with optional component backfill
 - implemented pages with visual implementation contracts, asset consistency checks, screenshot review, and responsive review notes
 
 Install the marketplace, restart Codex, then invoke the full workflow with `@Maquette` or `$maquette`:
@@ -59,9 +59,9 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for notable Maquette workflow, prompt, and 
 ## Core rule
 
 Maquette chooses a workflow mode before generating artifacts:
-- **Greenfield Website Mode** for new websites/brands: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> visual implementation contract -> staged assets -> thin slice -> just-in-time components -> page -> fidelity review -> system backfill
-- **Existing Brand Mode** for existing identities: reference inventory -> brand kit -> executable brand canon -> page concept or requested page -> visual implementation contract -> just-in-time components/pages
-- **One-Shot Fast Mode** only when explicitly requested: direction concept -> compact brand canon -> page concept -> visual implementation contract -> staged assets -> thin slice -> page -> summary
+- **Greenfield Website Mode** for new websites/brands: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> visual implementation contract -> section/detail references when needed -> staged assets -> section-by-section page -> fidelity repair -> optional component backfill
+- **Existing Brand Mode** for existing identities: reference inventory -> brand kit -> executable brand canon -> page concept or requested page -> visual implementation contract -> section-by-section page -> optional component backfill
+- **One-Shot Fast Mode** only when explicitly requested: direction concept -> compact brand canon -> page concept -> visual implementation contract -> staged assets -> section-by-section page -> summary
 - **Design System Mode** when the user wants broader reusable coverage before pages: brand/page direction -> full brand canon -> scoped component contracts -> browser component proofs -> component catalog -> pages
 
 If the `image_gen` tool is available in the environment, it is **not optional** for creative visual artifacts in the normal happy-path workflow.
@@ -70,8 +70,8 @@ Each creative phase must use it as follows unless the user explicitly asks to sk
 - direction phase -> for greenfield websites, create concrete page direction concepts before the brand board exists
 - brand-kit phase -> create or edit a focused foundational 1:1 **brand board image** with no logo, wordmark, brand mark, large product-name treatment, or detailed component inventory; record explicit typography recommendations and fallback strategy
 - brand-canon phase -> create browser-rendered brand primitive CSS and `brand-proof.html` before components or pages can reinterpret the board
-- components phase -> do not create visual component sheets by default; structured component contracts and browser proofs are the default source of truth
-- pages phase -> create or edit a **page concept image**, then write a visual implementation contract and page layout contract before implementation
+- components phase -> run only when reusable component work is explicitly in scope; visual component sheets are still explicit-request only
+- pages phase -> create or edit a **page concept image**, then write a visual implementation contract and page layout contract before section-by-section implementation
 
 After every generated or edited image, inspect the actual result with `view_image` before using it as the basis for tokens, component specs, page blueprints, or code. Do not continue from the prompt alone.
 Direction-concept, brand-board, and page-concept images are explicit user approval gates. After Maquette generates and inspects one, it should ask whether to use it or make a new one before deriving direction inventories, tokens, page blueprints, layout contracts, assets, or code. The approval buttons should not include a separate revise choice, though free-form revision notes may still be handled if the user provides them. Structured component contracts and deterministic posters remain internal implementation artifacts unless the user explicitly asks to approve each one.
@@ -80,8 +80,8 @@ Generated boards and explicit-request visual sheets should be readable at normal
 Sites with primary navigation should define responsive navigation before page implementation: desktop inline nav, tablet/mobile menu toggle, expanded panel or drawer, accessible states, and no document-level horizontal scrolling for nav.
 Repeated card grids should define equal-height cards and bottom-pinned action rows before page implementation. Footer social links should use recognizable social icons, and page typography should follow the approved font strategy rather than crude defaults such as `Impact`.
 Maquette-authored logo, wordmark, monogram, mascot, emblem, lockup, and brand-mark assets must never be code-generated SVG. They must be supplied assets or generated raster image assets. Generic UI icons and non-identity ornaments may be SVG.
-Component implementation includes hard gates per artifact: first make the optional QA tooling decision, then create one focused structured component contract by default, optionally render a deterministic poster, render an artifact-specific browser proof/reference using reusable CSS/JS and the brand canon, write batch artifacts, and only then move to the next artifact. Every contract must use a strict selector allowlist.
-Page implementation includes a fidelity gate: inventory visible concept regions, write a visual implementation contract and page layout contract for section compactness, image fit/crop behavior, terminal regions, and responsive structure, create an asset manifest plus asset consistency notes for required raster assets, then document section-by-section screenshot comparison notes before approval. Final review should not mark a page approved while major concept deviations, missing regions, silent simplifications, or inconsistent generated assets remain.
+Component implementation is no longer part of the ordinary first-page path. When reusable component work is explicitly in scope, it still has hard gates per artifact: first make the optional QA tooling decision, then create one focused structured component contract, optionally render a deterministic poster, render an artifact-specific browser proof/reference using reusable CSS/JS and the brand canon, write batch artifacts, and only then move to the next artifact. Every contract must use a strict selector allowlist.
+Page implementation includes a fidelity gate: inventory visible concept regions, write a visual implementation contract and page layout contract for section compactness, image fit/crop behavior, terminal regions, and responsive structure, create an asset manifest plus asset consistency notes for required raster assets, implement in sections, then document section-by-section screenshot comparison notes before approval. Final review should not mark a page approved while major concept deviations, strict-region minor deviations, missing regions, silent simplifications, or inconsistent generated assets remain.
 
 ## Output philosophy
 
@@ -90,13 +90,14 @@ The direction inventory is the structured bridge from exploratory image to reusa
 The brand reference inventory is the preservation contract for existing websites, screenshots, code, and supplied brand assets.
 The brand board is the 1:1 visual-system contract.
 The executable brand canon is the browser bridge from board to code: `design-system.json`, `tokens.css`, `brand-primitives.css`, `brand-proof.html`, and `brand-proof-review.md`.
-The structured component contract is the default source for selectors, states, slots, dimensions, accessibility hooks, and token intent.
+The structured component contract is the source for selectors, states, slots, dimensions, accessibility hooks, and token intent when component work is explicitly in scope.
 The deterministic contract poster is a review aid rendered from structured JSON, not implementation truth.
 An explicit visual component sheet is an optional presentation artifact only when requested.
-The reusable component library is the CSS/JS/catalog API proven by browser component proofs and consumed by pages.
+The reusable component library is optional backfill in page-first workflows, or the main deliverable in Design System Mode.
 The approved page concept is the visual implementation target for page composition, density, section anatomy, and terminal regions.
 The visual implementation contract records which concept regions are strict, adaptive, or intentional deviations before code exists.
 Asset consistency notes lock approved identity/product text and reference assets before dependent image-worker waves.
+Asset consistency also covers section role: correct text is not enough if a product card, hero, story image, or footer/app asset has the wrong crop, scale, background treatment, or composition.
 The structured JSON/CSS files are the machine-readable source of truth.
 The coded reference/page screenshots are the verification artifacts.
 Token scripts are serializers, not design authorities: `tokens.css` should be exported from the inspected-board-derived `design-system.json`, not extracted from or overridden by a predetermined design file unless the user explicitly approves that file as a constraint.
@@ -120,7 +121,7 @@ For a new project or broad page request, invoke Maquette directly:
 @Maquette Make a homepage for "Northstar Metrics", a lightweight analytics product. Include a metrics overview, recent activity, and a clear signup path.
 ```
 
-If no approved brand exists, Maquette should create or select a concrete page direction first, write the direction inventory, create the constrained brand kit, build the executable brand canon, generate the page concept, write the visual implementation contract and layout contract, create the asset manifest, stage identity/product assets before dependent images, build a thin slice, then add just-in-time component contracts/proofs for page-critical regions. Existing websites, screenshots, and code can inform the brand kit, but they do not replace the generated brand board or brand proof.
+If no approved brand exists, Maquette should create or select a concrete page direction first, write the direction inventory, create the constrained brand kit, build the executable brand canon, generate the page concept, write the visual implementation contract and layout contract, create the asset manifest, stage identity/product assets before dependent images, then implement the page section by section with screenshot comparison and repair. Existing websites, screenshots, and code can inform the brand kit, but they do not replace the generated brand board or brand proof.
 
 For existing websites or brands, Maquette should not run greenfield direction exploration unless the user asks for a redesign or new alternatives. It should first create `.maquette/brand/reference-inventory.md` to record preserved palette, type personality, imagery style, layout density, supplied assets, allowed evolution, do-not-change constraints, accessibility issues, and uncertainty. The generated brand board then normalizes that existing identity into tokens rather than inventing a new one.
 
@@ -166,13 +167,13 @@ After approval, Maquette should build and review the browser brand proof before 
 
 ### 3. Build components when needed
 
-After the brand canon exists, use `$maquette-components` when you explicitly want component work:
+After the brand canon exists, use `$maquette-components` when you explicitly want reusable component work:
 
 ```text
 $maquette-components Make the product-card and responsive navigation components.
 ```
 
-This pass creates a focused structured component contract first, optionally renders a deterministic poster from that contract, builds and reviews a browser component proof with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats only for needed data/composite/form/navigation/repeated-card/newsletter/footer-social artifacts.
+This pass is no longer required for ordinary single-page output. Use it for Design System Mode, immediate multi-page reuse, or complex reusable interactions. It creates a focused structured component contract first, optionally renders a deterministic poster from that contract, builds and reviews a browser component proof with reusable classes, states, slots, and usage examples, writes batch artifacts, then repeats only for needed data/composite/form/navigation/repeated-card/newsletter/footer-social artifacts.
 Every default component contract is focused by selector allowlist. Visual component sheets are generated only when explicitly requested. Each batch should create concrete category-prefixed evidence directly under `.maquette/components/`, including `contracts/<batch-slug>.contract.json`, an optional `contracts/<batch-slug>.contract.svg`, `<batch-slug>.replica.html`, `css/<batch-slug>.components.css`, `js/<batch-slug>.components.js` when needed, `<batch-slug>.component-catalog.json`, and `<batch-slug>.review.md`. The final `replica-gallery.html` is the componentized reference, linked to the brand canon plus `css/components.css` and `js/components.js`.
 Each batch must complete screenshot review or documented manual visual review against its structured contract and brand proof before Maquette creates the next component artifact.
 
@@ -190,7 +191,7 @@ You can also give a more detailed page brief:
 $maquette-pages Make a homepage with a proof-led hero, services section, client logos, founder note, pricing preview, and consultation CTA.
 ```
 
-This pass creates a page concept image, writes a visual implementation contract and page layout contract for section density, media crops, terminal sections, and responsive behavior, creates an asset manifest, stages identity/product assets before dependent image-worker waves, builds a thin slice, implements just-in-time component proofs when needed, implements the page with the approved brand canon, captures screenshots when possible, and records region-level review notes.
+This pass creates a page concept image, writes a visual implementation contract and page layout contract for section density, media crops, terminal sections, and responsive behavior, creates an asset manifest, stages identity/product assets before dependent image-worker waves, implements the page with the approved brand canon section by section, captures screenshots when possible, fixes visible concept drift, and records region-level review notes.
 Maquette should ask for approval immediately after viewing the page concept, before writing the blueprint, inventory, visual implementation contract, layout contract, asset manifest, or page code.
 
 ## Invocation
@@ -201,7 +202,7 @@ You can invoke Maquette explicitly by naming the plugin or one of its bundled sk
 @Maquette make a homepage for a new SaaS product.
 $maquette-direction explore homepage directions for a new SaaS product.
 $maquette-brand-kit create a brand kit for an AI note-taking app.
-$maquette-components build page-critical components from the approved brand canon.
+$maquette-components build reusable components from the approved brand canon.
 $maquette-pages make a pricing page.
 ```
 

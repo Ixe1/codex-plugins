@@ -28,4 +28,4 @@ Handoff requirements:
 - make accessibility risks visible where possible, especially contrast, small text, tap targets, and complex imagery behind text
 - make asset and implementation feasibility clear enough for a later direction inventory
 
-Do not create final production page code from this image. The selected concept will be normalized into a brand board, design-system tokens, critical component contracts, and then a final page implementation.
+Do not create final production page code from this image. The selected concept will be normalized into a brand board, design-system tokens, an approved page concept, section-level fidelity contracts, and then a final page implementation. Component contracts are optional backfill unless the user asks for a reusable design system or complex reusable interactions.

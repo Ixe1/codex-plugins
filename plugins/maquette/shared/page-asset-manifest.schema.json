@@ -211,6 +211,26 @@
               "not-applicable"
             ]
           },
+          "section_role": {
+            "type": "string"
+          },
+          "concept_reference_path": {
+            "type": "string"
+          },
+          "crop_intent": {
+            "type": "string"
+          },
+          "section_role_status": {
+            "type": "string",
+            "enum": [
+              "unchecked",
+              "matches",
+              "minor-deviation",
+              "deviates",
+              "accepted-exception",
+              "not-applicable"
+            ]
+          },
           "dimensions": {
             "type": "object",
             "additionalProperties": false,

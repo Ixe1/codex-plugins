@@ -1,9 +1,9 @@
 ---
 name: maquette-components
-description: "Build reusable website components from an approved brand canon and, in page-first workflows, from approved page concept regions. This skill is contract-first: create structured component contracts and browser proofs by default, with visual sheets only when explicitly requested."
+description: "Build reusable website components from an approved brand canon when the user requests a design system, multi-page reuse, or complex reusable interactions. Page-first Maquette runs should usually implement the first page directly and backfill components after the page matches."
 ---
 
-You are responsible for the **website component-library phase**.
+You are responsible for the **website component-library phase**. This phase is not part of the ordinary first-page path unless the user explicitly requested reusable component work, Design System Mode, immediate multi-page reuse, or a complex reusable interaction.
 
 Write all Maquette-owned component artifacts under `.maquette/components/` in the current project. Do not create or overwrite root-level website files such as `index.html`.
 
@@ -24,6 +24,8 @@ Require user approval of the generated and inspected brand board before expandin
 
 ## Component contract policy
 
+In page-first Maquette workflows, do not invoke this skill merely because a page has normal reusable-looking sections such as a header, product cards, newsletter strip, rich footer, promo band, or story band. Those should be implemented page-locally from the approved concept and brand canon, then listed as future component candidates after the page passes fidelity review.
+
 The default component workflow is structured-contract first. The coding model owns token names, CSS values, selectors, states, breakpoints, accessibility hooks, and component APIs. Do not rely on image-generated text as the source of CSS truth.
 
 Default contract workflow:
@@ -40,9 +42,9 @@ Use `image_gen` in this phase only when the user explicitly asks for visual comp
 
 If a visual component sheet and structured contract conflict, the approved brand canon and structured contract win for implementation details. The visual sheet can inform presentation notes; it does not override design-system JSON, token CSS, brand primitive CSS, accessibility requirements, or component APIs.
 
-When a page or site has global navigation, responsive navigation primitives are required component coverage, not a page-only afterthought.
+When Design System Mode or immediate multi-page reuse is in scope, global navigation should have reusable responsive primitives. In ordinary page-first runs, verify responsive navigation directly on the page first, then backfill reusable nav guidance only after the page matches.
 
-The structured component contract is the default source of truth for selectors, states, sizing, spacing, token intent, accessibility hooks, and component anatomy. If it conflicts with the brand canon, the brand canon wins for primitive color, typography, spacing, radius, shadow, surface, and state language unless the design-system JSON and brand proof are intentionally updated first. Record any inconsistency and resolution in `.maquette/components/approved.md`.
+When this component phase is explicitly in scope, the structured component contract is the source of truth for selectors, states, sizing, spacing, token intent, accessibility hooks, and component anatomy. If it conflicts with the brand canon, the brand canon wins for primitive color, typography, spacing, radius, shadow, surface, and state language unless the design-system JSON and brand proof are intentionally updated first. Record any inconsistency and resolution in `.maquette/components/approved.md`.
 
 The deterministic poster is not a creative visual design target. Use it to review contract readability and selector coverage, then rely on rendered browser screenshots and the component fidelity rubric to correct visual quality. If the structured contract is generic or too broad, tighten the selector allowlist or split the family before implementation. Do not generate a visual component sheet unless the user explicitly asks for one.
 
@@ -109,6 +111,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - If the user declines or the install is not possible, continue with manual review and record the missing tooling in `.maquette/components/approved.md`.
    - Do not postpone this decision until after component implementation.
 3. Determine the ordered contract batches needed for the product before creating contracts or visual sheets.
+   - Stop here and return to page implementation if the current task is only an ordinary first page and the needed regions can be implemented page-locally without a reusable contract.
    - Use this order: core primitives, navigation/layout, data/display, cards/composites, then any focused follow-up sheets.
    - Core primitives is always first.
    - Add navigation/layout when global navigation exists or is likely.

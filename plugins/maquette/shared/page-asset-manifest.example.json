@@ -57,6 +57,10 @@
         "Example"
       ],
       "consistency_status": "consistent",
+      "section_role": "hero",
+      "concept_reference_path": "pages/homepage/concept.png",
+      "crop_intent": "Match the approved hero crop and product scale.",
+      "section_role_status": "matches",
       "alt_text": "Product arranged in the approved hero composition."
     },
     {
@@ -82,6 +86,10 @@
         "Example"
       ],
       "consistency_status": "consistent",
+      "section_role": "product-card",
+      "concept_reference_path": "pages/homepage/section-flavors-concept.png",
+      "crop_intent": "Card media should match the concept's product scale and background treatment without blank side bands.",
+      "section_role_status": "matches",
       "alt_text": "Primary product package."
     },
     {
@@ -98,7 +106,7 @@
     "missing_assets": [],
     "asset_consistency_path": "pages/homepage/asset-consistency.md",
     "inconsistent_assets": [],
-    "consistency_notes": "Generated assets were checked against approved brand/product text and reference assets before use.",
+    "consistency_notes": "Generated assets were checked against approved brand/product text, reference assets, and section-role crop/composition before use.",
     "notes": "Every asset referenced by page HTML/CSS/review exists locally."
   }
 }

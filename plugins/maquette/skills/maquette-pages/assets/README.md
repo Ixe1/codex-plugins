@@ -1,4 +1,4 @@
-Use `shared/page-blueprint.schema.json` together with the approved design system and component catalog.
+Use `shared/page-blueprint.schema.json` together with the approved design system. A component catalog is optional in page-first workflows and should be consumed only when reusable component work is explicitly in scope or already helps match the approved page concept.
 
 Before page implementation, also create:
 

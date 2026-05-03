@@ -4,8 +4,8 @@
     "page_type": "marketing-homepage",
     "version": "1.0.0",
     "status": "draft",
-    "based_on_component_catalog_version": "1.0.0",
-    "notes": "Example homepage blueprint built from the approved system."
+    "based_on_component_catalog_version": "none",
+    "notes": "Example homepage blueprint built from the approved brand system with page-local sections."
   },
   "references": [
     {
@@ -25,12 +25,9 @@
       "path": "direction/direction-inventory.json"
     },
     {
-      "kind": "component-contract",
-      "path": "components/contracts/core-primitives.contract.json"
-    },
-    {
-      "kind": "component-contract-poster",
-      "path": "components/contracts/core-primitives.contract.svg"
+      "kind": "section-detail-concept",
+      "path": "pages/homepage/section-flavors-concept.png",
+      "notes": "Only required when the full-page concept is too compressed to implement a section exactly."
     },
     {
       "kind": "visual-implementation-contract",
@@ -127,9 +124,9 @@
   ],
   "acceptance_criteria": [
     "Uses approved typography and semantic colors.",
-    "Reuses existing components before introducing new composites.",
+    "Uses page-local sections unless component contracts are justified by Design System Mode, multi-page reuse, or complex reusable interactions.",
     "Preserves the approved page concept's major composition, density, region order, and terminal-section anatomy unless an intentional deviation is recorded before coding.",
-    "Generated identity and product assets remain consistent with approved brand/product text and reference assets.",
+    "Generated identity and product assets remain consistent with approved brand/product text, reference assets, and section role/crop requirements.",
     "Follows the page layout contract for section compactness, terminal regions, and media fit/crop behavior.",
     "Remains readable and coherent across desktop, tablet, and mobile viewports.",
     "Primary navigation has accessible closed and open tablet/mobile states with no document-level horizontal overflow.",
@@ -145,8 +142,10 @@
     "page_layout_contract": "Section density, terminal regions, and media fit/crop behavior are recorded before coding and checked against screenshots.",
     "asset_consistency": "Identity/product assets are generated in staged waves and checked for approved brand names, product labels, and packaging consistency before dependent scenes are accepted.",
     "asset_manifest": "Every required raster asset is listed in asset-manifest.json and every referenced local path is verified before final review.",
-    "concept_fidelity_review": "Final review records each visible concept region as matches, minor deviation, major deviation, missing, simplified, blocked, intentional deviation, or fixed.",
-    "component_contract_gallery_fidelity": "Page uses component implementations that were reviewed against structured component contracts and screenshots rather than simplified selector demos.",
+    "concept_fidelity_review": "Final review records each visible concept region as matches, minor deviation, major deviation, missing, simplified, blocked, intentional deviation, or fixed; strict regions cannot finish as minor deviation without user-approved intent.",
+    "section_fidelity_review": "Major sections are screenshot-compared against the page concept or section/detail concept, with visible drift fixed before approval.",
+    "component_strategy": "Page-local sections by default; component contracts are used only for Design System Mode, multi-page reuse, or complex reusable interactions.",
+    "component_contract_gallery_fidelity": "Not required for ordinary first pages; when component contracts are in scope, page uses implementations reviewed against structured contracts and screenshots rather than simplified selector demos.",
     "repeated_card_alignment": "Repeated cards use shared media/header/body/footer/action anatomy, equal-height rows, stable badge placement, and bottom-pinned action regions when they appear in multi-column grids.",
     "footer_fidelity": "Footer regions are compared against the concept for links, social icons, legal rows, app/device modules, and bottom strips when shown.",
     "mobile_drawer_scrollability": "Opened mobile and tablet drawers remain scrollable when content exceeds viewport height and controls remain reachable.",

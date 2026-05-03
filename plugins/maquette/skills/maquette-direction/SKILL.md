@@ -1,6 +1,6 @@
 ---
 name: maquette-direction
-description: Create greenfield website direction concepts before a brand kit exists, then convert the selected direction into a structured inventory for downstream brand and component work.
+description: Create greenfield website direction concepts before a brand kit exists, then convert the selected direction into a structured inventory for downstream brand and page work.
 ---
 
 You are responsible for the **greenfield direction phase**.
@@ -69,4 +69,4 @@ When image-worker subagents are available, run direction concept generation or e
 
 After this phase, the brand-kit phase should generate a brand board constrained by the selected direction. The brand board must preserve the approved direction's visual intent while normalizing it into reusable palette, type, spacing, radius, surface, state, and accessibility rules.
 
-The component/page phases should use the direction inventory to choose page-critical component families for just-in-time contracts and browser proofs. Expand a broader component library only in explicit Design System Mode or as post-page backfill.
+The page phase should use the direction inventory to choose page structure, asset needs, responsive implications, and future component candidates. Create component contracts before the first page only in explicit Design System Mode, immediate multi-page reuse, or complex reusable interactions; otherwise backfill reusable component notes after the page matches.

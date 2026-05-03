@@ -13,16 +13,16 @@ All Maquette-owned outputs must live under `.maquette/` in the current project. 
 
 Choose the workflow mode before generating artifacts:
 
-- **Greenfield Website Mode**: use when the user asks for a new website, landing page, homepage, campaign page, product site, or new brand and no approved Maquette brand kit exists. Run: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> visual implementation contract -> staged identity/product assets -> page thin slice -> just-in-time components derived from the page concept -> page implementation -> independent fidelity review -> system backfill.
-- **Existing Brand Mode**: use when an approved brand kit, supplied brand system, existing site identity, or supplied brand assets should be preserved. Run: reference inventory -> brand kit -> executable brand canon -> page concept or requested page -> visual implementation contract -> just-in-time components/pages.
-- **One-Shot Fast Mode**: use only when the user explicitly asks for fast/unattended/minimal output. Run: direction concept -> compact brand canon -> page concept -> visual implementation contract -> staged assets -> thin slice -> page -> final system summary.
+- **Greenfield Website Mode**: use when the user asks for a new website, landing page, homepage, campaign page, product site, or new brand and no approved Maquette brand kit exists. Run: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> visual implementation contract -> section/detail references when needed -> staged identity/product assets -> section-by-section page implementation -> direct concept/screenshot fidelity repair -> optional component backfill.
+- **Existing Brand Mode**: use when an approved brand kit, supplied brand system, existing site identity, or supplied brand assets should be preserved. Run: reference inventory -> brand kit -> executable brand canon -> page concept or requested page -> visual implementation contract -> section-by-section page implementation -> optional component backfill.
+- **One-Shot Fast Mode**: use only when the user explicitly asks for fast/unattended/minimal output. Run: direction concept -> compact brand canon -> page concept -> visual implementation contract -> staged assets -> section-by-section page implementation -> final system summary.
 - **Design System Mode**: use when the user explicitly asks for a broader reusable design system before pages. Run: brand/page direction -> full brand canon -> scoped component contracts -> browser component proofs -> component catalog -> pages.
 
 For greenfield websites, do not start with an abstract brand board. First run the direction phase using `maquette-direction`, then use the selected direction as a seed for the brand kit. The first direction concept is not a final page design or implementation contract; it is a concrete context for hierarchy, visual tone, content density, component needs, and asset needs.
 
 Only proceed to implementation after the required artifacts for the selected workflow mode exist. Do not skip phase gates; change the phase order only through an explicit workflow mode.
 
-The default workflow is page-first after the executable brand canon. Do not build a broad component library before the first page unless the user explicitly asks for Design System Mode. Create the approved page concept and visual implementation contract first, then derive only the critical-path or just-in-time component contracts and browser proofs needed by that page. Backfill the component catalog after page proof.
+The default workflow is page-first after the executable brand canon. Do not build a broad component library, component proof, or contract poster before the first page unless the user explicitly asks for Design System Mode, a multi-page reusable system, or the page contains genuinely complex reusable interactions that would be risky to implement page-locally. Create the approved page concept and visual implementation contract first, then implement the page in faithful sections using page-local components and shared brand primitives. Backfill reusable component notes or a component catalog after the page proof.
 
 ## Orchestration model
 
@@ -33,11 +33,11 @@ Use subagents for:
 - direction concept generation
 - brand board generation
 - independent identity or raster asset generation
-- focused component contract/proof implementation
-- page thin-slice implementation when the write scope is narrow
+- focused component contract/proof implementation only when component work is explicitly in scope
+- independent section implementation only when the write scope is narrow and the main workflow has supplied the approved concept crop, visual contract, assets, and exact acceptance criteria
 - independent QA or concept-vs-screenshot review
 
-Do not let subagents approve visual artifacts, reinterpret the brand, loosen the page concept, invent alternate asset names, or mark final fidelity as passing. Subagent outputs are candidates until the main workflow inspects the files, compares them with the approved references, and records accept/reject status.
+Do not let subagents approve visual artifacts, reinterpret the brand, loosen the page concept, invent alternate asset names, accept "minor" strict-region drift, or mark final fidelity as passing. Subagent outputs are candidates until the main workflow inspects the files, compares them with the approved references, and records accept/reject status.
 
 Before component or page implementation, the optional QA tooling decision must be explicit when any planned automated QA path is blocked. Partial availability is not enough: if Playwright is available but `ajv` or `ajv-formats` is missing, ask for an install decision before replacing schema validation with manual JSON checks, unless the user already declined installation for the current run or installation is impossible. When Maquette reference artifacts are soft or compressed enough to benefit from same-size sharpening, check for project-local `sharp` with `shared/scripts/ensure-qa-tooling.mjs --check-image-prep`; if available, use `shared/scripts/sharpen-reference-image.mjs` to create separate `*-sharpened.png` references while preserving the raw images as ground truth. Do not use image prep to upscale or resize Maquette artifacts.
 
@@ -84,12 +84,12 @@ Before broad design-system page work, verify that these component artifacts exis
 - deterministic contract review posters when created, such as `.maquette/components/contracts/<batch-slug>.contract.svg`
 - generated and inspected visual component artifacts only when explicitly requested, such as `.maquette/components/component-sheet-vN.png`
 
-In the default page-first workflow, missing component coverage is not a reason to build a broad library first. Instead, run only the focused `maquette-components` batches needed for the current page, or let the page phase request just-in-time component contracts/proofs before implementing those regions. Multi-artifact component work should proceed sequentially: create one focused structured component contract, optionally render a deterministic poster, build and review its browser proof/reference, document reusable APIs, then move to the next needed artifact.
+In the default page-first workflow, missing component coverage is not a reason to build component artifacts before the first page. Implement ordinary page sections directly with page-local classes that import the brand canon. Use `maquette-components` before the first page only when the user requested Design System Mode, the same component API must serve multiple pages immediately, or the region is a genuinely complex reusable interaction such as dense data grids, editors, timelines, calendars, maps, or multi-state app shells. When component work is justified, keep it focused and sequential: create one structured contract, optionally render a deterministic poster, build and review its browser proof/reference, document reusable APIs, then move to the next needed artifact.
 If a multi-batch component catalog records `assets.sheet_implementation_batches`, verify each batch has concrete artifact paths for the structured contract, deterministic poster if created, visual sheet if used, batch replica/reference, batch component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review before proceeding to the page phase. Retrospective batch logs without concrete batch artifacts are not enough.
-If the requested page has a header, product grid, rich footer, newsletter, app/download module, or other reusable region, derive the needed component contracts from the approved page concept and visual implementation contract. Verify responsive navigation, repeated-card anatomy, footer/social details, and other reusable behavior before coding those regions, but do not create generic pre-concept component proofs that can reshape the page.
+If the requested page has a header, product grid, rich footer, newsletter, app/download module, or other repeated region, verify responsive navigation, repeated-card anatomy, footer/social details, and other reusable behavior directly in the page screenshots. Do not create generic pre-page component proofs for those ordinary regions. Derive component contracts from the approved page concept only when a reusable component pass is explicitly justified, and never let it reshape the page.
 Verify that the page phase will create a concept-region inventory, page layout contract, and asset manifest before coding. This applies even when the page has few raster assets, because the layout contract is the guardrail for section compactness, terminal-region fidelity, and media fit/crop behavior.
 
-Only after the brand canon exists should you run the page phase using `maquette-pages`. In Design System Mode, complete the broader component gate before page work. In default page-first mode, the page phase creates the page concept and visual implementation contract before requesting or producing focused component proofs.
+Only after the brand canon exists should you run the page phase using `maquette-pages`. In Design System Mode, complete the broader component gate before page work. In default page-first mode, the page phase creates the page concept and visual implementation contract before any optional component proof is requested.
 
 ## Existing website and brand references
 
@@ -124,6 +124,7 @@ Before accepting any component proof or final page, verify:
 - it preserves the approved color roles, typography hierarchy, button geometry, spacing rhythm, radius, shadow, and surface language
 - it avoids generic UI-kit, SaaS, or ecommerce defaults that are absent from the brand canon
 - it preserves the approved page concept's major composition, section order, density, product/card anatomy, hero model, newsletter/footer anatomy, and terminal-region visual weight unless an intentional deviation was approved before coding
+- every strict concept region is either `matches` or `fixed` in the final review; fixable `minor deviation` is not an acceptable final state for strict regions
 - it does not introduce unauthorized logo, wordmark, monogram, mascot, emblem, lockup, or brand-mark assets
 - it does not introduce unapproved alternate brand names, product line names, labels, signage, or packaging systems in generated raster assets
 - it does not contain uninspected generated images or final empty placeholders
@@ -140,14 +141,13 @@ If the user asks for a page and the project has no Maquette artifacts yet, compl
 4. Create the requested page concept.
 5. Create the concept-region inventory, visual implementation contract, page layout contract, and asset manifest.
 6. Generate identity/product assets first when needed, write asset consistency notes, then generate dependent images in staged parallel waves.
-7. Build and screenshot-review a thin slice using the brand canon and approved assets.
-8. Create just-in-time component contracts and browser proofs only for components the approved page concept actually needs.
-9. Complete the requested page.
-10. Run an independent concept-vs-screenshot fidelity review and fix major deviations before finalizing.
-11. Backfill final system notes with confirmed tokens, confirmed components, provisional components, page-local patterns, future component candidates, and known concept deviations.
+7. Implement the requested page section by section. After each major section or slice is screenshot-captured, compare it against the concept or section reference and fix visible drift before moving on when practical.
+8. Create component contracts/browser proofs only when explicitly justified by Design System Mode, immediate multi-page reuse, or complex reusable interactions. Otherwise keep repeated regions page-local and backfill future component candidates after final page proof.
+9. Run an independent concept-vs-screenshot fidelity review and fix every fixable strict-region deviation before finalizing.
+10. Backfill final system notes with confirmed tokens, page-local patterns, future component candidates, and any user-approved intentional deviations.
 
 Mark the outputs as proposed or provisional only for phases that do not require an image approval gate, or when the user explicitly requested an unattended run.
-Infer focused extra component/composite contracts when the page brief needs them; do not generate component sheets unless the user explicitly asks for visual sheets.
+Infer focused extra component/composite contracts only for Design System Mode, immediate multi-page reuse, or complex reusable interactions; do not generate component sheets unless the user explicitly asks for visual sheets.
 Infer responsive navigation coverage for page/site requests with global navigation; the user should not have to ask for mobile nav or overflow checks.
 Infer repeated-card and footer/social coverage for commerce, product-grid, pricing, service-list, newsletter, app/download, and footer-heavy pages; the user should not have to ask for card anatomy, action alignment, footer fidelity, or recognizable social icons.
 Infer page asset-manifest needs for pages with logos supplied by the user, hero images, product images, promo imagery, lifestyle/story imagery, footer/app/device images, background textures, or requested imagegen assets.

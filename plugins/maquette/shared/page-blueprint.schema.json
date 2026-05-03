@@ -72,6 +72,7 @@
               "visual-implementation-contract",
               "asset-consistency",
               "page-layout-contract",
+              "section-detail-concept",
               "page-concept",
               "other"
             ]
@@ -241,7 +242,13 @@
         "concept_fidelity_review": {
           "type": "string"
         },
+        "section_fidelity_review": {
+          "type": "string"
+        },
         "asset_manifest": {
+          "type": "string"
+        },
+        "component_strategy": {
           "type": "string"
         },
         "component_sheet_gallery_fidelity": {

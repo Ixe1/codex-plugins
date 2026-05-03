@@ -10,6 +10,20 @@ Entries before this changelog was introduced were backfilled from git history an
 
 No notable changes yet.
 
+## 0.7.0 - 2026-05-03
+
+### Changed
+
+- Changed the default page workflow to page-section fidelity first: implement and screenshot-review the approved concept section by section before final approval.
+- Changed component contracts/proofs to be optional in ordinary single-page Maquette runs; create them before the first page only for explicit Design System Mode, multi-page reuse, or genuinely complex reusable interactions.
+- Changed strict-region review so fixable `minor deviation` results are not accepted as final; strict regions must be fixed or recorded as user-approved intentional deviations.
+- Changed generated asset guidance so product-card, hero, and packaging imagery should use concept-matching standalone assets or image edits instead of accepting loose crops from a lineup image when the concept shows richer card scenes.
+
+### Fixed
+
+- Tightened final review language to prevent unattended runs from marking a page `approved` when visible concept drift remains in product cards, hero crops, footer/app modules, or other strict regions.
+- Reduced component-proof noise in page-first workflows by making page-local section implementation and post-page component backfill the default.
+
 ## 0.6.0 - 2026-05-03
 
 ### Added

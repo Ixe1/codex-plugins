@@ -8,8 +8,9 @@ Status: draft before implementation.
 - Brand board:
 - Visual implementation contract:
 - Asset consistency notes:
-- Component catalog:
-- Component contract or sheet references:
+- Existing component catalog, if consumed:
+- Optional component contract or sheet references:
+- Section/detail reference concepts:
 
 ## Global Layout
 
@@ -20,6 +21,7 @@ Status: draft before implementation.
 - Desktop breakpoint notes:
 - Tablet breakpoint notes:
 - Mobile breakpoint notes:
+- Component strategy: page-local sections by default; pre-page component contracts only for Design System Mode, immediate multi-page reuse, or complex reusable interactions.
 
 ## Section Contracts
 
@@ -72,6 +74,7 @@ Each region must include a fidelity target: `strict`, `adaptive`, or `intentiona
 - Every major media region must state its intended aspect ratio or min-height.
 - Images intended to fill a media container must use explicit sizing and `object-fit`.
 - Blank bands, letterboxing, or visible parent backgrounds around fitted media are deviations unless documented as intentional.
+- Product-card, hero, story, newsletter, and footer images must match the concept's section role. Do not accept a broad product-lineup crop as a substitute when it leaves blank bands, changes product scale, or loses the concept's background treatment.
 
 ## Deviations Accepted Before Coding
 
@@ -84,6 +87,7 @@ Do not use broad exceptions such as "assets may not match the concept." Identity
 ## Region Fidelity Review
 
 Fill this after screenshots are captured. Allowed statuses: `matches`, `minor deviation`, `major deviation`, `missing`, `simplified`, `blocked`, `intentional deviation`, `fixed`.
+Strict regions may not finish as `minor deviation` unless the user explicitly approves that difference as an intentional deviation.
 
 | Region | Expected fidelity | Screenshot evidence | Status | Fix or approved reason |
 | --- | --- | --- | --- | --- |
@@ -99,4 +103,4 @@ Fill this after screenshots are captured. Allowed statuses: `matches`, `minor de
 - Repeated cards have shared anatomy and aligned action rows.
 - Rich footer details are either implemented or explicitly recorded as intentional deviations.
 - Section density and compactness match the concept, or each adaptive difference is explicitly bounded.
-- Final review has no `major deviation`, `missing`, `simplified`, or `blocked` region unless the user explicitly accepted that outcome.
+- Final review has no `major deviation`, `missing`, `simplified`, `blocked`, or strict-region `minor deviation` unless the user explicitly accepted that outcome as an intentional deviation.
