@@ -1,6 +1,6 @@
 ---
 name: maquette-components
-description: "Build reusable website components from an approved brand canon. This skill is contract-first: create structured component contracts and browser proofs by default, with visual sheets only when explicitly requested."
+description: "Build reusable website components from an approved brand canon and, in page-first workflows, from approved page concept regions. This skill is contract-first: create structured component contracts and browser proofs by default, with visual sheets only when explicitly requested."
 ---
 
 You are responsible for the **website component-library phase**.
@@ -27,7 +27,7 @@ Require user approval of the generated and inspected brand board before expandin
 The default component workflow is structured-contract first. The coding model owns token names, CSS values, selectors, states, breakpoints, accessibility hooks, and component APIs. Do not rely on image-generated text as the source of CSS truth.
 
 Default contract workflow:
-- create one focused `.maquette/components/contracts/<batch-slug>.contract.json` from the approved brand board, design-system tokens, product brief, direction inventory when present, current component family, and strict selector allowlist
+- create one focused `.maquette/components/contracts/<batch-slug>.contract.json` from the approved brand board, design-system tokens, product brief, direction inventory when present, approved page concept region when present, visual implementation contract when present, current component family, and strict selector allowlist
 - validate the structured contract against `shared/component-contract.schema.json` when schema validation is available
 - optionally render a deterministic poster such as `.maquette/components/contracts/<batch-slug>.contract.svg` from that JSON using `shared/scripts/render-component-contract-poster.mjs`
 - inspect the deterministic poster only as a readability/review aid; the JSON contract remains authoritative
@@ -97,6 +97,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 1. Read `.maquette/brand/design-system.json` and `.maquette/brand/tokens.css`.
    - Read `.maquette/brand/brand-primitives.css`, `.maquette/brand/brand-proof.html`, and `.maquette/brand/brand-proof-review.md` before creating contracts.
    - Treat the brand proof as the browser-rendered authority for primitive styling. Contracts and component CSS must preserve its palette, typography hierarchy, button geometry, spacing, radius, shadow, surface, and state language.
+   - When `.maquette/pages/<page-name>/concept.png`, `concept-region-inventory.md`, or `visual-implementation-contract.md` exists for the current page, read those before contract planning and derive the focused contract from the specific page region it will serve.
 2. Run the optional QA tooling check before creating component contracts, visual component sheets, deterministic posters, or component code.
    - Use `shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --check-image-prep` when the script is available and generated raster references are likely to benefit from same-size sharpening before transcription or QA.
    - If `sharp` is available, Maquette may preprocess Maquette reference images with `shared/scripts/sharpen-reference-image.mjs` to create a separate `*-sharpened.png` derivative before visual transcription or screenshot comparison. Keep the raw reference as ground truth and do not overwrite, upscale, or resize it.
@@ -114,10 +115,11 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Add data/display for dense data, dashboards, server lists, tables, maps, calendars, editors, timelines, complex workflows, or filter builders.
    - Add cards/composites for reusable composites, repeated cards, product cards, pricing/service cards, newsletter modules, rich footers, or footer/social modules.
    - In the default workflow, every structured contract must be focused by component family or pattern.
+   - In page-first workflows, every structured contract must cite the approved page concept region it supports and preserve that region's fidelity target. Do not create a generic component gallery first and then let it change the page layout.
    - For every contract, define a strict selector allowlist before authoring it. Keep one complex family per contract. Combine at most two tightly related simple families when the contract will remain readable, such as buttons plus icon buttons or checkbox plus radio. Do not combine forms, actions, navigation, data tables, and cards into one contract.
    - If the user explicitly asks for visual component sheets, every visual sheet must be 1:1 and focused by component family or pattern. Otherwise, do not generate component sheets.
 4. Process each contract or visual-sheet batch sequentially. Do not create all planned component artifacts before implementation.
-   - Create exactly one focused structured contract for the current batch using the approved brand board, design-system tokens, direction inventory when present, and selector allowlist.
+   - Create exactly one focused structured contract for the current batch using the approved brand board, design-system tokens, direction inventory when present, page concept region when present, visual implementation contract when present, and selector allowlist.
    - Default workflow: write `.maquette/components/contracts/<batch-slug>.contract.json` and optionally render `.maquette/components/contracts/<batch-slug>.contract.svg` with `shared/scripts/render-component-contract-poster.mjs`.
    - Explicit visual-sheet workflow only: generate a focused 1:1 visual component sheet using `assets/component-sheet-prompt.md`.
    - It is a workflow violation to create the navigation/layout, data/display, cards/composites, or follow-up artifact before the current contract or sheet has completed batch evidence.
@@ -240,6 +242,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 - Do not invent a new visual language.
 - Treat `.maquette/brand/brand-primitives.css` and `.maquette/brand/brand-proof.html` as the implementation bridge from brand board to components.
 - Treat structured component contracts as the default implementation contracts.
+- In page-first workflows, treat the approved page concept region and visual implementation contract as the source for larger component anatomy, density, and composition. Component proofs should support the page concept, not normalize it into a generic gallery pattern.
 - Treat deterministic contract posters as review aids rendered from structured contracts, not creative visual design targets.
 - Treat explicit 1:1 visual component sheets as componentized reference targets, not loose inspiration.
 - Keep the reference page layout and reusable component API conceptually separate; page implementations should consume the catalog, CSS, JS, and usage examples, not copy the reference layout.

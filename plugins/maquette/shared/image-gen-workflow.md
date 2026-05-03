@@ -3,15 +3,19 @@
 This plugin is designed around a strict separation of roles:
 
 - `image_gen` = creative visual designer
-- coding model = specification writer, implementer, reviewer, and refiner
+- main workflow = design owner, orchestrator, approval gate, final reviewer, and refiner
+- subagents/workers = bounded producers for image assets, focused component proofs, page slices, or independent QA notes
+- coding model = implementer for the approved visual contract, under main-workflow review
+
+The main workflow must stay the source-of-truth holder. It owns the approved direction, brand canon, page concept, identity/product lockups, visual implementation contract, and final accept/reject decisions. Subagents may create candidates or execute narrow implementation tasks, but they must not approve visual artifacts, loosen the concept contract, invent brand direction, or declare final page fidelity.
 
 ## Mandatory default behavior
 
 Maquette has multiple workflow modes:
 
-- Greenfield Website Mode: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> parallel assets -> page thin slice -> just-in-time components -> page implementation -> system backfill
-- Existing Brand Mode: reference inventory -> brand kit -> executable brand canon -> just-in-time components/pages
-- One-Shot Fast Mode: direction concept -> compact brand canon -> page concept -> parallel assets -> thin slice -> page -> system summary
+- Greenfield Website Mode: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> visual implementation contract -> staged identity/product assets -> page thin slice -> just-in-time components derived from the page concept -> page implementation -> independent fidelity review -> system backfill
+- Existing Brand Mode: reference inventory -> brand kit -> executable brand canon -> page concept or requested page -> visual implementation contract -> just-in-time components/pages
+- One-Shot Fast Mode: direction concept -> compact brand canon -> page concept -> visual implementation contract -> staged assets -> thin slice -> page -> system summary
 - Design System Mode: brand/page direction -> full brand canon -> scoped component contracts -> browser component proofs -> component catalog -> pages
 
 When `image_gen` is available, use it for creative visual artifacts:
@@ -39,7 +43,7 @@ Brand identity assets must not be hand-authored or code-generated SVG. Logos, wo
 
 ## Project output isolation
 
-Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes direction concepts, direction inventories, brand reference inventories, brand boards, design-system JSON, CSS tokens, brand primitive CSS, brand-proof HTML/screenshots/reviews, structured component contracts, deterministic contract posters, explicit component sheets, component inventories, componentized references, component CSS/JS, component catalogs, page concepts, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
+Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes direction concepts, direction inventories, brand reference inventories, brand boards, design-system JSON, CSS tokens, brand primitive CSS, brand-proof HTML/screenshots/reviews, structured component contracts, deterministic contract posters, explicit component sheets, component inventories, componentized references, component CSS/JS, component catalogs, page concepts, visual implementation contracts, asset consistency notes, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
 
 Do not create, overwrite, or rely on `index.html` in the project root for Maquette output. If the user later wants to integrate a Maquette page into the real app or root site entrypoint, treat that as a separate explicit integration task.
 
@@ -70,6 +74,13 @@ The main workflow must wait for every worker in the current wave, close workers 
 If an image worker fails, record the failure in the relevant manifest or review file and retry when appropriate. If subagent tooling is unavailable, generate the image in the main workflow and record `fallback_source: main_workflow` or equivalent notes. If image generation fails completely, use an explicit placeholder only when the workflow allows placeholders; mark the asset unresolved and do not present it as final. For logo, wordmark, or brand-mark failures, do not create a code-generated SVG fallback.
 
 Do not delegate approval decisions to image workers. Workers create or edit visual artifacts and report paths; the main workflow inspects, asks any required approval question, and decides the next phase.
+
+For multi-asset pages, use staged asset waves instead of treating all images as independent by default:
+
+1. Generate and inspect identity assets first when needed: logo, wordmark, brand mark, mascot, package label language, or hero product style.
+2. Write a short asset consistency contract before dependent imagery. Include the exact allowed brand text, product/flavor names, logo usage, packaging style, forbidden alternate brand names, forbidden placeholder marks, and which accepted assets are references.
+3. Generate dependent product, hero, promo, story, and footer scenes from that contract. Each worker prompt must include the allowed text and forbidden drift list.
+4. Reject or retry any asset that introduces unapproved brand names, alternate product lines, inconsistent packaging systems, unrelated signage, unreadable fake labels that conflict with the approved copy, or a different visual brand.
 
 ## User Approval Gates
 
@@ -104,6 +115,7 @@ Generated direction concepts, boards, and sheets are approval artifacts only whe
 - Each component contract or visual-sheet batch must complete screenshot review or documented manual visual review against the contract and any visual sheet before the next artifact is created.
 - Repeated-card sheets must show shared media/header/body/footer/action anatomy, consistent badge or eyebrow placement, equal-height cards, and bottom-pinned action rows when card grids are relevant.
 - Sites or pages with global navigation need inspectable responsive navigation coverage before implementation: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and visible icons.
+- Approved page concepts are binding visual implementation targets for section structure, hierarchy, density, crop intent, and terminal-region anatomy. They are not pixel rulers, but a coded page that changes the major composition, page rhythm, region order, footer/newsletter structure, hero model, or product-grid anatomy is a deviation that must be fixed or explicitly recorded before final acceptance.
 - Page concepts with headers or primary navigation must define desktop, tablet, and mobile behavior. A desktop-only navigation concept is incomplete.
 - Page concepts must make visible regions identifiable for pre-code inventory: header, nav, hero, sidebars, annotations, product grids, promo cards, newsletter, footer, bottom bars, mobile/tablet callouts, app/device modules, social links, and imagery.
 - Page concepts with product, pricing, service, offer, or promo cards must make repeated-card anatomy and action-row alignment clear enough to implement.
@@ -116,9 +128,11 @@ In Greenfield Website Mode, create `.maquette/direction/direction-inventory.json
 
 After brand-board approval, create an executable brand canon before components or pages are accepted: `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, `.maquette/brand/brand-primitives.css`, `.maquette/brand/brand-proof.html`, and `.maquette/brand/brand-proof-review.md`. Capture a brand-proof screenshot when browser tooling is available. Components and pages must import the canonical token and primitive CSS, then preserve the approved brand fingerprint instead of reinterpreting the brand board from scratch.
 
-Before page implementation, create a concept-region inventory, page layout contract, and generated asset manifest. Visible concept regions default to implementation, not omission. Any region or asset that is simplified, omitted, implemented differently, blocked on assets, or blocked on component coverage must be documented with a concrete reason before coding proceeds.
+Before page implementation, create a concept-region inventory, page layout contract, visual implementation contract, asset consistency notes, and generated asset manifest. Visible concept regions default to implementation, not omission. Any region or asset that is simplified, omitted, implemented differently, blocked on assets, or blocked on component coverage must be documented with a concrete reason before coding proceeds.
 
-The page layout contract should translate the inspected page concept into implementable layout rules before code is written: section order, relative section heights, density/compactness, background bands, grid behavior, image aspect ratios, image crop and fit behavior, footer structure, legal/bottom rows, and mobile stacking. Terminal sections such as impact strips, newsletter blocks, rich footers, app/download areas, social areas, and legal rows must be included. Blank image-container bands or letterboxing are deviations unless the contract explicitly accepts them.
+The page layout contract should translate the inspected page concept into implementable layout rules before code is written: section order, relative section heights, density/compactness, background bands, grid behavior, image aspect ratios, image crop and fit behavior, footer structure, legal/bottom rows, and mobile stacking. Terminal sections such as impact strips, newsletter blocks, rich footers, app/download areas, social areas, and legal rows must be included. Blank image-container bands or letterboxing are deviations unless the contract explicitly accepts them. The contract must mark each major concept region with an expected fidelity level: `strict`, `adaptive`, or `intentional-deviation`. `Intentional-deviation` requires a concrete reason before coding.
+
+Create just-in-time component contracts after the page concept and visual implementation contract are approved unless Design System Mode was explicitly requested. Derive those component contracts from the actual concept regions and required behavior. Do not create generic component proofs before the page concept and then let those abstractions reshape the page.
 
 Before component coding, write a sheet inventory that lists structured contract batches, visual sheets when used, component families, variants, states, larger patterns, unclear areas, missing coverage, and the decision to implement, revise the contract, create a visual sheet, or create another focused contract.
 
@@ -133,7 +147,7 @@ After the componentized reference passes review, ensure the component CSS/JS and
 
 Use Maquette's bundled scripts for optional QA tooling checks, reference-image sharpening, deterministic contract-poster rendering, screenshot capture, linked asset validation, responsive audits, contrast/API checks, JSON validation, and page-consumption smoke checks when available. Optional Node dependencies should be resolved from the current project; do not rely on global npm installs. For component workflows, check optional QA tooling immediately after the brand kit exists and before component contracts, visual sheets, deterministic posters, or component code are created. Treat partial QA availability as missing QA tooling: if browser QA can run but `ajv` or `ajv-formats` is missing, schema validation is still blocked and requires an install decision. When a generated raster reference is too soft or compressed for confident inspection, run `ensure-qa-tooling.mjs --check-image-prep`; if project-local `sharp` is available, use `sharpen-reference-image.mjs` to create a separate same-size `*-sharpened.png` reference while preserving the raw image as ground truth. Do not use image prep to upscale or resize Maquette references. If `ensure-qa-tooling.mjs` reports missing packages, blocked QA capabilities, or `installDecisionRequired: true`, ask the user through the Codex user-input/question tool before installing project-local dependencies or skipping those checks, unless the user already declined for this run or installation is impossible. If the user agrees, run the project-local install commands reported by the tooling check, including `sharp` when reference sharpening will be used and browser/schema dependencies as needed; install Chromium only when browser QA requires it. If the user declines, continue with manual review and record the missing tooling. Generated run-local scripts are fallback-only and must be documented in the relevant approval notes with the reason the bundled helper did not cover the scenario.
 
-No silent simplification is allowed across brand, component, or page phases. If implementation cannot match a generated artifact, record the deviation, reason, and recommended follow-up in the relevant `approved.md` or `review.md`.
+No silent simplification is allowed across brand, component, or page phases. If implementation cannot match a generated artifact, record the deviation, reason, and recommended follow-up in the relevant `approved.md` or `review.md`. A final page review must not say `approved`, `matches`, or `complete` for a region that visibly deviates; use `minor deviation`, `major deviation`, `missing`, `simplified`, or `blocked` and fix major issues before finalizing.
 
 ## Responsive QA
 
@@ -155,6 +169,8 @@ When browser tooling is available, page and component QA must include responsive
 ## Final review requirements
 
 Final component and page review files must summarize the generated asset manifest and missing assets, concept-region inventory, page layout contract status, structured contract or visual sheet vs replica fidelity, reusable component readiness, card anatomy alignment, terminal-section compactness, media-container fit/crop results, footer fidelity, mobile drawer scrollability, responsive overflow measurements, open nav screenshots, visual deviations, and fixes. "Screenshots captured" alone is not a sufficient review.
+
+For pages, include a region-level concept-fidelity table in `review.md` with one row for each visible concept region. Allowed status values are `matches`, `minor deviation`, `major deviation`, `missing`, `simplified`, `blocked`, and `intentional deviation`. Major deviations, missing regions, simplified regions without approved reasons, and inconsistent generated assets fail final review.
 
 ## Transparent image requests
 

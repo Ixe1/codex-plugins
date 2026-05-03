@@ -24,6 +24,11 @@
       "identity_asset": true,
       "inspection_status": "accepted",
       "worker_mode": "parallel-worker",
+      "consistency_group": "primary-brand",
+      "visible_text": [
+        "Example"
+      ],
+      "consistency_status": "consistent",
       "dimensions": {
         "width": 1024,
         "height": 512
@@ -41,6 +46,17 @@
       "format": "png",
       "inspection_status": "accepted",
       "worker_mode": "parallel-worker",
+      "consistency_group": "primary-product-system",
+      "depends_on_asset_ids": [
+        "brand-wordmark"
+      ],
+      "approved_reference_asset_ids": [
+        "brand-wordmark"
+      ],
+      "visible_text": [
+        "Example"
+      ],
+      "consistency_status": "consistent",
       "alt_text": "Product arranged in the approved hero composition."
     },
     {
@@ -53,6 +69,19 @@
       "format": "png",
       "inspection_status": "accepted",
       "worker_mode": "parallel-worker",
+      "consistency_group": "primary-product-system",
+      "depends_on_asset_ids": [
+        "brand-wordmark",
+        "hero-product"
+      ],
+      "approved_reference_asset_ids": [
+        "brand-wordmark",
+        "hero-product"
+      ],
+      "visible_text": [
+        "Example"
+      ],
+      "consistency_status": "consistent",
       "alt_text": "Primary product package."
     },
     {
@@ -67,6 +96,9 @@
   "review": {
     "all_referenced_assets_exist": true,
     "missing_assets": [],
+    "asset_consistency_path": "pages/homepage/asset-consistency.md",
+    "inconsistent_assets": [],
+    "consistency_notes": "Generated assets were checked against approved brand/product text and reference assets before use.",
     "notes": "Every asset referenced by page HTML/CSS/review exists locally."
   }
 }

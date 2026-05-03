@@ -80,10 +80,20 @@ const checks = [
 ];
 
 const pageAssetManifestSchemaPath = path.join(schemaRoot, "page-asset-manifest.schema.json");
+const pageBlueprintSchemaPath = path.join(schemaRoot, "page-blueprint.schema.json");
 const pagesRoot = path.join(projectRoot, ".maquette/pages");
 if (fs.existsSync(pageAssetManifestSchemaPath) && fs.existsSync(pagesRoot)) {
   for (const pageDirent of fs.readdirSync(pagesRoot, { withFileTypes: true })) {
     if (!pageDirent.isDirectory()) continue;
+    const blueprintPath = path.join(pagesRoot, pageDirent.name, "page-blueprint.json");
+    if (fs.existsSync(pageBlueprintSchemaPath) && fs.existsSync(blueprintPath)) {
+      checks.push({
+        name: `page-blueprint:${pageDirent.name}`,
+        schemaPath: pageBlueprintSchemaPath,
+        dataPath: blueprintPath,
+        optional: true,
+      });
+    }
     const manifestPath = path.join(pagesRoot, pageDirent.name, "asset-manifest.json");
     if (!fs.existsSync(manifestPath)) continue;
     checks.push({
@@ -166,6 +176,34 @@ function collectComponentContractPaths(componentCatalog) {
   return [...new Set(paths.filter((item) => typeof item === "string" && item.endsWith(".json")))];
 }
 
+function collectPageAssetManifestArtifactPaths(manifest) {
+  const review = manifest.review ?? {};
+  const paths = [
+    review.asset_consistency_path,
+    ...asArray(manifest.assets).map((asset) => asset.path),
+  ];
+  return paths.filter(Boolean);
+}
+
+function collectPageBlueprintArtifactPaths(blueprint) {
+  const assets = blueprint.assets ?? {};
+  const paths = [
+    assets.concept_path,
+    assets.html_path,
+    assets.css_path,
+    assets.js_path,
+    assets.concept_region_inventory_path,
+    assets.visual_implementation_contract_path,
+    assets.page_layout_contract_path,
+    assets.asset_consistency_path,
+    assets.asset_manifest_path,
+    assets.review_notes_path,
+    ...asArray(assets.screenshot_paths),
+    ...asArray(assets.nav_open_screenshot_paths),
+  ];
+  return paths.filter(Boolean);
+}
+
 const results = checks.map((check) => {
   if (!fs.existsSync(check.dataPath)) {
     if (check.optional) {
@@ -196,7 +234,11 @@ const results = checks.map((check) => {
     ? collectComponentArtifactPaths(data)
     : check.name === "design-system"
       ? collectDesignSystemArtifactPaths(data)
-      : [];
+      : check.name.startsWith("page-asset-manifest:")
+        ? collectPageAssetManifestArtifactPaths(data)
+        : check.name.startsWith("page-blueprint:")
+          ? collectPageBlueprintArtifactPaths(data)
+        : [];
   const artifactErrors = artifactPaths
     .map((artifactPath) => ({
       artifactPath,

@@ -69,6 +69,8 @@
               "component-contract",
               "component-contract-poster",
               "component-sheet",
+              "visual-implementation-contract",
+              "asset-consistency",
               "page-layout-contract",
               "page-concept",
               "other"
@@ -227,7 +229,16 @@
         "concept_region_inventory": {
           "type": "string"
         },
+        "visual_implementation_contract": {
+          "type": "string"
+        },
         "page_layout_contract": {
+          "type": "string"
+        },
+        "asset_consistency": {
+          "type": "string"
+        },
+        "concept_fidelity_review": {
           "type": "string"
         },
         "asset_manifest": {
@@ -263,6 +274,7 @@
         "concept_path",
         "html_path",
         "concept_region_inventory_path",
+        "visual_implementation_contract_path",
         "page_layout_contract_path",
         "asset_manifest_path",
         "screenshot_paths"
@@ -296,7 +308,13 @@
         "concept_region_inventory_path": {
           "type": "string"
         },
+        "visual_implementation_contract_path": {
+          "type": "string"
+        },
         "page_layout_contract_path": {
+          "type": "string"
+        },
+        "asset_consistency_path": {
           "type": "string"
         },
         "asset_manifest_path": {

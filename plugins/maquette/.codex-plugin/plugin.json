@@ -1,7 +1,7 @@
 {
   "name": "maquette",
-  "version": "0.5.0",
-  "description": "Image-guided website directions, executable brand proofs, component contracts, and implemented pages",
+  "version": "0.6.0",
+  "description": "Image-guided website directions, executable brand proofs, concept-fidelity contracts, and implemented pages",
   "author": {
     "name": "Ixel",
     "url": "https://github.com/Ixe1"
@@ -15,6 +15,7 @@
     "ui",
     "direction",
     "brand-proof",
+    "concept-fidelity",
     "component-contracts",
     "design-system",
     "image-generation"
@@ -22,8 +23,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Maquette",
-    "shortDescription": "Generate directions, brand proofs, components, and pages with image-first QA",
-    "longDescription": "Create greenfield website directions, executable brand proofs, just-in-time component contracts, and implemented pages through an image-guided workflow.",
+    "shortDescription": "Generate directions, brand proofs, concept-fidelity contracts, components, and pages with image-first QA",
+    "longDescription": "Create greenfield website directions, executable brand proofs, visual implementation contracts, staged raster assets, just-in-time component contracts, and implemented pages through an image-guided workflow.",
     "developerName": "Ixel",
     "category": "Design",
     "websiteURL": "https://github.com/Ixe1/codex-plugins/tree/master/plugins/maquette",
@@ -32,7 +33,7 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Start with a greenfield direction concept, then create the brand kit, executable brand proof, page concept, parallel assets, thin slice, and page.",
+      "Use $maquette to make a homepage for a fictional sparkling beverage brand called Fizz & Co. Start with a greenfield direction concept, then create the brand kit, executable brand proof, page concept, visual implementation contract, staged assets, thin slice, and page.",
       "Use $maquette-direction to explore homepage directions for a new AI note-taking product before creating its brand kit.",
       "Use $maquette-brand-kit to create a brand kit for a boutique snack brand with a warm premium grocery feel.",
       "Use $maquette-components to build reusable product-card and responsive navigation components from the existing approved Maquette brand canon.",

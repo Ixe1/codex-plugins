@@ -10,6 +10,25 @@ Entries before this changelog was introduced were backfilled from git history an
 
 No notable changes yet.
 
+## 0.6.0 - 2026-05-03
+
+### Added
+
+- Added a main-workflow orchestration model: subagents may produce bounded candidates, but the main workflow owns approved references, visual inspection, approval gates, and final accept/reject decisions.
+- Added page visual implementation contracts, concept-region fidelity targets, asset consistency notes, and templates for concept-to-code review.
+- Added page blueprint and asset-manifest schema support for visual implementation contracts, asset consistency artifacts, generated-asset dependencies, visible text, and consistency status.
+
+### Changed
+
+- Changed the default page-first flow so approved page concepts become binding visual implementation targets before just-in-time component contracts are created.
+- Changed page asset generation to stage identity/product references before dependent hero, promo, story, and footer images when visible brand/product text is involved.
+- Updated page, component, workflow, README, plugin metadata, and agent prompts to reject generic pre-concept component galleries that reshape an approved page concept.
+
+### Fixed
+
+- Tightened final page review so major concept deviations, missing regions, silent simplifications, and inconsistent generated raster assets must be fixed or explicitly blocked before a page is marked approved.
+- Added explicit guidance to reject generated assets that introduce alternate brand names, product labels, signage, or packaging systems inconsistent with the approved concept.
+
 ## 0.5.0 - 2026-05-03
 
 ### Added

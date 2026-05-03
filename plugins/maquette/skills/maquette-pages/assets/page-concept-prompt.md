@@ -1,9 +1,9 @@
-Edit the visible approved brand board, executable brand proof, structured component contract summary, and any explicitly requested visual component-sheet references into a website page concept.
+Edit the visible approved brand board, executable brand proof, directional inventory, and any existing reusable component API notes into a website page concept.
 
 Requirements:
-- use only components and styling consistent with the approved system and browser-rendered brand proof
-- treat the brand canon, existing component contracts, catalog APIs, and approved browser proofs as the first source of truth
-- only introduce a new composite if it is truly necessary for the page goal and a focused component/composite contract plus browser proof already exists or is created first
+- use only styling consistent with the approved system and browser-rendered brand proof
+- treat the brand canon and approved page goal as the first source of truth; existing component contracts and catalog APIs are reusable implementation context, not a reason to simplify or reshape the page concept
+- include necessary page-specific composites when the page goal requires them; later implementation will create focused just-in-time component contracts/proofs from the approved concept regions
 - do not silently invent significant new component language that is absent from the approved or provisional component references
 - prioritize hierarchy, layout, density, and state clarity
 - make section compactness and vertical rhythm clear from top to bottom, including terminal regions rather than only the hero
@@ -24,5 +24,5 @@ Requirements:
 - if the page requires dense data tables, dashboards, server lists, maps, calendars, editors, timelines, filter builders, or other large reusable patterns not present in the component references, pause page invention and request a focused component/composite contract plus browser proof first
 - do not create a logo, wordmark, brand mark, seal, badge, app icon, emblem, mascot, monogram, or lockup as code-generated SVG; identity assets must be supplied or generated later as raster assets
 
-This page concept is the creative design artifact for the page.
-The later coded page should match its overall hierarchy, composition, and styling while importing the approved brand canon and reusing approved components first.
+This page concept is the creative design artifact and visual implementation target for the page.
+The later coded page should match its overall hierarchy, composition, density, region order, crop intent, product/card anatomy, terminal-section structure, and styling while importing the approved brand canon and reusing or creating focused components as needed.

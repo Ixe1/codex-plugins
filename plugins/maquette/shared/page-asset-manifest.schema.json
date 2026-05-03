@@ -121,6 +121,8 @@
               "generated",
               "provided",
               "reused-existing",
+              "rejected",
+              "failed",
               "not-generated-with-reason",
               "missing"
             ]
@@ -178,6 +180,37 @@
           "fallback_source": {
             "type": "string"
           },
+          "consistency_group": {
+            "type": "string"
+          },
+          "depends_on_asset_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "approved_reference_asset_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visible_text": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "consistency_status": {
+            "type": "string",
+            "enum": [
+              "unchecked",
+              "consistent",
+              "deviates",
+              "accepted-exception",
+              "not-applicable"
+            ]
+          },
           "dimensions": {
             "type": "object",
             "additionalProperties": false,
@@ -221,6 +254,18 @@
           "items": {
             "type": "string"
           }
+        },
+        "asset_consistency_path": {
+          "type": "string"
+        },
+        "inconsistent_assets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "consistency_notes": {
+          "type": "string"
         },
         "notes": {
           "type": "string"
