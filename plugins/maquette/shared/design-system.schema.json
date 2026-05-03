@@ -161,6 +161,8 @@
             "enum": [
               "screenshot",
               "brand-board",
+              "brand-proof",
+              "brand-primitives",
               "direction-concept",
               "direction-inventory",
               "component-sheet",
@@ -185,6 +187,72 @@
           "notes": {
             "type": "string"
           }
+        }
+      }
+    },
+    "brand_fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "must_preserve",
+        "forbidden"
+      ],
+      "properties": {
+        "must_preserve": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "brand_proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "html_path",
+        "css_path",
+        "review_path",
+        "status"
+      ],
+      "properties": {
+        "html_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "css_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "screenshot_path": {
+          "type": "string"
+        },
+        "review_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "reviewed",
+            "approved",
+            "manual-review"
+          ]
+        },
+        "notes": {
+          "type": "string"
         }
       }
     },

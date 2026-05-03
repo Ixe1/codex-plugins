@@ -9,22 +9,25 @@ Write all Maquette-owned page artifacts under `.maquette/pages/<page-name>/` in 
 
 ## Preconditions
 
-Use this skill after the component library exists.
+Use this skill after the executable brand canon exists. A broad component library is optional unless the user explicitly requested Design System Mode.
 
 Preferred inputs:
 - `.maquette/direction/direction-inventory.json` when the project started in Greenfield Website Mode
 - `.maquette/brand/design-system.json`
+- `.maquette/brand/tokens.css`
+- `.maquette/brand/brand-primitives.css`
+- `.maquette/brand/brand-proof.html`
 - `.maquette/components/component-catalog.json`
 - approved brand-board image
 - structured component contract paths and deterministic posters when rendered
-- approved visual component-sheet images when creative clarification was used
+- approved visual component-sheet images only when explicitly requested
 
 Hard gate:
-- If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
-- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or structured component contract evidence is missing, do not create a page concept. Run the component-library phase first using `maquette-components`.
-- If the component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Run or request `maquette-components` to complete reusable component coverage first.
+- If `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, `.maquette/brand/brand-primitives.css`, `.maquette/brand/brand-proof.html`, or a generated and inspected brand board image is missing, do not create a page concept. Run the brand-kit phase first using `maquette-brand-kit`.
+- If `.maquette/components/component-catalog.json`, `.maquette/components/css/components.css`, `.maquette/components/replica-gallery.html`, or structured component contract evidence exists, consume it. If it is missing, create only the just-in-time page-critical component contracts and browser proofs required by this page; do not build a broad component library first unless the user requested Design System Mode.
+- If an existing component catalog lacks reusable component API coverage or marks `assets.reusable_component_review.ready_for_pages` as false, do not copy the componentized reference layout into the page. Create or request focused just-in-time component proof work for the missing page-critical pieces.
 - If the component catalog records multiple `assets.sheet_implementation_batches`, each implemented batch should have concrete batch artifact paths for the batch replica/reference, component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review. If these are missing, run or request `maquette-components` to complete the component phase before page work.
-- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, run or request the component-library phase first to create the missing focused structured contract and visual sheet when useful. Do not silently invent significant new component language inside the page phase.
+- If the requested page needs components, dense data patterns, or reusable composites that are not covered by the existing component catalog or inspected component references, create or request the missing focused structured contract and browser proof before implementing that region. Do not generate visual component sheets unless the user explicitly asks for them.
 - Do not treat an existing website, screenshot, copied CSS, or style notes as a substitute for the brand kit and component library.
 - In a one-shot unattended `maquette` workflow where the user explicitly asked not to pause, earlier phases may be marked provisional, but they still must exist before this phase starts. Otherwise, generated brand-board and page-concept approval gates still require explicit user decisions.
 
@@ -43,7 +46,7 @@ If editing a local reference image, first make it visible in the conversation wi
 
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive page blueprints, layout decisions, or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 
-When image-worker subagents are explicitly authorized for the current run, run page-concept image generation or editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/pages/<page-name>/concept.png` path. The main workflow must then inspect the returned image with `view_image`, ask the approval question, and only then derive page artifacts or code.
+When image-worker subagents are available, run page-concept image generation or editing in a dedicated image worker subagent automatically. Do not ask whether to use image workers. The worker should return the exact saved image path and the project-local `.maquette/pages/<page-name>/concept.png` path. The main workflow must inspect the returned image with `view_image`, ask the approval question, and only then derive page artifacts or code.
 
 After inspecting a generated or edited page concept that passes rejection checks, ask the user whether to use it before writing the page blueprint, concept-region inventory, page layout contract, asset manifest, or page code. Use the Codex user-input/question tool when available with choices equivalent to:
 - `Yes, use this` as the recommended choice
@@ -82,10 +85,11 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - If `.maquette/direction/direction-inventory.json` exists, read it as directional context only. The design-system tokens and component catalog remain the implementation source of truth.
 2. Check component coverage before page concept work.
    - Reuse existing components first.
-   - Use component catalog APIs, slots, variants, states, and usage examples from the componentized reference. Do not copy the `replica-gallery.html` page layout into the page.
+   - Import the executable brand canon first: `tokens.css` and `brand-primitives.css`.
+   - Use component catalog APIs, slots, variants, states, and usage examples from the componentized reference when they exist. Do not copy the `replica-gallery.html` page layout into the page.
    - Identify any missing primitives, dense data patterns, or larger reusable composites needed by the page.
-   - If the page has a header or primary navigation, verify that the component catalog covers responsive navigation variants before concept or implementation work.
-   - If missing coverage is significant, run or request `maquette-components` to create the focused component/composite sheet before continuing.
+   - If the page has a header or primary navigation, verify existing responsive navigation variants or create a just-in-time responsive navigation contract/proof before implementation.
+   - If missing coverage is significant for this page, run or request `maquette-components` to create the focused component contract and browser proof before implementing that region.
 3. If `image_gen` is available, create or edit a page concept using the approved references and `assets/page-concept-prompt.md`.
    - Inspect the generated page concept with `view_image` before writing the page blueprint or implementation.
    - A concept with header or primary navigation is incomplete if it only shows desktop navigation. It must define desktop, tablet, and mobile nav behavior, including the collapsed and expanded tablet/mobile state.
@@ -108,13 +112,17 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Any visible concept region that will be taller, looser, more compact, cropped differently, or structurally simplified must be recorded here before implementation with a concrete reason.
 7. Create `.maquette/pages/<page-name>/asset-manifest.json` before coding.
    - Use `shared/page-asset-manifest.example.json` and `shared/page-asset-manifest.schema.json` if present.
-   - List every required raster image: logo if supplied or explicitly requested, hero images, product-card images, promo images, lifestyle/story images, footer/app/device images, background textures, decorative rasters, and generated concept/page screenshots.
-   - If the user asked for generated image assets, generate all required project-local assets or document why each missing asset was not generated.
-   - When image-worker subagents are explicitly authorized for the current run, generate or edit required raster assets through the dedicated image worker handoff from `shared/image-gen-workflow.md`, then inspect or verify each returned project-local path before using it in HTML, CSS, JS, or review notes. Generate these assets in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
+   - List every required identity asset and raster image: logo/wordmark/brand mark when supplied or explicitly needed, hero images, product-card images, promo images, lifestyle/story images, footer/app/device images, background textures, decorative rasters, and generated concept/page screenshots.
+   - Classify brand identity assets separately from generic UI icons and decorative SVG. Maquette-authored logos, wordmarks, monograms, mascots, emblems, lockups, and brand marks must be generated raster image assets from `image_gen`; supplied SVG identity assets may be reused and recorded as supplied or existing-project assets.
+   - Never create a Maquette-authored logo, wordmark, monogram, mascot, emblem, lockup, or brand mark as code-generated SVG. If identity generation fails, record the asset as missing or failed and use plain text brand copy only as non-logo navigation text when the page must continue.
+   - If generated image assets are needed, generate all required project-local assets or document why each missing asset was not generated.
+   - Generate independent image assets through parallel image-worker subagents by default. Use one worker per independent asset or tightly related independent batch, assign unique target paths before spawning, wait for the wave, inspect every returned project-local path with `view_image`, and update the manifest before using assets in HTML, CSS, JS, or review notes.
+   - Use staged waves when an asset depends on an earlier generated asset. For example, inspect and accept a logo or package asset before spawning workers for product scenes that must include it.
    - If Maquette policy forbids an asset, such as generating a new logo during the brand-kit phase, record the reason and use a permissible fallback only when it still matches the concept.
    - Every asset referenced by HTML, CSS, JS, or review notes must exist locally before final review.
 8. Reuse existing components first.
-9. Translate the page concept and page layout contract into code using the component library before adding any new composite patterns.
+9. Translate the page concept and page layout contract into code using the brand canon and existing/just-in-time components before adding any new composite patterns.
+   - Import `../../brand/tokens.css` and `../../brand/brand-primitives.css` or the correct relative equivalents. Page-specific CSS should primarily handle composition, layout, and page-only exceptions, not recreate buttons, cards, type roles, or state primitives.
    - Use the font families, weights, widths, sizes, and line-heights recorded in the design system and component catalog. If the concept implies condensed or editorial display type, choose a closer available CSS stack or project-approved open-source import instead of defaulting to crude substitutes such as `Impact`.
    - Do not silently simplify visible concept regions, generated component details, or requested image assets. Any simplification must be documented with a concrete reason and recommended follow-up when appropriate.
    - Preserve section density from the layout contract. Do not let terminal sections such as impact strips, newsletter areas, or footers become materially taller, looser, or more generic than the concept unless the contract records why.
@@ -128,6 +136,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Opened mobile/tablet drawers must remain scrollable when content exceeds viewport height; prefer `overflow-y: auto` and `overscroll-behavior: contain` on the drawer or drawer body while any body scroll lock is active.
    - Close controls and links must remain reachable in the opened drawer at mobile and tablet heights.
 11. Before implementing the full page, build and screenshot-review a thin slice when browser tooling is available: header plus hero plus one representative card, form, data, or content section. Fix major token, typography, spacing, component, or responsive mismatches before continuing to the rest of the page. If this step is skipped, record why in `review.md`.
+   - The thin slice fails if it uses final empty placeholders, generic ecommerce/SaaS styling, a code-generated identity SVG, uninspected generated assets, or buttons/type/surfaces that do not match the brand proof.
 12. Update the page blueprint to document composition, concept-region inventory path, page layout contract path, asset manifest path, thin-slice status, and any new composites.
 13. Capture screenshots when possible and compare them to the concept and approved references.
    - Use Maquette's bundled scripts where possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/sharpen-reference-image.mjs`, `shared/scripts/capture-browser.mjs`, or `skills/maquette-pages/scripts/capture-page.mjs`.
@@ -146,6 +155,8 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Verify the page concept region inventory against the rendered page. Missing concept regions fail QA unless the inventory records an intentional omission with a concrete reason.
    - Verify the page layout contract against the rendered page. Fail and fix when the implementation violates recorded section order, section density, image crop behavior, footer structure, or terminal-section compactness without a documented reason.
    - Verify the generated asset manifest. Every referenced local raster asset must exist, every generated asset requested by the user must be present or explicitly documented as not generated, and unused generated assets should be noted.
+   - Fail QA if any Maquette-authored logo, wordmark, monogram, mascot, emblem, lockup, or brand mark is `source: code-generated`, is hand-authored SVG, or was not inspected by the main workflow. Supplied SVG identity assets are allowed only when recorded as supplied or existing-project assets.
+   - Fail QA if any image-worker output is referenced before the main workflow has viewed it and recorded manifest status.
    - Compare the top and bottom of the coded page against the concept, especially headers, navigation, newsletter bands, footers, bottom ribbons, and final calls to action.
    - Compare first, middle, and last full-page screenshot regions against the concept and layout contract. Do not accept a page because the hero matches if the bottom third drifts in spacing, footer anatomy, or media treatment.
    - Score page compactness and vertical rhythm in `review.md`: `matches`, `slightly looser`, `too loose`, `too compact`, or `intentionally different`. A `too loose` or `too compact` result requires a fix or a documented block.
@@ -160,6 +171,7 @@ The asset manifest JSON must validate against `shared/page-asset-manifest.schema
    - Prefer an existing icon library when available. If no brand-icon library is available, use simple inline SVGs or a locally defined icon set with accessible names.
    - Check that icon-only buttons and compact controls visibly render supported icons and are not blank.
    - Compare coded typography weight, width, scale, and line-height against the concept, brand board, and component references. Avoid `Impact` as the fallback for condensed headings unless the board explicitly approves it.
+   - Compare buttons, inputs, chips, cards, panels, inverse surfaces, and focus states against `.maquette/brand/brand-proof.html` or its screenshot. Fail and fix if the page drifts into generic controls or page-local replacements for brand primitives.
    - Record the chosen font family, fallback stack, and rationale in the design system or `review.md`, especially when importing or substituting an open-source font.
    - Capture and inspect navigation at desktop, tablet, and mobile widths. For tablet and mobile, inspect both closed and open menu states.
    - If browser tooling is available, click the menu toggle and verify `aria-expanded` changes.
@@ -194,6 +206,7 @@ When the concept image is small or compressed:
 
 - Do not silently introduce a new brand direction.
 - Prefer already-approved primitives and states.
+- Treat the executable brand canon as the implementation source for primitive styling. Components and pages must preserve it, not reinterpret the brand board independently.
 - Do not silently introduce significant new component language that is absent from the approved or provisional component references.
 - Keep page code composable so later pages can reuse sections and composites.
 - Headers and primary navigation must be responsive by design. Do not ship desktop-only inline nav that breaks on tablet or mobile.

@@ -13,20 +13,20 @@ All Maquette-owned outputs must live under `.maquette/` in the current project. 
 
 Choose the workflow mode before generating artifacts:
 
-- **Greenfield Website Mode**: use when the user asks for a new website, landing page, homepage, campaign page, product site, or new brand and no approved Maquette brand kit exists. Run: direction concept -> direction inventory -> constrained brand kit -> critical-path components -> page implementation -> system backfill.
-- **Existing Brand Mode**: use when an approved brand kit, supplied brand system, existing site identity, or supplied brand assets should be preserved. Run: reference inventory -> brand kit/tokens -> components -> page.
-- **One-Shot Fast Mode**: use only when the user explicitly asks for fast/unattended/minimal output. Run: direction concept -> compact brand tokens -> critical-path components only -> page -> final system summary.
-- **Design System Mode**: use when the user explicitly asks for a broader reusable design system before pages. Run: brand/page direction -> full brand kit -> full component coverage -> pages.
+- **Greenfield Website Mode**: use when the user asks for a new website, landing page, homepage, campaign page, product site, or new brand and no approved Maquette brand kit exists. Run: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> parallel assets -> page thin slice -> just-in-time components -> page implementation -> system backfill.
+- **Existing Brand Mode**: use when an approved brand kit, supplied brand system, existing site identity, or supplied brand assets should be preserved. Run: reference inventory -> brand kit -> executable brand canon -> just-in-time components/pages.
+- **One-Shot Fast Mode**: use only when the user explicitly asks for fast/unattended/minimal output. Run: direction concept -> compact brand canon -> page concept -> parallel assets -> thin slice -> page -> final system summary.
+- **Design System Mode**: use when the user explicitly asks for a broader reusable design system before pages. Run: brand/page direction -> full brand canon -> scoped component contracts -> browser component proofs -> component catalog -> pages.
 
 For greenfield websites, do not start with an abstract brand board. First run the direction phase using `maquette-direction`, then use the selected direction as a seed for the brand kit. The first direction concept is not a final page design or implementation contract; it is a concrete context for hierarchy, visual tone, content density, component needs, and asset needs.
 
 Only proceed to implementation after the required artifacts for the selected workflow mode exist. Do not skip phase gates; change the phase order only through an explicit workflow mode.
 
-The component-library phase uses structured component contracts by default. Preserve explicit user requests for visual component sheets when the user asks for visual sheets or when the component skill documents that creative clarification is needed. Any CSS-contract poster should be rendered deterministically from a structured contract and treated as a review aid, not as image-generated source text.
+The default workflow is page-first after the executable brand canon. Do not build a broad component library before the first page unless the user explicitly asks for Design System Mode. Create only critical-path or just-in-time component contracts and browser proofs needed by the current page, then backfill the component catalog after page proof.
 
 Before component or page implementation, the optional QA tooling decision must be explicit when any planned automated QA path is blocked. Partial availability is not enough: if Playwright is available but `ajv` or `ajv-formats` is missing, ask for an install decision before replacing schema validation with manual JSON checks, unless the user already declined installation for the current run or installation is impossible. When Maquette reference artifacts are soft or compressed enough to benefit from same-size sharpening, check for project-local `sharp` with `shared/scripts/ensure-qa-tooling.mjs --check-image-prep`; if available, use `shared/scripts/sharpen-reference-image.mjs` to create separate `*-sharpened.png` references while preserving the raw images as ground truth. Do not use image prep to upscale or resize Maquette artifacts.
 
-When subagent tooling is available, follow `shared/image-gen-workflow.md` to resolve the image-worker decision before the first Maquette `image_gen` create or edit call. If the user has not already explicitly authorized subagents and has not explicitly declined or requested unattended/no-question mode, ask once whether to use Maquette image-worker subagents. Do not treat "not explicitly authorized" as permission to skip image workers. If authorized, run Maquette image creation and image editing in a dedicated image worker subagent, then have the main workflow inspect the returned project-local image path. This applies to direction concepts, brand boards, visual component sheets, page concepts, and generated page raster assets. Deterministic component contract posters do not require image workers. Continue in the main workflow only when image workers are explicitly declined, unavailable after the required question, or explicitly bypassed by unattended/no-question language, and record the reason.
+When subagent tooling is available, follow `shared/image-gen-workflow.md` and use Maquette image-worker subagents automatically. Do not ask whether to use image workers. For multiple independent images, spawn one worker per image asset or tightly related independent batch, run workers in parallel waves, and have the main workflow inspect every returned project-local image path before use. Deterministic component contract posters do not require image workers.
 
 Direction concepts, brand boards, and page concepts are user approval gates. After the main workflow inspects the generated image, ask whether to use it or make a new one before deriving downstream artifacts. Do not include a separate revise choice in the approval buttons. Do not treat one-shot provisional runs as implicit approval unless the user explicitly requested an unattended run.
 
@@ -48,12 +48,15 @@ Before creating a page concept or page implementation, verify that these brand a
 - `.maquette/brand/brief.md`
 - `.maquette/brand/design-system.json`
 - `.maquette/brand/tokens.css`
+- `.maquette/brand/brand-primitives.css`
+- `.maquette/brand/brand-proof.html`
+- `.maquette/brand/brand-proof-review.md`
 - `.maquette/brand/approved.md`
 - a generated and inspected brand board image such as `.maquette/brand/brand-board-vN.png`
 
 If any are missing, run the brand-kit phase first using `maquette-brand-kit`.
 
-Before creating a page concept or page implementation, verify that these component artifacts exist:
+Before broad design-system page work, verify that these component artifacts exist:
 
 - `.maquette/components/component-catalog.json`
 - `.maquette/components/sheet-inventory.md`
@@ -64,18 +67,16 @@ Before creating a page concept or page implementation, verify that these compone
 - `.maquette/components/approved.md`
 - one or more structured component contracts, such as `.maquette/components/contracts/<batch-slug>.contract.json`
 - deterministic contract review posters when created, such as `.maquette/components/contracts/<batch-slug>.contract.svg`
-- generated and inspected visual component artifacts only when creative clarification was needed, such as `.maquette/components/component-sheet-vN.png`
+- generated and inspected visual component artifacts only when explicitly requested, such as `.maquette/components/component-sheet-vN.png`
 
-If any are missing, run the component-library phase next using `maquette-components`.
-If the component catalog does not mark the reusable component library as ready for pages, run `maquette-components` again before the page phase. The page phase should consume reusable components and cataloged APIs, not copy a componentized reference layout.
-If the requested page needs dense data patterns, dashboards, tables, maps, calendars, editors, timelines, complex workflows, filter builders, or reusable composites that are not covered by the existing component references, run `maquette-components` again to create focused missing coverage before running the page phase. Multi-artifact component work should proceed sequentially: create one focused structured component contract by default, optionally render a deterministic poster, optionally generate one focused 1:1 visual component sheet when creative clarification is needed, build and review its componentized replica/reference, document reusable component APIs, then move to the next artifact.
+In the default page-first workflow, missing component coverage is not a reason to build a broad library first. Instead, run only the focused `maquette-components` batches needed for the current page, or let the page phase request just-in-time component contracts/proofs before implementing those regions. Multi-artifact component work should proceed sequentially: create one focused structured component contract, optionally render a deterministic poster, build and review its browser proof/reference, document reusable APIs, then move to the next needed artifact.
 If a multi-batch component catalog records `assets.sheet_implementation_batches`, verify each batch has concrete artifact paths for the structured contract, deterministic poster if created, visual sheet if used, batch replica/reference, batch component CSS/JS, catalog snapshot, screenshot/manual review evidence, and review before proceeding to the page phase. Retrospective batch logs without concrete batch artifacts are not enough.
 If the requested page has a header or primary navigation, verify responsive navigation component coverage before running the page phase: desktop inline nav, tablet/mobile collapsed state, menu toggle, expanded panel or drawer, active/focus states, and icon rendering.
 If the requested page has product, pricing, service, offer, or promo card grids, verify repeated-card component coverage before running the page phase: shared media/header/body/footer/action anatomy, stable badge or eyebrow placement, equal-height cards, flex or grid card bodies, and bottom-pinned CTA, quantity, price, or action rows.
 If the requested page has a rich footer, footer social links, app/download modules, legal/locale rows, or device imagery, verify footer/social module coverage before running the page phase: recognizable social icons, accessible names, link column anatomy, app/device module coverage, bottom strip coverage, and no unrelated generic icon substitutions.
 Verify that the page phase will create a concept-region inventory, page layout contract, and asset manifest before coding. This applies even when the page has few raster assets, because the layout contract is the guardrail for section compactness, terminal-region fidelity, and media fit/crop behavior.
 
-Only after both gates pass should you run the page phase using `maquette-pages`.
+Only after the brand canon exists and any page-critical missing component proofs are planned should you run the page phase using `maquette-pages`. In Design System Mode, complete the broader component gate before page work.
 
 ## Existing website and brand references
 
@@ -102,21 +103,38 @@ Use existing references to extract:
 
 Do not treat copied CSS values, notes, or screenshots as the final design system. In Existing Brand Mode, first convert the reference into a generated brand board, inspect it with `view_image`, then derive the design-system JSON and CSS tokens from that inspected artifact. In Greenfield Website Mode, first create or select a direction concept, write the direction inventory, then generate a brand board constrained by that selected direction.
 
+## Brand drift gate
+
+Before accepting any component proof or final page, verify:
+
+- it imports `.maquette/brand/tokens.css` and `.maquette/brand/brand-primitives.css`, or equivalent relative paths from the page/component artifact
+- it preserves the approved color roles, typography hierarchy, button geometry, spacing rhythm, radius, shadow, and surface language
+- it avoids generic UI-kit, SaaS, or ecommerce defaults that are absent from the brand canon
+- it does not introduce unauthorized logo, wordmark, monogram, mascot, emblem, lockup, or brand-mark assets
+- it does not contain uninspected generated images or final empty placeholders
+
+If any check fails, revise before proceeding or record a concrete blocker and follow-up in the relevant review file.
+
 ## One-shot requests
 
-If the user asks for a page and the project has no Maquette artifacts yet, complete a full pass in Greenfield Website Mode, pausing at the image-worker authorization question and required image approval gates unless the user explicitly asked for an unattended run:
+If the user asks for a page and the project has no Maquette artifacts yet, complete a full pass in Greenfield Website Mode, using automatic image workers when available and pausing at required image approval gates unless the user explicitly asked for an unattended run:
 
 1. Create or select a concrete direction concept and inventory.
 2. Create the brand kit constrained by that direction.
-3. Create critical-path component contracts and reusable components.
-4. Create the requested page.
-5. Backfill final system notes with confirmed tokens, confirmed components, provisional components, page-local patterns, future component candidates, and known concept deviations.
+3. Create the executable brand canon: design-system JSON, tokens CSS, brand primitive CSS, browser brand proof, and brand-proof review.
+4. Create the requested page concept.
+5. Create the asset manifest and generate independent image assets in parallel image-worker waves.
+6. Build and screenshot-review a thin slice using the brand canon.
+7. Create just-in-time component contracts and browser proofs only for components the page actually needs.
+8. Complete the requested page.
+9. Backfill final system notes with confirmed tokens, confirmed components, provisional components, page-local patterns, future component candidates, and known concept deviations.
 
 Mark the outputs as proposed or provisional only for phases that do not require an image approval gate, or when the user explicitly requested an unattended run.
-Infer focused extra component/composite sheets when the page brief needs them; the user should not have to ask for fewer components, split sheets, or wide-data coverage.
+Infer focused extra component/composite contracts when the page brief needs them; do not generate component sheets unless the user explicitly asks for visual sheets.
 Infer responsive navigation coverage for page/site requests with global navigation; the user should not have to ask for mobile nav or overflow checks.
 Infer repeated-card and footer/social coverage for commerce, product-grid, pricing, service-list, newsletter, app/download, and footer-heavy pages; the user should not have to ask for card anatomy, action alignment, footer fidelity, or recognizable social icons.
 Infer page asset-manifest needs for pages with logos supplied by the user, hero images, product images, promo imagery, lifestyle/story imagery, footer/app/device images, background textures, or requested imagegen assets.
+Never create Maquette-authored logo, wordmark, monogram, mascot, emblem, lockup, or brand-mark SVGs by code. Identity assets are supplied assets or generated raster image assets only. Generic UI icons and non-identity ornaments may be SVG.
 Infer page layout-contract needs for section compactness, terminal regions, image fit/crop behavior, footer structure, and responsive stacking; the user should not have to ask for bottom-of-page fidelity checks.
 
 Do not ask the user to manually rerun separate commands unless you are blocked.

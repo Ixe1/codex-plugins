@@ -4,7 +4,7 @@ This repository is the Ixel Codex plugin marketplace. It contains marketplace me
 
 The marketplace currently includes:
 
-- [Maquette](./plugins/maquette) - image-guided website directions, brand kits, component contracts, and implemented pages
+- [Maquette](./plugins/maquette) - image-guided website directions, executable brand proofs, component contracts, and implemented pages
 
 ## Install From Dev
 
@@ -64,13 +64,13 @@ The root `marketplace.json` mirrors the same marketplace metadata for compatibil
 
 ### Maquette
 
-Maquette is a Codex plugin for image-guided website design-system workflows.
+Maquette is a Codex plugin for image-guided website workflows.
 
 It helps Codex turn an approved visual direction into reusable website artifacts:
 
 - greenfield page direction concepts with structured direction inventories
-- brand kits with design-system JSON and CSS tokens
-- component contracts and reusable HTML/CSS/JS with reference QA
+- brand kits with design-system JSON, CSS tokens, brand primitive CSS, and browser brand proofs
+- just-in-time component contracts and reusable HTML/CSS/JS with reference QA
 - implemented pages with screenshot and responsive review notes
 
 Invoke the full staged workflow with `@Maquette` or `$maquette`:

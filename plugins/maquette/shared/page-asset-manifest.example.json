@@ -9,7 +9,27 @@
       "required_by": "page concept review",
       "path": "pages/homepage/concept.png",
       "source": "image_gen",
+      "format": "png",
+      "inspection_status": "accepted",
       "notes": "Inspected before implementation."
+    },
+    {
+      "id": "brand-wordmark",
+      "kind": "wordmark",
+      "status": "generated",
+      "required_by": "header and footer",
+      "path": "pages/homepage/assets/brand-wordmark.png",
+      "source": "image_gen",
+      "format": "png",
+      "identity_asset": true,
+      "inspection_status": "accepted",
+      "worker_mode": "parallel-worker",
+      "dimensions": {
+        "width": 1024,
+        "height": 512
+      },
+      "alt_text": "Example product wordmark.",
+      "notes": "Generated raster identity asset; Maquette must not create code-generated SVG identity fallbacks."
     },
     {
       "id": "hero-product",
@@ -18,6 +38,9 @@
       "required_by": "hero",
       "path": "pages/homepage/assets/hero-product.png",
       "source": "image_gen",
+      "format": "png",
+      "inspection_status": "accepted",
+      "worker_mode": "parallel-worker",
       "alt_text": "Product arranged in the approved hero composition."
     },
     {
@@ -27,6 +50,9 @@
       "required_by": "product-grid",
       "path": "pages/homepage/assets/product-card-01.png",
       "source": "image_gen",
+      "format": "png",
+      "inspection_status": "accepted",
+      "worker_mode": "parallel-worker",
       "alt_text": "Primary product package."
     },
     {

@@ -36,7 +36,50 @@
       "notes": "Interactive controls should remain usable in compact tables."
     }
   },
-  "references": [],
+  "references": [
+    {
+      "kind": "brand-board",
+      "path": "brand/brand-board-v1.png",
+      "role": "primary",
+      "notes": "Approved visual-system board."
+    },
+    {
+      "kind": "brand-proof",
+      "path": "brand/brand-proof.html",
+      "role": "primary",
+      "notes": "Browser-rendered proof of the approved brand primitives."
+    },
+    {
+      "kind": "brand-primitives",
+      "path": "brand/brand-primitives.css",
+      "role": "primary",
+      "notes": "Reusable primitive CSS consumed by components and pages."
+    }
+  ],
+  "brand_fingerprint": {
+    "must_preserve": [
+      "clean operational dashboard palette",
+      "Sora-like geometric headings",
+      "compact data-dense spacing",
+      "blue primary actions with teal accents",
+      "subtle bordered white surfaces"
+    ],
+    "forbidden": [
+      "marketing landing-page gradients",
+      "generic unstyled browser controls",
+      "new hard-coded component colors outside approved tokens",
+      "logo or wordmark generation"
+    ],
+    "notes": "Components and pages should compare against this fingerprint before approval."
+  },
+  "brand_proof": {
+    "html_path": "brand/brand-proof.html",
+    "css_path": "brand/brand-primitives.css",
+    "screenshot_path": "brand/brand-proof.png",
+    "review_path": "brand/brand-proof-review.md",
+    "status": "reviewed",
+    "notes": "Proof imports tokens.css and demonstrates primitives before component/page work."
+  },
   "tokens": {
     "color": {
       "palette": {

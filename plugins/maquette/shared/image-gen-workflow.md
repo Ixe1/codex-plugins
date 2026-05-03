@@ -9,10 +9,10 @@ This plugin is designed around a strict separation of roles:
 
 Maquette has multiple workflow modes:
 
-- Greenfield Website Mode: direction concept -> direction inventory -> constrained brand kit -> critical-path components -> page implementation -> system backfill
-- Existing Brand Mode: reference inventory -> brand kit -> components -> page
-- One-Shot Fast Mode: direction concept -> compact tokens -> critical-path components only -> page -> system summary
-- Design System Mode: brand/page direction -> full brand kit -> full component library -> pages
+- Greenfield Website Mode: direction concept -> direction inventory -> constrained brand kit -> executable brand canon -> page concept -> parallel assets -> page thin slice -> just-in-time components -> page implementation -> system backfill
+- Existing Brand Mode: reference inventory -> brand kit -> executable brand canon -> just-in-time components/pages
+- One-Shot Fast Mode: direction concept -> compact brand canon -> page concept -> parallel assets -> thin slice -> page -> system summary
+- Design System Mode: brand/page direction -> full brand canon -> scoped component contracts -> browser component proofs -> component catalog -> pages
 
 When `image_gen` is available, use it for creative visual artifacts:
 
@@ -20,10 +20,13 @@ When `image_gen` is available, use it for creative visual artifacts:
    - for greenfield websites, generate or edit concrete page direction concepts before brand tokenization
 2. Brand kit
    - generate or edit a focused 1:1 brand board
-3. Components
-   - generate focused 1:1 visual component sheets only when the user explicitly asks for visual sheets or when creative clarification is useful
-   - do not generate CSS text as an image for implementation truth; create structured component contracts first and render deterministic posters from those contracts when useful
-4. Pages
+3. Brand canon
+   - after brand-board approval, create browser-rendered brand primitives and a brand proof before components or pages reinterpret the board
+4. Components
+   - do not generate visual component sheets by default
+   - create structured component contracts and browser component proofs for page-critical components
+   - visual component sheets are explicit-request presentation artifacts only; they are never implementation truth
+5. Pages
    - generate or edit a page concept
 
 Only after the required visual artifact and structured contract artifacts exist should the workflow proceed to code implementation.
@@ -32,9 +35,11 @@ For brand kits, token creation is not script-led extraction. The inspected brand
 
 In Existing Brand Mode, create `.maquette/brand/reference-inventory.md` before the brand board when existing websites, screenshots, code, or supplied brand assets are present. The board should preserve and normalize the existing identity, not invent a new one. Do not regenerate logos, wordmarks, marks, supplied icons, photography, product screenshots, or other brand assets; record them as supplied assets and consume them later only when explicitly needed for page implementation.
 
+Brand identity assets must not be hand-authored or code-generated SVG. Logos, wordmarks, monograms, mascots, emblems, lockups, and brand marks may only be supplied assets, including supplied SVGs, or generated raster assets from `image_gen`. Generic UI icons, interface glyphs, arrows, separators, and non-identity ornaments may be inline SVG. If a logo or wordmark is needed and no supplied asset exists, generate it as a raster image asset and record it in the asset manifest. If generation fails, record it as missing or failed; do not create a code-generated SVG fallback.
+
 ## Project output isolation
 
-Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes direction concepts, direction inventories, brand reference inventories, brand boards, design-system JSON, CSS tokens, structured component contracts, deterministic contract posters, component sheets, sheet inventories, componentized references, component CSS/JS, component catalogs, page concepts, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
+Maquette-owned artifacts must be written under `.maquette/` in the current project. This includes direction concepts, direction inventories, brand reference inventories, brand boards, design-system JSON, CSS tokens, brand primitive CSS, brand-proof HTML/screenshots/reviews, structured component contracts, deterministic contract posters, explicit component sheets, component inventories, componentized references, component CSS/JS, component catalogs, page concepts, page HTML/CSS/JS, generated raster assets, manifests, review notes, Playwright screenshots, and responsive audit JSON.
 
 Do not create, overwrite, or rely on `index.html` in the project root for Maquette output. If the user later wants to integrate a Maquette page into the real app or root site entrypoint, treat that as a separate explicit integration task.
 
@@ -50,34 +55,21 @@ After inspection, continue the same turn unless the user explicitly asked for im
 
 ## Image Generation Delegation
 
-Subagent delegation must follow the current Codex runtime policy. If that policy requires explicit user authorization before spawning subagents, Maquette must not silently skip the image-worker path. Absence of prior subagent authorization is a reason to ask the user, not a reason to generate images in the main workflow.
+When image-worker subagent tooling is available, Maquette must use it automatically. Do not ask the user whether to use image workers.
 
-Before the first Maquette `image_gen` create or edit call in a run, resolve the image-worker decision:
+For multiple independent generated images, spawn one dedicated image-worker subagent per image asset, or per tightly related independent batch. Run independent workers in parallel. Use staged waves only when assets depend on earlier generated assets, such as product scenes that need an accepted logo or packaging image first.
 
-- If the user already explicitly asked for subagents or image-worker subagents in the current Maquette request, treat that as authorization for this run and do not ask again.
-- If the user explicitly declined subagents/image workers, explicitly asked to avoid questions, or explicitly requested an unattended/no-pauses/skip-approval run, do not ask the image-worker question; use the main workflow and record the reason.
-- Otherwise, ask once near the start of the run whether to use dedicated image-worker subagents for Maquette image generation and editing.
-
-Workflow violation: do not make or edit any Maquette image in the main workflow merely because subagents were not previously authorized. The decision must be authorized, declined, explicitly bypassed by unattended language, or blocked by unavailable tooling before the first image generation/editing step starts. A request to use `Image Gen` or to generate image assets is not, by itself, image-worker authorization; ask the preflight question unless the request also authorizes subagents.
-
-Use the Codex user-input/question tool when available. Provide choices equivalent to:
-- `Use image workers` as the recommended choice
-- `Use main workflow`
-
-If the user chooses image workers, that is explicit authorization for Maquette image-generation and image-edit subtasks in the current run. If the user chooses the main workflow, or if subagents are unavailable after authorization, generate and edit images in the main workflow and record that image-worker handoff was not used.
-
-When authorized and available, Maquette image creation and image editing should run inside a dedicated image worker subagent rather than the main workflow agent.
-
-Use this handoff pattern:
-- start a bounded image worker with the specific Maquette artifact type, product brief, approved references, prompt asset, output naming convention, and target project path
-- instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the expected `.maquette/` artifact path, and return the exact source path and project-local path
+Use this handoff pattern for each worker:
+- assign a unique target path before spawning the worker
+- give the worker the artifact type, product brief, approved brand fingerprint, forbidden drift list, approved references, prompt asset, output naming convention, and target project path
+- instruct the worker to run `image_gen`, locate the saved image on disk, copy or preserve it under the assigned `.maquette/` artifact path, and return the exact source path and project-local path
 - capture the worker start time and worker/subagent id when available; if the worker cannot directly report a saved path, use those details to locate the matching file in the Codex generated-images directory by timestamp and filename metadata
-- after the worker returns, the main workflow agent must display or inspect the returned project-local image with `view_image`
-- the main workflow agent, not the worker, performs approval gating, token/spec extraction, coding, and QA
-- if the worker cannot locate a saved file path, the main workflow agent may locate the latest generated image from the Codex generated-images directory and copy it into the expected `.maquette/` path, but must record that path recovery was manual
-- if subagents are unavailable after asking, explicitly declined, or explicitly bypassed by unattended/no-question language, perform image generation in the main workflow and record the exact reason the image-worker path was not used
 
-Do not delegate approval decisions to the image worker. The worker creates or edits the visual artifact and reports paths; the main workflow inspects, asks any required approval question, and decides the next phase.
+The main workflow must wait for every worker in the current wave, close workers that are no longer needed, inspect every returned project-local image with `view_image`, and then accept, reject, retry, or record fallback for each asset. Worker outputs are candidates, not final assets, until the main workflow has inspected them and updated the relevant manifest or review note.
+
+If an image worker fails, record the failure in the relevant manifest or review file and retry when appropriate. If subagent tooling is unavailable, generate the image in the main workflow and record `fallback_source: main_workflow` or equivalent notes. If image generation fails completely, use an explicit placeholder only when the workflow allows placeholders; mark the asset unresolved and do not present it as final. For logo, wordmark, or brand-mark failures, do not create a code-generated SVG fallback.
+
+Do not delegate approval decisions to image workers. Workers create or edit visual artifacts and report paths; the main workflow inspects, asks any required approval question, and decides the next phase.
 
 ## User Approval Gates
 
@@ -95,7 +87,7 @@ Use the Codex user-input/question tool when available. Provide choices equivalen
 
 If the user approves, continue the workflow from the inspected image. If the user asks for a new image, regenerate before deriving downstream artifacts. If the user gives free-form revision notes, use those notes as the edit brief, inspect the revised image, and ask again with the same two approval choices. In a one-shot Maquette workflow, do not treat direction concepts, brand boards, or page concepts as approved merely because the run is provisional; the approval question is still required unless the user explicitly asked for an unattended run.
 
-An unattended run requires explicit language such as `unattended`, `do not ask questions`, `no pauses`, `skip approval questions`, or `make all decisions yourself`. Do not infer unattended mode from phrases such as `one pass`, `full workflow`, `final homepage`, `fresh disposable test`, `run a Maquette test`, or `complete it end to end`; those still require the image-worker authorization question and the brand-board/page-concept approval gates.
+An unattended run requires explicit language such as `unattended`, `do not ask questions`, `no pauses`, `skip approval questions`, or `make all decisions yourself`. Do not infer unattended mode from phrases such as `one pass`, `full workflow`, `final homepage`, `fresh disposable test`, `run a Maquette test`, or `complete it end to end`; those still use automatic image workers when available and still require the brand-board/page-concept approval gates unless the user explicitly skipped approval questions.
 
 ## Inspectability gates
 
@@ -106,7 +98,7 @@ Generated direction concepts, boards, and sheets are approval artifacts only whe
 - Brand boards must specify font direction and fallback strategy, but must not show detailed component inventories or button/input/card variant specs.
 - Brand boards must not contain logo-like marks, brand-name mastheads, large product-name treatments, monograms, seals, badges, app icons, emblems, or trademark-like elements.
 - Structured component contracts are the default implementation contracts for selectors, states, slots, dimensions, accessibility hooks, and token intent. Deterministic posters rendered from those contracts should be readable, but they must not replace the JSON contract as source of truth.
-- Visual component sheets are optional fallback or explicit-request artifacts. They must use 1:1 square composition and be split into focused 1:1 sheets when a single sheet would become cluttered or uninspectable.
+- Visual component sheets are optional explicit-request presentation artifacts. They must use 1:1 square composition and be split into focused 1:1 sheets when a single sheet would become cluttered or uninspectable.
 - Component sheets should be categorized when needed: core primitives, navigation/layout, data/display, and cards/composites. The core primitives sheet comes first; focused follow-up sheets are preferred over crowded mega-sheets.
 - Multi-contract or multi-sheet component work must be sequential: author/review the structured contract, optionally inspect a visual sheet, build a componentized reference, review, and document reusable component APIs from the current artifact before creating the next artifact. The current artifact must produce concrete category-prefixed batch artifacts under `.maquette/components/` before the next artifact is created, with structured contracts under `.maquette/components/contracts/`, CSS under `.maquette/components/css/`, and JS under `.maquette/components/js/`; retrospective logs after all artifacts are generated are not sufficient.
 - Each component contract or visual-sheet batch must complete screenshot review or documented manual visual review against the contract and any visual sheet before the next artifact is created.
@@ -121,6 +113,8 @@ Generated direction concepts, boards, and sheets are approval artifacts only whe
 ## Fidelity gates
 
 In Greenfield Website Mode, create `.maquette/direction/direction-inventory.json` after direction approval and before the brand kit. Treat it as the bridge from exploratory image to reusable system: record visual direction, hierarchy, component needs, asset needs, responsive implications, accessibility risks, ambiguities, and page-local candidates.
+
+After brand-board approval, create an executable brand canon before components or pages are accepted: `.maquette/brand/design-system.json`, `.maquette/brand/tokens.css`, `.maquette/brand/brand-primitives.css`, `.maquette/brand/brand-proof.html`, and `.maquette/brand/brand-proof-review.md`. Capture a brand-proof screenshot when browser tooling is available. Components and pages must import the canonical token and primitive CSS, then preserve the approved brand fingerprint instead of reinterpreting the brand board from scratch.
 
 Before page implementation, create a concept-region inventory, page layout contract, and generated asset manifest. Visible concept regions default to implementation, not omission. Any region or asset that is simplified, omitted, implemented differently, blocked on assets, or blocked on component coverage must be documented with a concrete reason before coding proceeds.
 

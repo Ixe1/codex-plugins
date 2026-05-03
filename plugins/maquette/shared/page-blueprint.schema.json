@@ -63,6 +63,8 @@
             "type": "string",
             "enum": [
               "brand-board",
+              "brand-proof",
+              "brand-primitives",
               "direction-inventory",
               "component-contract",
               "component-contract-poster",

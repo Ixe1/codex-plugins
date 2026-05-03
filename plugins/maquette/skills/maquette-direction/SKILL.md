@@ -9,7 +9,7 @@ Use this skill when the user asks for a new website, landing page, homepage, cam
 
 ## Scope
 
-This phase explores concrete page direction before Maquette commits to a brand board or component library.
+This phase explores concrete page direction before Maquette commits to a brand board, brand canon, or component scope.
 
 All Maquette-owned outputs must live under `.maquette/`. Write direction artifacts under `.maquette/direction/`.
 
@@ -35,9 +35,9 @@ The inventory JSON must validate against `shared/direction-inventory.schema.json
 
 If `image_gen` is available, use it for the creative direction pass unless the user explicitly asks not to use image generation.
 
-Follow `shared/image-gen-workflow.md` for image-worker authorization, generated image inspection, same-turn continuation, and transparent PNG verification when relevant.
+Follow `shared/image-gen-workflow.md` for automatic image-worker delegation, generated image inspection, same-turn continuation, and transparent PNG verification when relevant.
 
-When image-worker subagents are explicitly authorized for the current run, run direction concept generation or editing in a dedicated image worker subagent. The main workflow must inspect the returned project-local image path before using it.
+When image-worker subagents are available, run direction concept generation or editing in dedicated image-worker subagents automatically. For multiple direction concepts, spawn one worker per concept and run them in parallel. The main workflow must inspect every returned project-local image path before using it.
 
 ## Workflow
 
@@ -69,4 +69,4 @@ When image-worker subagents are explicitly authorized for the current run, run d
 
 After this phase, the brand-kit phase should generate a brand board constrained by the selected direction. The brand board must preserve the approved direction's visual intent while normalizing it into reusable palette, type, spacing, radius, surface, state, and accessibility rules.
 
-The component phase should use the direction inventory to choose critical-path component families before expanding the broader library.
+The component/page phases should use the direction inventory to choose page-critical component families for just-in-time contracts and browser proofs. Expand a broader component library only in explicit Design System Mode or as post-page backfill.

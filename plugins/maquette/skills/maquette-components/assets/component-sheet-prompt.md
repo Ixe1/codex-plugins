@@ -1,4 +1,6 @@
-Edit the visible approved brand board into a focused website component-sheet image.
+Use this prompt only when the user explicitly requested a visual component-sheet presentation artifact. Do not use component sheets in the default Maquette workflow.
+
+Edit the visible approved brand board and brand proof into a focused website component-sheet image.
 
 Use a 1:1 square composition for every component sheet. Exact generated pixel dimensions are not controllable; prioritize a clearly square board with no cropping, letterboxing, or extra content outside the board.
 
@@ -36,8 +38,8 @@ Adaptive sheet rules:
 - do not hardcode an exact number of components; each sheet must remain readable and useful at normal preview size
 
 Quality requirements:
-- component sheets define component styling; they should not contradict the approved brand board, and any unavoidable contradiction must be noted for `approved.md`
-- component sheets are componentized reference targets, not mood references; the later coded reference should reproduce the visible component families, anatomy, variants, states, density, spacing, radius, shadows, and polish using reusable CSS/JS from the start
+- component sheets do not define implementation truth; they should not contradict the approved brand board, brand proof, design-system JSON, token CSS, or brand primitive CSS, and any unavoidable contradiction must be noted for `approved.md`
+- component sheets are optional presentation targets, not source of truth; the later coded reference should preserve the approved brand canon while reproducing the visible component families, anatomy, variants, states, density, spacing, radius, shadows, and polish using reusable CSS/JS from the start
 - foreground/background contrast must remain readable in active, selected, focus, disabled, inverse, and dark navigation states
 - the later coded componentized reference and reusable component API must be able to match this sheet's sophistication; do not show component details, density, states, or composites that are too ambiguous to implement
 - icon-only controls must have readable icon/background contrast in default, hover, active, selected, disabled, and inverse states

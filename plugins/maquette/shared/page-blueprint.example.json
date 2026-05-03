@@ -13,6 +13,14 @@
       "path": "brand/brand-board-v1.png"
     },
     {
+      "kind": "brand-proof",
+      "path": "brand/brand-proof.html"
+    },
+    {
+      "kind": "brand-primitives",
+      "path": "brand/brand-primitives.css"
+    },
+    {
       "kind": "direction-inventory",
       "path": "direction/direction-inventory.json"
     },

@@ -28,6 +28,60 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "brand-identity",
+                    "logo",
+                    "wordmark",
+                    "brand-mark"
+                  ]
+                },
+                "source": {
+                  "const": "code-generated"
+                }
+              },
+              "required": [
+                "kind",
+                "source"
+              ]
+            },
+            "then": false
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "brand-identity",
+                    "logo",
+                    "wordmark",
+                    "brand-mark"
+                  ]
+                },
+                "source": {
+                  "const": "image_gen"
+                }
+              },
+              "required": [
+                "kind",
+                "source"
+              ]
+            },
+            "then": {
+              "properties": {
+                "path": {
+                  "not": {
+                    "pattern": "\\.svg$"
+                  }
+                }
+              }
+            }
+          }
+        ],
         "required": [
           "id",
           "kind",
@@ -42,7 +96,10 @@
           "kind": {
             "type": "string",
             "enum": [
+              "brand-identity",
               "logo",
+              "wordmark",
+              "brand-mark",
               "hero-image",
               "product-card-image",
               "promo-image",
@@ -51,6 +108,8 @@
               "app-device-image",
               "background-texture",
               "decorative-raster",
+              "decorative-svg",
+              "ui-icon",
               "concept-screenshot",
               "page-screenshot",
               "other"
@@ -81,6 +140,61 @@
               "code-generated",
               "not-applicable"
             ]
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "png",
+              "jpg",
+              "jpeg",
+              "webp",
+              "svg",
+              "gif",
+              "other"
+            ]
+          },
+          "identity_asset": {
+            "type": "boolean"
+          },
+          "inspection_status": {
+            "type": "string",
+            "enum": [
+              "uninspected",
+              "inspected",
+              "accepted",
+              "rejected",
+              "not-applicable"
+            ]
+          },
+          "worker_mode": {
+            "type": "string",
+            "enum": [
+              "parallel-worker",
+              "worker-batch",
+              "main-workflow",
+              "not-applicable"
+            ]
+          },
+          "fallback_source": {
+            "type": "string"
+          },
+          "dimensions": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "width",
+              "height"
+            ],
+            "properties": {
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
           },
           "alt_text": {
             "type": "string"

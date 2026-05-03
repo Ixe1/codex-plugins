@@ -90,6 +90,15 @@
         "tokens_css_path": {
           "type": "string"
         },
+        "brand_primitives_css_path": {
+          "type": "string"
+        },
+        "brand_proof_html_path": {
+          "type": "string"
+        },
+        "brand_proof_review_path": {
+          "type": "string"
+        },
         "sheet_inventory_path": {
           "type": "string"
         },

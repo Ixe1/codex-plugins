@@ -13,6 +13,9 @@
   },
   "assets": {
     "tokens_css_path": "brand/tokens.css",
+    "brand_primitives_css_path": "brand/brand-primitives.css",
+    "brand_proof_html_path": "brand/brand-proof.html",
+    "brand_proof_review_path": "brand/brand-proof-review.md",
     "sheet_inventory_path": "components/sheet-inventory.md",
     "sheet_implementation_log_path": "components/sheet-implementation-log.md",
     "sheet_implementation_batches": [
@@ -246,6 +249,7 @@
       "visual_review": {
         "reference_image_paths": [
           "brand/brand-board-v1.png",
+          "brand/brand-proof.html",
           "components/contracts/core-primitives.contract.svg"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
@@ -307,7 +311,8 @@
       ],
       "visual_review": {
         "reference_image_paths": [
-          "brand/brand-board-v1.png"
+          "brand/brand-board-v1.png",
+          "brand/brand-proof.html"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",
         "similarity_notes": "Field border and focus ring align with approved design language."
@@ -369,6 +374,7 @@
       ],
       "visual_review": {
         "reference_image_paths": [
+          "brand/brand-proof.html",
           "components/contracts/core-primitives.contract.svg"
         ],
         "latest_screenshot_path": "components/screenshots/responsive-nav-open-390.png",
@@ -434,6 +440,7 @@
       },
       "visual_review": {
         "reference_image_paths": [
+          "brand/brand-proof.html",
           "components/contracts/core-primitives.contract.svg"
         ],
         "latest_screenshot_path": "components/replica-gallery.png",

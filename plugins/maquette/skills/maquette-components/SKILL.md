@@ -1,6 +1,6 @@
 ---
 name: maquette-components
-description: "Build a reusable website component library from an approved brand token set. This skill is contract-first: create structured component contracts by default, optionally render deterministic posters or visual sheets, then implement componentized replicas that are reusable HTML/CSS/JS from the start."
+description: "Build reusable website components from an approved brand canon. This skill is contract-first: create structured component contracts and browser proofs by default, with visual sheets only when explicitly requested."
 ---
 
 You are responsible for the **website component-library phase**.
@@ -13,6 +13,8 @@ Do not start this phase until a brand system exists at:
 
 - `.maquette/brand/design-system.json`
 - `.maquette/brand/tokens.css`
+- `.maquette/brand/brand-primitives.css`
+- `.maquette/brand/brand-proof.html`
 
 Also require a generated and inspected brand board image, such as `.maquette/brand/brand-board-vN.png`, unless the user explicitly asks to skip image generation or the environment does not provide `image_gen`.
 
@@ -32,18 +34,17 @@ Default contract workflow:
 - build the componentized replica/reference from the structured contract and approved tokens
 - treat browser screenshots as the primary visual validation artifact
 
-Use `image_gen` in this phase only when creative clarification is needed:
-- create or edit a focused 1:1 visual component sheet when the user explicitly asks for visual sheets
-- create or edit a focused visual component sheet when the structured contract lacks enough visual personality for expressive components such as navigation, cards, pricing, testimonials, rich footers, hero-supporting modules, or product composites
+Use `image_gen` in this phase only when the user explicitly asks for visual component sheets as a presentation artifact:
+- create or edit a focused 1:1 visual component sheet only when explicitly requested
 - inspect every generated visual sheet with `view_image` before deriving any component decisions from it
 
-If a visual component sheet and structured contract conflict, the approved design-system tokens and structured contract win for implementation details. The visual sheet informs feel, density, polish, and anatomy; it does not override token names, CSS values, accessibility requirements, or component APIs.
+If a visual component sheet and structured contract conflict, the approved brand canon and structured contract win for implementation details. The visual sheet can inform presentation notes; it does not override design-system JSON, token CSS, brand primitive CSS, accessibility requirements, or component APIs.
 
 When a page or site has global navigation, responsive navigation primitives are required component coverage, not a page-only afterthought.
 
-The structured component contract is the default source of truth for selectors, states, sizing, spacing, token intent, accessibility hooks, and component anatomy. If it conflicts with the brand board, preserve the brand foundation where possible, but the current component contract wins for component anatomy, variants, state styling, density, spacing, radius, shadows, and polish; record the inconsistency and resolution in `.maquette/components/approved.md`.
+The structured component contract is the default source of truth for selectors, states, sizing, spacing, token intent, accessibility hooks, and component anatomy. If it conflicts with the brand canon, the brand canon wins for primitive color, typography, spacing, radius, shadow, surface, and state language unless the design-system JSON and brand proof are intentionally updated first. Record any inconsistency and resolution in `.maquette/components/approved.md`.
 
-The deterministic poster is not a creative visual design target. Use it to review contract readability and selector coverage, then rely on rendered browser screenshots and the component fidelity rubric to correct visual quality. If the structured contract is generic or too broad, tighten the selector allowlist or split the family before implementation. Generate a visual component sheet only when the user explicitly asks for visual component sheets or when creative clarification is useful.
+The deterministic poster is not a creative visual design target. Use it to review contract readability and selector coverage, then rely on rendered browser screenshots and the component fidelity rubric to correct visual quality. If the structured contract is generic or too broad, tighten the selector allowlist or split the family before implementation. Do not generate a visual component sheet unless the user explicitly asks for one.
 
 The component-library phase has one implementation target:
 - **Componentized replica/reference**: `.maquette/components/replica-gallery.html`, `.maquette/components/css/components.css`, `.maquette/components/js/components.js`, and `.maquette/components/component-catalog.json` match the approved structured component contracts and any visual component sheets while exposing reusable components, variants, states, slots, and usage examples for the pages phase.
@@ -55,7 +56,7 @@ If a local board or sheet image must be edited, first make it visible in the con
 After every `image_gen` create or edit step, inspect the generated image with `view_image` before treating it as the design source. Do not derive component specifications or implementation details from the prompt alone. If the generated file cannot be inspected, state that limitation and treat the image as unverified.
 Reject, regenerate, or split a sheet before implementation if it is not readable and useful at normal preview size.
 
-When image-worker subagents are explicitly authorized for the current run and a visual component sheet is needed, run component visual-sheet generation and image editing in a dedicated image worker subagent. If the image-worker decision is unresolved, follow the preflight authorization question in `shared/image-gen-workflow.md`; do not silently skip the image-worker path. The worker should return the exact saved image path and the project-local `.maquette/components/component-sheet-*-vN.png` path. The main workflow must inspect the returned image with `view_image`, inventory it, reconcile it with the structured contract, and perform implementation and QA. Generate in the main workflow only when image workers are explicitly declined, unavailable after asking, or explicitly bypassed by unattended/no-question language; record the exact reason.
+When image-worker subagents are available and the user explicitly requested a visual component sheet, run visual-sheet generation and image editing in a dedicated image worker subagent automatically. Do not ask whether to use image workers. The worker should return the exact saved image path and the project-local `.maquette/components/component-sheet-*-vN.png` path. The main workflow must inspect the returned image with `view_image`, inventory it, reconcile it with the structured contract, and perform implementation and QA.
 
 ## Required outputs
 
@@ -85,8 +86,8 @@ Keep structured contracts and deterministic posters under `.maquette/components/
 When possible, also create:
 
 - `.maquette/components/replica-gallery.png`
-- `.maquette/components/component-sheet-vN.png`
-- additional focused sheet images such as `.maquette/components/component-sheet-data-vN.png`, `.maquette/components/component-sheet-forms-vN.png`, or `.maquette/components/component-sheet-composites-vN.png` when needed
+- `.maquette/components/component-sheet-vN.png` only when the user explicitly requested visual component sheets
+- additional focused sheet images such as `.maquette/components/component-sheet-data-vN.png`, `.maquette/components/component-sheet-forms-vN.png`, or `.maquette/components/component-sheet-composites-vN.png` only when explicitly requested
 - deterministic contract posters such as `.maquette/components/contracts/forms.contract.svg`
 
 The catalog JSON must validate against `shared/component-catalog.schema.json`.
@@ -94,6 +95,8 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 ## Workflow
 
 1. Read `.maquette/brand/design-system.json` and `.maquette/brand/tokens.css`.
+   - Read `.maquette/brand/brand-primitives.css`, `.maquette/brand/brand-proof.html`, and `.maquette/brand/brand-proof-review.md` before creating contracts.
+   - Treat the brand proof as the browser-rendered authority for primitive styling. Contracts and component CSS must preserve its palette, typography hierarchy, button geometry, spacing, radius, shadow, surface, and state language.
 2. Run the optional QA tooling check before creating component contracts, visual component sheets, deterministic posters, or component code.
    - Use `shared/scripts/ensure-qa-tooling.mjs --project . --check-browser --check-image-prep` when the script is available and generated raster references are likely to benefit from same-size sharpening before transcription or QA.
    - If `sharp` is available, Maquette may preprocess Maquette reference images with `shared/scripts/sharpen-reference-image.mjs` to create a separate `*-sharpened.png` derivative before visual transcription or screenshot comparison. Keep the raw reference as ground truth and do not overwrite, upscale, or resize it.
@@ -112,11 +115,11 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Add cards/composites for reusable composites, repeated cards, product cards, pricing/service cards, newsletter modules, rich footers, or footer/social modules.
    - In the default workflow, every structured contract must be focused by component family or pattern.
    - For every contract, define a strict selector allowlist before authoring it. Keep one complex family per contract. Combine at most two tightly related simple families when the contract will remain readable, such as buttons plus icon buttons or checkbox plus radio. Do not combine forms, actions, navigation, data tables, and cards into one contract.
-   - If the user explicitly asks for visual component sheets, every visual sheet must be 1:1 and focused by component family or pattern.
+   - If the user explicitly asks for visual component sheets, every visual sheet must be 1:1 and focused by component family or pattern. Otherwise, do not generate component sheets.
 4. Process each contract or visual-sheet batch sequentially. Do not create all planned component artifacts before implementation.
    - Create exactly one focused structured contract for the current batch using the approved brand board, design-system tokens, direction inventory when present, and selector allowlist.
    - Default workflow: write `.maquette/components/contracts/<batch-slug>.contract.json` and optionally render `.maquette/components/contracts/<batch-slug>.contract.svg` with `shared/scripts/render-component-contract-poster.mjs`.
-   - Visual fallback or explicit visual-sheet workflow: generate a focused 1:1 visual component sheet using `assets/component-sheet-prompt.md`.
+   - Explicit visual-sheet workflow only: generate a focused 1:1 visual component sheet using `assets/component-sheet-prompt.md`.
    - It is a workflow violation to create the navigation/layout, data/display, cards/composites, or follow-up artifact before the current contract or sheet has completed batch evidence.
    - Inspect generated visual sheets with `view_image` before deriving any decisions from them. Deterministic posters may be inspected as rendered SVGs or browser artifacts, but the JSON contract is authoritative.
    - Update `.maquette/components/sheet-inventory.md` for that batch with component families, variants, states, larger patterns, unclear areas, missing coverage, required raster asset types, visual sheet usage if any, and the decision to implement, revise the contract, create a visual sheet, or create another focused contract.
@@ -127,10 +130,10 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Maintain `.maquette/components/replica-gallery.html` as the combined component reference.
    - For multi-artifact runs, first create `.maquette/components/<batch-slug>.replica.html` for the current contract or sheet, with CSS in `.maquette/components/css/<batch-slug>.components.css` and JS in `.maquette/components/js/<batch-slug>.components.js` when behavior is needed. The combined `replica-gallery.html` can be assembled or updated after the batch replica exists.
    - In the default workflow, the replica should make the structured contract visually reviewable in the browser while using reusable component classes, slots, state attributes, and minimal JS hooks from the start.
-   - The replica should implement the structured contract's selector contract, states, slots, dimensions, and token intent, then use the rendered browser screenshot as the visual correction target. Do not copy raw visual-sheet colors or font stacks when matching approved tokens exist.
+   - The replica should implement the structured contract's selector contract, states, slots, dimensions, and token intent, then use the rendered browser screenshot as the visual correction target. Import `../brand/tokens.css` and `../brand/brand-primitives.css` in combined proofs and the correct relative equivalents in batch proofs. Do not recreate primitive button, card, input, chip, badge, panel, inverse-surface, or focus styling page-locally when the brand canon defines it.
    - If the batch uses an explicit visual component sheet, the replica should match the current sheet's visual arrangement closely enough to evaluate fidelity while using reusable component classes, slots, state attributes, and minimal JS hooks from the start.
    - Page implementations should consume the component catalog, CSS, JS, and usage examples extracted from this componentized reference. They should not copy the reference page layout.
-   - Batch replica HTML should link brand tokens directly from `../brand/tokens.css`, batch CSS from `css/<batch-slug>.components.css`, and batch JS from `js/<batch-slug>.components.js`. Prefer HTML stylesheet links over CSS `@import` so local file paths stay shallow and inspectable.
+   - Batch replica HTML should link brand tokens directly from `../brand/tokens.css`, brand primitives from `../brand/brand-primitives.css`, batch CSS from `css/<batch-slug>.components.css`, and batch JS from `js/<batch-slug>.components.js`. Prefer HTML stylesheet links over CSS `@import` so local file paths stay shallow and inspectable.
 6. If screenshot tooling is available, capture the current componentized replica/reference evidence. Use Maquette's bundled scripts when possible, especially `shared/scripts/ensure-qa-tooling.mjs`, `shared/scripts/capture-browser.mjs`, `skills/maquette-components/scripts/capture-gallery.mjs`, and `shared/scripts/audit-responsive-layout.mjs`; document manual review mode when unavailable.
    - Keep Playwright/Chromium screenshot capture headless.
    - Ensure every browser/session opened for screenshot capture is closed before finishing.
@@ -175,8 +178,8 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - Mark the batch as `completed_before_next_sheet: true` in the final catalog only if these batch artifacts and screenshot/manual review evidence existed before the next component contract or sheet was created.
    - Only then continue to the next planned contract or sheet batch.
 9. Keep component primitives and larger patterns conceptually separate:
-   - component sheet: reusable primitives and core states
-   - additional focused sheets: dense data patterns and reusable larger composites
+   - brand proof: reusable primitives and core states
+   - additional focused contracts: dense data patterns and reusable larger composites
    - page concept: page-level composition
 10. Use semantic HTML and CSS custom properties.
 11. Keep JS minimal and only add it where interactivity requires it.
@@ -191,7 +194,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
    - If cleanup fails, record the failed cleanup command or operation in the final response.
    - Capture desktop, tablet, and mobile reference screenshots when possible; at minimum use representative widths 390, 768, and 1440 when browser tooling is available.
 14. Run the required component QA pass:
-   - Fail and fix if the implementation omits contract selectors, states, slots, dimensions, accessibility hooks, or token intent, or if the screenshot is visually too generic for the approved brand. If the batch uses an explicit visual component sheet, also fail and fix when the reference is significantly simpler, sparser, less polished, or less sophisticated than that sheet.
+   - Fail and fix if the implementation omits contract selectors, states, slots, dimensions, accessibility hooks, or token intent, if it does not import the brand token and primitive CSS, or if the screenshot is visually too generic for the approved brand proof. If the batch uses an explicit visual component sheet, also fail and fix when the reference is significantly simpler, sparser, less polished, or less sophisticated than that sheet.
    - Fail and fix the componentized reference if it lacks reusable component APIs, slots, states, accessibility hooks, or realistic usage examples.
    - Check structured contract and visual sheet coverage: every contracted component family, important variant, major state, repeated-card anatomy pattern, responsive navigation state, product-card pattern, newsletter module, and footer/social module should appear in the componentized reference or be documented as intentionally deferred with a reason.
    - Check icon and icon-button contrast in every visible state, especially active, selected, disabled, inverse, and dark-background states.
@@ -235,6 +238,7 @@ The catalog JSON must validate against `shared/component-catalog.schema.json`.
 
 - Follow the approved brand system exactly.
 - Do not invent a new visual language.
+- Treat `.maquette/brand/brand-primitives.css` and `.maquette/brand/brand-proof.html` as the implementation bridge from brand board to components.
 - Treat structured component contracts as the default implementation contracts.
 - Treat deterministic contract posters as review aids rendered from structured contracts, not creative visual design targets.
 - Treat explicit 1:1 visual component sheets as componentized reference targets, not loose inspiration.

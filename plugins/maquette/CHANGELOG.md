@@ -10,6 +10,26 @@ Entries before this changelog was introduced were backfilled from git history an
 
 No notable changes yet.
 
+## 0.5.0 - 2026-05-03
+
+### Added
+
+- Added an executable brand-canon step after brand-board approval, including `brand-primitives.css`, `brand-proof.html`, brand-proof review guidance, schema support, and validation hooks.
+- Added brand fingerprint and brand proof metadata to the design-system schema/example.
+- Added page asset-manifest fields and schema rules for generated identity assets, inspection status, worker mode, dimensions, and format.
+
+### Changed
+
+- Changed Maquette's default flow to page-first after the brand canon, with just-in-time component contracts/proofs instead of a broad component library before the first page.
+- Changed image-worker guidance so Maquette automatically uses image-worker subagents when available and parallelizes independent image generations by worker wave.
+- Changed visual component sheets to explicit-request presentation artifacts only; structured contracts and browser proofs are the default fidelity gate.
+- Updated page, component, direction, brand-kit, README, plugin metadata, and agent prompts for the simplified brand-proof-first workflow.
+
+### Fixed
+
+- Added hard guidance and schema checks to prevent Maquette-authored logos, wordmarks, monograms, mascots, emblems, lockups, or brand marks from being created as code-generated SVGs.
+- Added brand-drift gates requiring components and pages to preserve the executable brand canon and inspect every image-worker output before use.
+
 ## 0.4.0 - 2026-05-03
 
 ### Added

@@ -79,6 +79,22 @@ const checks = [
   },
 ];
 
+const pageAssetManifestSchemaPath = path.join(schemaRoot, "page-asset-manifest.schema.json");
+const pagesRoot = path.join(projectRoot, ".maquette/pages");
+if (fs.existsSync(pageAssetManifestSchemaPath) && fs.existsSync(pagesRoot)) {
+  for (const pageDirent of fs.readdirSync(pagesRoot, { withFileTypes: true })) {
+    if (!pageDirent.isDirectory()) continue;
+    const manifestPath = path.join(pagesRoot, pageDirent.name, "asset-manifest.json");
+    if (!fs.existsSync(manifestPath)) continue;
+    checks.push({
+      name: `page-asset-manifest:${pageDirent.name}`,
+      schemaPath: pageAssetManifestSchemaPath,
+      dataPath: manifestPath,
+      optional: true,
+    });
+  }
+}
+
 function asArray(value) {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
@@ -96,6 +112,9 @@ function collectComponentArtifactPaths(componentCatalog) {
   const assets = componentCatalog.assets ?? {};
   const paths = [
     assets.tokens_css_path,
+    assets.brand_primitives_css_path,
+    assets.brand_proof_html_path,
+    assets.brand_proof_review_path,
     assets.sheet_inventory_path,
     assets.sheet_implementation_log_path,
     assets.replica_gallery_html_path,
@@ -124,6 +143,17 @@ function collectComponentArtifactPaths(componentCatalog) {
     );
   }
 
+  return paths.filter(Boolean);
+}
+
+function collectDesignSystemArtifactPaths(designSystem) {
+  const proof = designSystem.brand_proof ?? {};
+  const paths = [
+    proof.html_path,
+    proof.css_path,
+    proof.screenshot_path,
+    proof.review_path,
+  ];
   return paths.filter(Boolean);
 }
 
@@ -162,19 +192,22 @@ const results = checks.map((check) => {
   const data = JSON.parse(fs.readFileSync(check.dataPath, "utf8"));
   const validate = ajv.compile(schema);
   const schemaPass = validate(data);
-  const artifactErrors = check.name === "component-catalog"
+  const artifactPaths = check.name === "component-catalog"
     ? collectComponentArtifactPaths(data)
-      .map((artifactPath) => ({
-        artifactPath,
-        resolvedPath: resolveArtifactPath(projectRoot, artifactPath),
-      }))
-      .filter((item) => !item.resolvedPath || !fs.existsSync(item.resolvedPath))
-      .map((item) => ({
-        instancePath: "/assets",
-        message: `Referenced artifact does not exist: ${item.artifactPath}`,
-        params: { artifactPath: item.artifactPath },
-      }))
-    : [];
+    : check.name === "design-system"
+      ? collectDesignSystemArtifactPaths(data)
+      : [];
+  const artifactErrors = artifactPaths
+    .map((artifactPath) => ({
+      artifactPath,
+      resolvedPath: resolveArtifactPath(projectRoot, artifactPath),
+    }))
+    .filter((item) => !item.resolvedPath || !fs.existsSync(item.resolvedPath))
+    .map((item) => ({
+      instancePath: check.name === "design-system" ? "/brand_proof" : "/assets",
+      message: `Referenced artifact does not exist: ${item.artifactPath}`,
+      params: { artifactPath: item.artifactPath },
+    }));
   const contractErrors = check.name === "component-catalog"
     ? collectComponentContractPaths(data).flatMap((contractPath) => {
       if (!validateComponentContract) return [];
