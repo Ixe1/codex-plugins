@@ -8,6 +8,10 @@ Entries before this changelog was introduced were backfilled from git history an
 
 ## Unreleased
 
+No notable changes yet.
+
+## 0.4.0 - 2026-05-03
+
 ### Added
 
 - Added Greenfield Website Mode with a new `maquette-direction` phase, direction concept prompt, direction inventory schema/example, and direction-aware workflow guidance.
